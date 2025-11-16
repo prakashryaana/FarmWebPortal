@@ -4,53 +4,30 @@
     <!-- Full name -->
     <div>
         <label for="full-name">Full Name</label>
-        <input
-            id="full-name"
-            type="text"
-            formControlName="fullName"
-            required
-        />
+        <input id="full-name" type="text" formControlName="fullName" required />
     </div>
 
     <!-- Primary contact number (exactly 10 digits) -->
     <div>
         <label for="contact-number">Contact Number</label>
-        <input
-            id="contact-number"
-            type="tel"
-            formControlName="contactNumber"
-            required
-        />
+        <input id="contact-number" type="tel" formControlName="contactNumber" required />
     </div>
 
     <!-- Alternate contact number (also 10 digits) -->
     <div>
         <label for="alternate-contact-number">Alternate Contact Number</label>
-        <input
-            id="alternate-contact-number"
-            formControlName="alternateContactNumber"
-            type="tel"
-        />
+        <input id="alternate-contact-number" formControlName="alternateContactNumber" type="tel" />
     </div>
 
     <div>
         <label for="address">Address</label>
-        <input
-            id="address"
-            type="text"
-            formControlName="address"
-            required
-        />
+        <input id="address" type="text" formControlName="address" required />
     </div>
 
     <!-- Government issued identity -->
     <div>
         <label for="govt-id-type">Government ID Type</label>
-        <select
-            id="govt-id-type"
-            formControlName="identityProofDocument"
-            required
-        >
+        <select id="govt-id-type" formControlName="identityProofDocument" required>
             <option value="" disabled selected>Select ID type</option>
             <option value="aadhaar">Aadhaar Card</option>
             <option value="pan">PAN Card</option>
@@ -63,12 +40,7 @@
 
     <div>
         <label for="govt-id-number">Government ID Number</label>
-        <input
-            id="govt-id-number"
-            formControlName="identityProofNumber"
-            type="text"
-            required
-        />
+        <input id="govt-id-number" formControlName="identityProofNumber" type="text" required />
     </div>
 
     <div style="margin-top:1rem">

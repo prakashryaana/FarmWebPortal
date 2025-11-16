@@ -1,10 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { FarmOwnerRegistration } from './farm-owner-registration/farm-owner-registration.component';
+import { FarmOwnerRegistrationComponent } from './farm-owner-registration/farm-owner-registration.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, FarmOwnerRegistration],
+  imports: [RouterOutlet, FarmOwnerRegistrationComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

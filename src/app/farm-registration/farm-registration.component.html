@@ -1,1 +1,31 @@
-<p>farm-registration works!</p>
+<form [formGroup]="farmRegistrationForm" (submit)="registerFarm()">
+    <h2>Farm Registration</h2>
+
+    <!-- Full name -->
+    <div>
+        <label for="farm-name">Farm Name</label>
+        <input id="farm-name" type="text" formControlName="farmName" required />
+    </div>
+
+    <div>
+        <label for="address">Address</label>
+        <input id="address" type="text" formControlName="address" required />
+    </div>
+
+    <div>
+        <label for="gps-location">GPS Location</label>
+        <input id="gps-location" type="text" formControlName="gpsLocation" />
+    </div>
+
+    <div>
+        <label for="size-in-sqr-mtrs">sizeInSqrMtrs</label>
+        <input id="size-in-sqr-mtrs" type="text" formControlName="sizeInSqrMtrs" required />
+    </div>
+
+
+
+    <div style="margin-top:1rem">
+        <button type="submit" [disabled]="farmRegistrationForm.invalid">Register</button>
+        <button type="button" (click)="farmRegistrationForm.reset()">Reset</button>
+    </div>
+</form>
