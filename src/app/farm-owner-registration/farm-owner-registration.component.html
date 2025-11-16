@@ -1,0 +1,78 @@
+<form [formGroup]="farmOwnerRegistrationForm" (submit)="registerFarmOwner()">
+    <h2>Farm Owner Registration</h2>
+
+    <!-- Full name -->
+    <div>
+        <label for="full-name">Full Name</label>
+        <input
+            id="full-name"
+            type="text"
+            formControlName="fullName"
+            required
+        />
+    </div>
+
+    <!-- Primary contact number (exactly 10 digits) -->
+    <div>
+        <label for="contact-number">Contact Number</label>
+        <input
+            id="contact-number"
+            type="tel"
+            formControlName="contactNumber"
+            required
+        />
+    </div>
+
+    <!-- Alternate contact number (also 10 digits) -->
+    <div>
+        <label for="alternate-contact-number">Alternate Contact Number</label>
+        <input
+            id="alternate-contact-number"
+            formControlName="alternateContactNumber"
+            type="tel"
+        />
+    </div>
+
+    <div>
+        <label for="address">Address</label>
+        <input
+            id="address"
+            type="text"
+            formControlName="address"
+            required
+        />
+    </div>
+
+    <!-- Government issued identity -->
+    <div>
+        <label for="govt-id-type">Government ID Type</label>
+        <select
+            id="govt-id-type"
+            formControlName="identityProofDocument"
+            required
+        >
+            <option value="" disabled selected>Select ID type</option>
+            <option value="aadhaar">Aadhaar Card</option>
+            <option value="pan">PAN Card</option>
+            <option value="voter">Voter ID</option>
+            <option value="passport">Passport</option>
+            <option value="driving">Driving License</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="govt-id-number">Government ID Number</label>
+        <input
+            id="govt-id-number"
+            formControlName="identityProofNumber"
+            type="text"
+            required
+        />
+    </div>
+
+    <div style="margin-top:1rem">
+        <button type="submit" [disabled]="farmOwnerRegistrationForm.invalid">Register</button>
+        <button type="button" (click)="farmOwnerRegistrationForm.reset()">Reset</button>
+    </div>
+</form>
