@@ -1,1 +1,56 @@
-<p>maintainer-registration works!</p>
+<h2>Maintainer Registration Under Development</h2>
+<!-- import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface FarmOwner {
+    id?: number;
+    name?: string;
+    email?: string;
+    phone?: string;
+    // add other fields as needed
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class FarmOwnerRegistrationService {
+    private baseUrl = 'https://localhost:7252';
+    private resource = '/api/farmowners'; // adjust endpoint path as needed
+
+    private httpOptions = {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json'
+        })
+    };
+
+    constructor(private http: HttpClient) {}
+
+    getAllOwners(): Observable<FarmOwner[]> {
+        return this.http.get<FarmOwner[]>(`${this.baseUrl}${this.resource}`);
+    }
+
+    getOwnerById(id: number | string): Observable<FarmOwner> {
+        return this.http.get<FarmOwner>(`${this.baseUrl}${this.resource}/${id}`);
+    }
+
+    createOwner(owner: FarmOwner): Observable<FarmOwner> {
+        return this.http.post<FarmOwner>(
+            `${this.baseUrl}${this.resource}`,
+            owner,
+            this.httpOptions
+        );
+    }
+
+    updateOwner(id: number | string, owner: FarmOwner): Observable<FarmOwner> {
+        return this.http.put<FarmOwner>(
+            `${this.baseUrl}${this.resource}/${id}`,
+            owner,
+            this.httpOptions
+        );
+    }
+
+    deleteOwner(id: number | string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}${this.resource}/${id}`);
+    }
+} -->
