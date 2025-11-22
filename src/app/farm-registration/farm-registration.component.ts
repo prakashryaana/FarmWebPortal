@@ -3,10 +3,11 @@ import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { Farm } from './farm';
 import { FarmRegistrationService } from './farm-registration.service';
+import { FileUploadComponent } from '../file-upload/file-upload.component';
 
 @Component({
   selector: 'app-farm-registration',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FileUploadComponent],
   templateUrl: './farm-registration.component.html',
   styleUrl: './farm-registration.component.css',
 })
@@ -66,9 +67,9 @@ export class FarmRegistrationComponent {
         }}
       );
     }
-    
+
     // Inject Router in constructor first, then use:
-    this.router.navigate(['maintainer-registration']);
+    //this.router.navigate(['/farm-owner-registration']);
   }
 
   onFileChange(event: any) {
@@ -76,4 +77,9 @@ export class FarmRegistrationComponent {
     console.log('Selected file:', file);
     // You can implement file upload logic here
   }
+
+  handleFileUploaded(data: any): void {
+        console.log('File uploaded successfully in other component!', data);
+        // Process the uploaded file data received from the file-upload component
+      }
 }

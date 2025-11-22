@@ -6,13 +6,13 @@ import { MaintainerRegistrationComponent } from './maintainer-registration/maint
 export const routes: Routes = [
     {
         path: '',
-        component: FarmOwnerRegistrationComponent,
-        title: 'Farm Owner Registration'
-    },
-    {
-        path: 'farm-registration',
         component: FarmRegistrationComponent,
         title: 'Farm Registration'
+    },
+    {
+        path: 'farm-owner-registration',
+        component: FarmOwnerRegistrationComponent,
+        title: 'Farm Owner Registration'
     },
     {
         path: 'maintainer-registration',

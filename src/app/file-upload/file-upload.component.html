@@ -1,0 +1,19 @@
+        <!-- file-upload.component.html -->
+    <div>
+      <input type="file" (change)="onFileSelected($event)">
+      <button (click)="uploadFile()" [disabled]="!selectedFile">Upload</button>
+
+      <div *ngIf="progress > 0 && progress < 100" class="progress">
+        <div class="progress-bar" [style.width.%]="progress">{{ progress }}%</div>
+      </div>
+
+      <div *ngIf="message" class="message">{{ message }}</div>
+    </div>
+    
+    <!-- <div>
+      <input type="file" (change)="onFileSelected($event)">
+      <button (click)="uploadFile()" [disabled]="!selectedFile">Upload</button>
+      <div *ngIf="uploadProgress > 0 && uploadProgress < 100">
+        Progress: {{ uploadProgress }}%
+      </div>
+    </div> -->

@@ -58,9 +58,14 @@
         <input id="additional-water-source" type="text" formControlName="additionalWaterSource"/>
     </div>
 
-    <div>
+    <!-- <div>
         <label for="water-test-certificate">Water Test Certificate</label>
         <input id="water-test-certificate" type="file" (change)="onFileChange($event)" />
+        <app-file-upload requiredFileType="image/png" formControlName="waterTestCertificateUrl"></app-file-upload>
+    </div> -->
+    <div>
+      <h2>Upload a document for this section:</h2>
+      <app-file-upload (fileUploaded)="handleFileUploaded($event)"></app-file-upload>
     </div>
 
     <div>

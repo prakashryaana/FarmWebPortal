@@ -51,8 +51,8 @@ export class FarmOwnerRegistrationComponent {
         }}
       );
     }
-    
+        
     // Inject Router in constructor first, then use:
-    this.router.navigate(['/farm-registration']);
+    this.router.navigate(['maintainer-registration']);
   }
 }
