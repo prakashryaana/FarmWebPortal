@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class FarmRegistrationService {
-  private apiUrl = `${environment.baseApiUrl}/api/`; // Update with your actual API endpoint
+  private apiUrl = `${environment.baseApiUrl}api`; // Update with your actual API endpoint
 
   constructor(private http: HttpClient) {}
 

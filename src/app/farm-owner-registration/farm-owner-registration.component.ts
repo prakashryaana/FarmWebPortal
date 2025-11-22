@@ -24,7 +24,7 @@ export class FarmOwnerRegistrationComponent {
     emailId: new FormControl('', [Validators.required, Validators.email]),
     identityProofDocument: new FormControl('', [Validators.required]),
     identityProofNumber: new FormControl('', [Validators.required])
-  })
+  });
 
   farmOwner: FarmOwner = {} as FarmOwner;
 
@@ -41,13 +41,14 @@ export class FarmOwnerRegistrationComponent {
         identityProofNumber: this.farmOwnerRegistrationForm.get('identityProofNumber')?.value
       };
       console.log(this.farmOwner);
-      this.farmOwnerRegistrationService.registerFarmOwner(this.farmOwner).subscribe(
-        (response) => {
+
+      this.farmOwnerRegistrationService.registerFarmOwner(this.farmOwner).subscribe({
+        next: (response) => {
           console.log('Registration successful', response);
         },
-        (error) => {
+        error: (error) => {
           console.error('Registration failed', error);
-        }
+        }}
       );
     }
     
