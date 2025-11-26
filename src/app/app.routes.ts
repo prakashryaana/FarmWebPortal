@@ -10,7 +10,7 @@ export const routes: Routes = [
         title: 'Farm Registration'
     },
     {
-        path: 'farm-owner-registration',
+        path: 'farm-owner-registration/:farmId',
         component: FarmOwnerRegistrationComponent,
         title: 'Farm Owner Registration'
     },

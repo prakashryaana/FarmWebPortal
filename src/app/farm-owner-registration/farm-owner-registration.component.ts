@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FarmOwnerRegistrationService } from './farm-owner-registration.service';
 import { FarmOwner } from './farm-owner';
+import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
 @Component({
@@ -12,10 +13,14 @@ import { NgForm } from '@angular/forms';
   templateUrl: './farm-owner-registration.component.html',
   styleUrl: './farm-owner-registration.component.css',
 })
-export class FarmOwnerRegistrationComponent {
+export class FarmOwnerRegistrationComponent implements OnInit {
   //farmOwnerRegistrationService: FarmOwnerRegistrationService = inject(FarmOwnerRegistrationService);
-  constructor(private router: Router, private farmOwnerRegistrationService: FarmOwnerRegistrationService) {}
-
+  constructor(private router: Router, private route: ActivatedRoute, private farmOwnerRegistrationService: FarmOwnerRegistrationService) {}
+  farmIdParam: string = '';
+  ngOnInit() {
+    this.farmIdParam = this.route.snapshot.paramMap.get('farmId');
+    console.log('Farm ID from route:', this.farmIdParam);
+  }
   farmOwnerRegistrationForm = new FormGroup({
     fullName: new FormControl('', [Validators.required]),
     address: new FormControl('', [Validators.required]),

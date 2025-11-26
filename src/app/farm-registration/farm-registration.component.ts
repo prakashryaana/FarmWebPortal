@@ -34,6 +34,7 @@ export class FarmRegistrationComponent {
   });
 
   farm: Farm = {} as Farm;
+  farmId: string = '';
 
   registerFarm(){
     if (this.farmRegistrationForm.valid) {
@@ -61,6 +62,10 @@ export class FarmRegistrationComponent {
       this.farmRegistrationService.registerFarm(this.farm).subscribe({
         next: (response) => {
           console.log('Registration successful', response);
+          this.farmId = response.FarmId;
+          console.log('Farm ID:', this.farmId);
+          // Inject Router in constructor first, then use:
+          this.router.navigate(['/farm-owner-registration', this.farmId]);
         },
         error: (error) => {
           console.error('Registration failed', error);
