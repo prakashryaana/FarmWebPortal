@@ -2,6 +2,7 @@ export interface FarmOwner {
     ownerId: string;
     ownerName: string | null | undefined;
     //farmName: string;
+    farmsOwned: string[];
     contactNumber: string | null | undefined;
     alternateContactNumber: string | null | undefined;
     emailId: string | null | undefined;

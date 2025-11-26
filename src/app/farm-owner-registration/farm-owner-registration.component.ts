@@ -37,6 +37,7 @@ export class FarmOwnerRegistrationComponent implements OnInit {
     if (this.farmOwnerRegistrationForm.valid) {
       this.farmOwner = {
         ownerId: Date.now().toString(),
+        farmsOwned: [this.farmIdParam],
         ownerName: this.farmOwnerRegistrationForm.get('fullName')?.value,
         contactNumber: this.farmOwnerRegistrationForm.get('contactNumber')?.value,
         alternateContactNumber: this.farmOwnerRegistrationForm.get('alternateContactNumber')?.value,
@@ -50,14 +51,12 @@ export class FarmOwnerRegistrationComponent implements OnInit {
       this.farmOwnerRegistrationService.registerFarmOwner(this.farmOwner).subscribe({
         next: (response) => {
           console.log('Registration successful', response);
+          this.router.navigate(['maintainer-registration']);
         },
         error: (error) => {
           console.error('Registration failed', error);
         }}
       );
     }
-        
-    // Inject Router in constructor first, then use:
-    this.router.navigate(['maintainer-registration']);
   }
 }
