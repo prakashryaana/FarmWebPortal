@@ -1,19 +1,32 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Farm } from './farm';
+import { CreateFarmDto } from './farm';
 import { FarmRegistrationService } from './farm-registration.service';
 import { FileUploadComponent } from '../file-upload/file-upload.component';
 
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { LocationComponent } from '../location/location.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { inject } from '@angular/core';
+
 @Component({
   selector: 'app-farm-registration',
-  imports: [ReactiveFormsModule, FileUploadComponent],
+  imports: [ReactiveFormsModule, FileUploadComponent, MatFormFieldModule, MatInputModule,
+    MatSelectModule, MatRadioModule, MatButtonModule, MatSlideToggle, LocationComponent],
   templateUrl: './farm-registration.component.html',
   styleUrl: './farm-registration.component.css',
 })
 export class FarmRegistrationComponent {
   constructor(private router: Router, private farmRegistrationService: FarmRegistrationService) {}
 
+  private snackBar = inject(MatSnackBar);
+  
   farmRegistrationForm = new FormGroup({
     farmName: new FormControl('', [Validators.required]),
     surveyNumber: new FormControl('', [Validators.required]),
@@ -33,11 +46,14 @@ export class FarmRegistrationComponent {
     storageAreaNote: new FormControl('')
   });
 
-  farm: Farm = {} as Farm;
+  farm: CreateFarmDto = {} as CreateFarmDto;
   farmId: string = '';
+  isFileUploaded: boolean = false;
 
   registerFarm(){
-    if (this.farmRegistrationForm.valid) {
+    // this.farmId = Date.now().toString();
+    // this.router.navigate(['/maintainer-registration', this.farmId]);
+    if (this.farmRegistrationForm.valid && this.isFileUploaded){
       this.farm = {
         farmId: Date.now().toString(),
         farmName: this.farmRegistrationForm.get('farmName')?.value,
@@ -47,7 +63,7 @@ export class FarmRegistrationComponent {
         //geoTag: this.farmRegistrationForm.get('geoTag')?.value,
         farmPondVolume: Number(this.farmRegistrationForm.get('farmPondVolume')?.value ?? undefined),
         isSolarPowerAvailable: Boolean(this.farmRegistrationForm.get('isSolarPowerAvailable')?.value ?? undefined),
-        motorCapacity: Number(this.farmRegistrationForm.get('motorCapacity')?.value ?? undefined),
+        motorCapacity: this.farmRegistrationForm.get('motorCapacity')?.value,
         additionalWaterSource: this.farmRegistrationForm.get('additionalWaterSource')?.value,
         waterTestCertificateUrl: this.farmRegistrationForm.get('waterTestCertificateUrl')?.value,
         isSinglePhasePower: Boolean(this.farmRegistrationForm.get('isSinglePhasePower')?.value ?? undefined),
@@ -61,20 +77,18 @@ export class FarmRegistrationComponent {
 
       this.farmRegistrationService.registerFarm(this.farm).subscribe({
         next: (response) => {
-          console.log('Registration successful', response);
-          this.farmId = response.FarmId;
-          console.log('Farm ID:', this.farmId);
-          // Inject Router in constructor first, then use:
-          this.router.navigate(['/farm-owner-registration', this.farmId]);
+          console.log('Farm Registration successful', response);
+          this.farmId = response.farmId;
+          // console.log('Farm ID:', this.farmId);
+          this.snackBar.open('Farm Registration successful!', 'Close', { duration: 5000 });
+          this.router.navigate(['/maintainer-registration', this.farmId]);
         },
         error: (error) => {
-          console.error('Registration failed', error);
+          console.error('Farm Registration failed', error);
+          this.snackBar.open('Farm Registration failed. Please try again.', 'Close', { duration: 5000 });
         }}
       );
     }
-
-    // Inject Router in constructor first, then use:
-    //this.router.navigate(['/farm-owner-registration']);
   }
 
   onFileChange(event: any) {
@@ -84,7 +98,9 @@ export class FarmRegistrationComponent {
   }
 
   handleFileUploaded(data: any): void {
-        console.log('File uploaded successfully in other component!', data);
-        // Process the uploaded file data received from the file-upload component
-      }
+    console.log('File uploaded successfully in farm component!', data);
+    this.isFileUploaded = true;
+    this.farmRegistrationForm.get('waterTestCertificateUrl')?.setValue(data.fullPath);
+    // Process the uploaded file data received from the file-upload component
+  }
 }

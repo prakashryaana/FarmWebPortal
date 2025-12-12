@@ -1,0 +1,40 @@
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header.brand-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  background-color: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+header.brand-name h1 {
+  margin: 0;
+  padding: 1rem 0;
+  font-size: 28px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.toolbar-right {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+section {
+  margin: 2rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+h1 a {
+  color: inherit;
+  text-decoration: none;
+}

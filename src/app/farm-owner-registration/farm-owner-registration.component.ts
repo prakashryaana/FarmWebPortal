@@ -5,22 +5,38 @@ import { Router } from '@angular/router';
 import { FarmOwnerRegistrationService } from './farm-owner-registration.service';
 import { FarmOwner } from './farm-owner';
 import { ActivatedRoute } from '@angular/router';
-import { NgForm } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'app-farm-owner-registration',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule,
+    MatSelectModule, MatButtonModule],
   templateUrl: './farm-owner-registration.component.html',
   styleUrl: './farm-owner-registration.component.css',
 })
 export class FarmOwnerRegistrationComponent implements OnInit {
   //farmOwnerRegistrationService: FarmOwnerRegistrationService = inject(FarmOwnerRegistrationService);
   constructor(private router: Router, private route: ActivatedRoute, private farmOwnerRegistrationService: FarmOwnerRegistrationService) {}
+
+  private snackBar = inject(MatSnackBar);
+
   farmIdParam: string = '';
+  maintainerIdParam: string = '';
+
   ngOnInit() {
-    this.farmIdParam = this.route.snapshot.paramMap.get('farmId');
-    console.log('Farm ID from route:', this.farmIdParam);
+    this.route.queryParams.subscribe(params => {
+      this.farmIdParam = params['farmId'];
+      this.maintainerIdParam = params['maintainerId'];
+    });
+    console.log('Farm ID from query params:', this.farmIdParam);
+    console.log('Maintainer ID from query params:', this.maintainerIdParam);
   }
+
   farmOwnerRegistrationForm = new FormGroup({
     fullName: new FormControl('', [Validators.required]),
     address: new FormControl('', [Validators.required]),
@@ -38,6 +54,7 @@ export class FarmOwnerRegistrationComponent implements OnInit {
       this.farmOwner = {
         ownerId: Date.now().toString(),
         farmsOwned: [this.farmIdParam],
+        maintainers: [this.maintainerIdParam],
         ownerName: this.farmOwnerRegistrationForm.get('fullName')?.value,
         contactNumber: this.farmOwnerRegistrationForm.get('contactNumber')?.value,
         alternateContactNumber: this.farmOwnerRegistrationForm.get('alternateContactNumber')?.value,
@@ -50,11 +67,13 @@ export class FarmOwnerRegistrationComponent implements OnInit {
 
       this.farmOwnerRegistrationService.registerFarmOwner(this.farmOwner).subscribe({
         next: (response) => {
-          console.log('Registration successful', response);
-          this.router.navigate(['maintainer-registration']);
+          console.log('Farm Owner Registration successful', response);
+          this.snackBar.open('Farm Owner Registration successful!', 'Close', { duration: 5000 });
+          this.router.navigate(['home']);
         },
         error: (error) => {
-          console.error('Registration failed', error);
+          console.error('Farm Owner Registration failed', error);
+          this.snackBar.open('Farm Owner Registration failed. Please try again.', 'Close', { duration: 5000 });
         }}
       );
     }

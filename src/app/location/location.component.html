@@ -1,0 +1,21 @@
+<div>
+  <button (click)="getLocation()">Get Current Location</button>
+@if (isLoading) {<div>Fetching location...</div>}
+@if (errorMessage) {<div style="color: red;">Error: {{ errorMessage }}</div>}
+@if (location) {
+  <div>
+    Latitude: {{ location.latitude }} <br />
+    Longitude: {{ location.longitude }}
+  </div>
+  <!-- Leaflet Map displays automatically when location is available -->
+    <app-leaflet-map 
+      [latitude]="location.latitude" 
+      [longitude]="location.longitude">
+    </app-leaflet-map>
+
+    <app-farm-weather 
+      [latitude]="location.latitude" 
+      [longitude]="location.longitude">
+    </app-farm-weather>
+}
+</div>

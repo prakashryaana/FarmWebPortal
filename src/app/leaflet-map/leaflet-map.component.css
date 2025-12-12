@@ -1,0 +1,31 @@
+.location-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+button {
+  background: #4CAF50;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.location-info {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.location-info p {
+  margin: 8px 0;
+}

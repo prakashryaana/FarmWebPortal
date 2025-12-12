@@ -1,23 +1,95 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FileUploadComponent } from '../file-upload/file-upload.component';
+import { Maintainer } from './maintainer';
+import { MaintainerRegistrationService } from './maintainer-registration.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'app-maintainer-registration',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FileUploadComponent],
   templateUrl: './maintainer-registration.component.html',
   styleUrl: './maintainer-registration.component.css',
 })
 export class MaintainerRegistrationComponent {
-  maintainerRegistrationForm = new FormGroup({
+  constructor(private router: Router, private route: ActivatedRoute, private maintainerRegistrationService: MaintainerRegistrationService) { }
+
+  private snackBar = inject(MatSnackBar);
+
+  farmIdParam: string = '';
+
+  ngOnInit() {
+    this.farmIdParam = this.route.snapshot.paramMap.get('farmId');
+    console.log('Farm ID from route:', this.farmIdParam);
+  }
+
+  farmMaintainerRegistrationForm = new FormGroup({
     fullName: new FormControl('', [Validators.required]),
     address: new FormControl('', [Validators.required]),
     contactNumber: new FormControl('', [Validators.required, Validators.pattern('^\\+?[1-9]\\d{1,14}$')]),
     alternateContactNumber: new FormControl('', [Validators.pattern('^\\+?[1-9]\\d{1,14}$')]),
-    role: new FormControl('', [Validators.required]),
-    //email: new FormControl('', [Validators.required, Validators.email]),
+    // role: new FormControl('', [Validators.required]),
+    education: new FormControl('', [Validators.required]),
+    trainingCertificateUrl: new FormControl(''),
     identityProofDocument: new FormControl('', [Validators.required]),
     identityProofNumber: new FormControl('', [Validators.required])
-  })
+  });
+  isFileUploaded: boolean = false;
+  maintainer: Maintainer = {} as Maintainer;
+  maintainerId: string = '';
+
+  registerFarmMaintainer() {
+    // this.maintainerId = Date.now().toString();
+    // this.router.navigate(
+    //         ['/farm-owner-registration'],
+    //         { queryParams: { farmId: this.farmIdParam, maintainerId: this.maintainerId }}
+    //       );
+    if (this.farmMaintainerRegistrationForm.valid && this.isFileUploaded) {
+      this.maintainer = {
+        maintainerId: Date.now().toString(),
+        maintainerName: this.farmMaintainerRegistrationForm.get('fullName')?.value,
+        address: this.farmMaintainerRegistrationForm.get('address')?.value,
+        trainingCertificateUrl: this.farmMaintainerRegistrationForm.get('trainingCertificateUrl')?.value,
+        contactNumber: this.farmMaintainerRegistrationForm.get('contactNumber')?.value,
+        alternateContactNumber: this.farmMaintainerRegistrationForm.get('alternateContactNumber')?.value,
+        education: this.farmMaintainerRegistrationForm.get('education')?.value,
+        identityProofDocument: this.farmMaintainerRegistrationForm.get('identityProofDocument')?.value,
+        identityProofNumber: this.farmMaintainerRegistrationForm.get('identityProofNumber')?.value,
+        farmsMaintained: [this.farmIdParam]
+      };
+      console.log(this.farmMaintainerRegistrationForm.value);
+
+      this.maintainerRegistrationService.registerMaintainer(this.maintainer).subscribe({
+        next: (response) => {
+          console.log('Maintainer Registration successful', response);
+          this.snackBar.open('Maintainer Registration successful!', 'Close', { duration: 5000 });
+          this.router.navigate(
+            ['/farm-owner-registration'],
+            { queryParams: { farmId: this.farmIdParam, maintainerId: response.maintainerId }}
+          );
+        },
+        error: (error) => {
+          console.error('Maintainer Registration failed', error);
+          this.snackBar.open('Maintainer Registration failed. Please try again.', 'Close', { duration: 5000 });
+        }
+      }
+      );
+    }
+  }
+
+  onFileChange(event: any) {
+    const file = event.target.files[0];
+    console.log('Selected file:', file);
+    // You can implement file upload logic here
+  }
+
+  handleFileUploaded(data: any): void {
+    console.log('File uploaded successfully in maintainer component!', data);
+    this.isFileUploaded = true;
+    this.farmMaintainerRegistrationForm.get('trainingCertificateUrl')?.setValue(data.fullPath);
+    // Process the uploaded file data received from the file-upload component
+  }
 
 }

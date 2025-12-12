@@ -1,0 +1,67 @@
+/* farm-lookup.component.scss */
+// .farm-lookup-container {
+//   max-width: 600px;
+//   margin: 2rem auto;
+//   padding: 2rem;
+//   vertical-align: middle;
+  
+//   h2 {
+//     text-align: center;
+//     margin-bottom: 2rem;
+//   }
+// }
+
+.lookup-form {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+// .full-width {
+//   width: 100%;
+// }
+
+.farm-result {
+  padding: 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  
+  &.success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+  }
+  
+  &.error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+  }
+}
+
+.farm-details {
+  flex: 1;
+  
+  h3 {
+    margin: 0 0 1rem 0;
+  }
+  
+  p {
+    margin: 0.5rem 0;
+  }
+}
+
+.status {
+  &.active {
+    color: #28a745;
+    font-weight: bold;
+  }
+}
+
+mat-spinner {
+  margin: 2rem auto;
+  display: block;
+}

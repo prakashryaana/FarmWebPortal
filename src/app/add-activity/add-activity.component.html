@@ -1,0 +1,90 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Add Farm Activity for Crop - {{selectedCropName}}</mat-card-title>
+  </mat-card-header>
+  
+  <!-- <div *ngIf="selectedCropFarm as sel">
+  <p>Farm: {{ sel.farmName }} ({{ sel.farmId }})</p>
+  <p>Crop: {{ sel.cropName }} ({{ sel.cropId }})</p>
+</div> -->
+  
+  <mat-card-content>
+    <form [formGroup]="activityForm" (ngSubmit)="onSubmit()">
+      <!-- DateTime Field -->
+      <!-- <mat-form-field appearance="outline">
+        <mat-label>Date & Time</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="dateTime">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field> -->
+
+      <!-- Activity Type -->
+      <mat-form-field appearance="outline">
+        <mat-label>Activity Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option *ngFor="let type of activityTypes" [value]="type.value">
+            {{ type.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Message -->
+      <mat-form-field appearance="outline">
+        <mat-label>Message/Notes</mat-label>
+        <textarea matInput formControlName="message" rows="3"></textarea>
+      </mat-form-field>
+
+      <!-- QR Scanner -->
+       @if (scanMode) {
+        <div id="scanner-container" class="scanner-container"></div>
+       }
+      
+      @if (qrResult) {
+        <div class="scan-result">
+        ✅ QR Scanned: {{ qrResult | slice:0:50 }}...
+      </div>
+      }
+      
+
+      <!-- Spray Details (conditional) -->
+       <!-- @if (activityForm.get('type')?.value === 'spraying' || activityForm.get('productName')?.value) {
+        <div>
+        <h4>Spray Details</h4>
+        <mat-form-field appearance="outline">
+          <mat-label>Product Name</mat-label>
+          <input matInput formControlName="productName">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Constituents</mat-label>
+          <textarea matInput formControlName="constituents" rows="2"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Quantity (liters/kg)</mat-label>
+          <input matInput type="number" formControlName="quantity">
+        </mat-form-field>
+
+        <mat-radio-group formControlName="isOrganic">
+          <mat-radio-button [value]="true">Organic</mat-radio-button>
+          <mat-radio-button [value]="false">Chemical</mat-radio-button>
+        </mat-radio-group>
+      </div>
+       } -->
+      
+
+      <!-- Actions -->
+      <div class="actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="!activityForm.valid">
+          Add Activity
+        </button>
+        <!-- <button mat-stroked-button type="button" (click)="toggleScanMode()">
+          {{ scanMode ? 'Switch to Manual' : 'Scan QR Code' }}
+        </button> -->
+        <button mat-button type="button" (click)="reset()">
+          Reset
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

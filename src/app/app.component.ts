@@ -1,10 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { FarmOwnerRegistrationComponent } from './farm-owner-registration/farm-owner-registration.component';
+import { CropFarmSelectorToolbarComponent } from './crop-farm-selector/crop-farm-selector-toolbar.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, FarmOwnerRegistrationComponent],
+  imports: [RouterOutlet, CropFarmSelectorToolbarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

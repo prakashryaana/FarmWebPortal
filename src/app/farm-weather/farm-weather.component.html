@@ -1,0 +1,29 @@
+<div class="farm-weather">
+  <button (click)="getFarmWeather()" [disabled]="isLoading">
+    {{ isLoading ? 'Loading Weather...' : 'Get Farm Weather Data' }}
+  </button>
+@if (errorMessage) {<div class="error">{{ errorMessage }}</div>}
+
+@if (location && weatherData) {
+  <div class="weather-results">
+    <h3>Farm at {{ location.latitude.toFixed(4) }}, {{ location.longitude.toFixed(4) }}</h3>
+    
+    <div class="current-weather">
+      <h4>Current Conditions</h4>
+      <p>🌡️ Temp: {{ weatherData.current.temperature }}°C</p>
+      <p>💨 Wind: {{ weatherData.current.wind_speed }} km/h</p>
+      <p>🌧️ Precip: {{ weatherData.current.precipitation }} mm</p>
+    </div>
+    
+    @if (weatherData.historical) {
+    <div class="historical-weather">
+      <h4>2024 Historical Summary</h4>
+      <p>🌡️ Mean Temps (Jan-Dec): {{ weatherData.historical.monthlyMeanTemp.join(', ') }}°C</p>
+      <p>🌧️ Rainy Months (>50mm): {{ weatherData.historical.rainyMonths.join(', ') }}</p>
+      <p>❄️ Winter Months: {{ weatherData.historical.winterMonths.join(', ') }}</p>
+      <p>💨 Avg Wind Speed: {{ weatherData.historical.avgWindSpeed.toFixed(1) }} km/h</p>
+    </div>
+    }
+  </div>
+}
+</div>

@@ -1,0 +1,73 @@
+<!-- farm-lookup.component.html -->
+<div class="farm-lookup-container">
+  <h2>Farm Lookup</h2>
+  
+  <form [formGroup]="farmLookupForm" (ngSubmit)="lookupFarm()" class="lookup-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Enter FarmId or FarmName</mat-label>
+      <input matInput 
+             formControlName="farmIdentifier" 
+             placeholder="e.g., FARM-123 or Green Acres Farm"
+             (input)="onInputChange()">
+      @if (farmLookupForm.get('farmIdentifier')?.hasError('required')) {
+        <mat-error>
+        FarmId or FarmName is required
+      </mat-error>
+      }
+      @if (farmLookupForm.get('farmIdentifier')?.hasError('minlength')) {
+      <mat-error>
+        Enter at least 3 characters
+      </mat-error>
+    }
+    </mat-form-field>
+    
+    <button mat-raised-button 
+            color="primary" 
+            type="submit" 
+            [disabled]="!farmLookupForm.valid || isLoading">
+      {{ isLoading ? 'Searching...' : 'Lookup Farm' }}
+    </button>
+  </form>
+
+  <!-- Loading spinner -->
+  <mat-spinner diameter="50" *ngIf="isLoading"></mat-spinner>
+
+  <!-- Success - Farm found -->
+   @if (foundFarms.length > 0 && !isLoading) {
+  <div class="farm-result success">
+    <mat-icon color="primary">check_circle</mat-icon>
+    <div class="farm-details">
+      <h3>Farms Found!</h3>
+      @for (farm of foundFarms; track $index) {
+        <input 
+            class="form-check-input" 
+            type="radio" 
+            [id]="farm.farmId"
+            [value]="farm.farmName"
+            [checked]="this.selectedFarmData === farm"
+            (change)="onFarmSelect(farm)"
+          />
+          <label class="form-check-label" [for]="farm.farmId">
+            {{ farm.farmName }} (FarmId: {{ farm.farmId }})
+          </label>
+        <br/>
+      }
+    </div>
+  </div>
+   } @else {
+  <!-- Error - Farm not found -->
+   @if (!isLoading) {
+  <div class="farm-result error">
+    <mat-icon color="warn">error_outline</mat-icon>
+    <div class="error-message">
+      <h3>Farm Not Found</h3>
+      <p>No farm found with ID "{{ searchTerm }}" or name containing "{{ searchTerm }}"</p>
+      <p>Try a different ID or partial farm name.</p>
+    </div>
+  </div>
+
+  }
+}
+</div>
+
+  

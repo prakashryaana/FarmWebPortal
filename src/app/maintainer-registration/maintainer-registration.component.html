@@ -1,56 +1,69 @@
-<h2>Maintainer Registration Under Development</h2>
-<!-- import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+<form [formGroup]="farmMaintainerRegistrationForm" (submit)="registerFarmMaintainer()">
+    <h2>Farm Maintainer Registration</h2>
 
-export interface FarmOwner {
-    id?: number;
-    name?: string;
-    email?: string;
-    phone?: string;
-    // add other fields as needed
-}
+    <!-- Full name -->
+    <div>
+        <label for="full-name">Full Name</label>
+        <input id="full-name" type="text" formControlName="fullName" required />
+    </div>
 
-@Injectable({
-    providedIn: 'root'
-})
-export class FarmOwnerRegistrationService {
-    private baseUrl = 'https://localhost:7252';
-    private resource = '/api/farmowners'; // adjust endpoint path as needed
+    <!-- Primary contact number (exactly 10 digits) -->
+    <div>
+        <label for="contact-number">Contact Number</label>
+        <input id="contact-number" type="tel" formControlName="contactNumber" required />
+    </div>
 
-    private httpOptions = {
-        headers: new HttpHeaders({
-            'Content-Type': 'application/json'
-        })
-    };
+    <!-- Alternate contact number (also 10 digits) -->
+    <div>
+        <label for="alternate-contact-number">Alternate Contact Number</label>
+        <input id="alternate-contact-number" formControlName="alternateContactNumber" type="tel" />
+    </div>
 
-    constructor(private http: HttpClient) {}
+    <div>
+        <label for="address">Address</label>
+        <input id="address" type="text" formControlName="address" required />
+    </div>
 
-    getAllOwners(): Observable<FarmOwner[]> {
-        return this.http.get<FarmOwner[]>(`${this.baseUrl}${this.resource}`);
-    }
+    <div appearance="fill" class="full-width">
+        <label for="training-certificate">Upload Training Certificate</label>
+        <app-file-upload id="training-certificate" (fileUploaded)="handleFileUploaded($event)"></app-file-upload>
+    </div>
 
-    getOwnerById(id: number | string): Observable<FarmOwner> {
-        return this.http.get<FarmOwner>(`${this.baseUrl}${this.resource}/${id}`);
-    }
+    <!-- Education -->
+    <div>
+        <label for="education">Education</label>
+        <select id="education" formControlName="education" required>
+            <option value="" disabled selected>Select Applicable Education</option>
+            <option value="UnEducated">Un-Educated</option>
+            <option value="10">10th Pass</option>
+            <option value="12">12th Pass</option>
+            <option value="Graduate">Graduate</option>
+            <option value="PostGraduate">Post-Graduate</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
 
-    createOwner(owner: FarmOwner): Observable<FarmOwner> {
-        return this.http.post<FarmOwner>(
-            `${this.baseUrl}${this.resource}`,
-            owner,
-            this.httpOptions
-        );
-    }
+    <!-- Government issued identity -->
+    <div>
+        <label for="govt-id-type">Government ID Type</label>
+        <select id="govt-id-type" formControlName="identityProofDocument" required>
+            <option value="" disabled selected>Select ID type</option>
+            <option value="aadhaar">Aadhaar Card</option>
+            <option value="pan">PAN Card</option>
+            <option value="voter">Voter ID</option>
+            <option value="passport">Passport</option>
+            <option value="driving">Driving License</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
 
-    updateOwner(id: number | string, owner: FarmOwner): Observable<FarmOwner> {
-        return this.http.put<FarmOwner>(
-            `${this.baseUrl}${this.resource}/${id}`,
-            owner,
-            this.httpOptions
-        );
-    }
+    <div>
+        <label for="govt-id-number">Government ID Number</label>
+        <input id="govt-id-number" formControlName="identityProofNumber" type="text" required />
+    </div>
 
-    deleteOwner(id: number | string): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}${this.resource}/${id}`);
-    }
-} -->
+    <div style="margin-top:1rem">
+        <button type="submit" [disabled]="farmMaintainerRegistrationForm.invalid">Register</button>
+        <button type="button" (click)="farmMaintainerRegistrationForm.reset()">Reset</button>
+    </div>
+</form>

@@ -1,117 +1,115 @@
-<form [formGroup]="farmRegistrationForm" (submit)="registerFarm()">
-    <h2>Farm Registration</h2>
+<div class="parentrow">
+<div class="childcol">
+<form class="container" [formGroup]="farmRegistrationForm" (ngSubmit)="registerFarm()" class="farm-registration-form">
 
-    <!-- Full name -->
-    <div>
-        <label for="farm-name">Farm Name</label>
-        <input id="farm-name" type="text" formControlName="farmName" required />
-    </div>
+  <h2>Farm Registration</h2>
 
-    <div>
-        <label for="survey-number">Survey No.</label>
-        <input id="survey-number" type="text" formControlName="surveyNumber" required />
-    </div>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Farm Name</mat-label>
+    <input matInput type="text" formControlName="farmName" required />
+  </mat-form-field>
 
-    <div>
-        <label for="address">Address</label>
-        <input id="address" type="text" formControlName="address" required />
-    </div>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Survey No.</mat-label>
+    <input matInput type="text" formControlName="surveyNumber" required />
+  </mat-form-field>
 
-    <!-- TODO
-    <div>
-        <label for="geo-tag">Geo Tag</label>
-        <input id="geo-tag" type="text" formControlName="geoTag" />
-    </div> -->
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Address</mat-label>
+    <input matInput type="text" formControlName="address" required />
+  </mat-form-field>
 
-    <div>
-        <label for="shade-net-area">Shade-net Area</label>
-        <input id="shade-net-area" type="number" formControlName="shadeNetArea" required />
-    </div>
+  <!-- Geo Tag input (optional) -->
+  <!-- <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Geo Tag</mat-label>
+    <input matInput type="text" formControlName="geoTag" />
+  </mat-form-field> -->
 
-    <div>
-        <label for="farm-pond-volume">Farm Pond Volume</label>
-        <input id="farm-pond-volume" type="number" formControlName="farmPondVolume" required />
-    </div>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Shade-net Area (sq. mt)</mat-label>
+    <input matInput type="number" formControlName="shadeNetArea" required />
+  </mat-form-field>
 
-    <div>
-        <label>Is Solar Power Available?</label>
-        <label>
-            <input type="radio" formControlName="isSolarPowerAvailable" [value]="true" /> Yes
-        </label>
-        <label>
-            <input type="radio" formControlName="isSolarPowerAvailable" [value]="false" /> No
-        </label>
-    </div>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Farm Pond Volume (cu. mt)</mat-label>
+    <input matInput type="number" formControlName="farmPondVolume" required />
+  </mat-form-field>
 
-    <div>
-        <label for="motor-capacity">Motor Capacity</label>
-        <select id="motor-capacity" formControlName="motorCapacity" required>
-            <option value="" disabled>Select Motor Capacity</option>
-            <option value="5">5 HP</option>
-            <option value="7.5">7.5 HP</option>
-            <option value="10">10 HP</option>
-        </select>
-    </div>
+  <label>Is Solar Power Available?</label>
+  <mat-radio-group formControlName="isSolarPowerAvailable" class="radio-group">
+    <mat-radio-button value="true">Yes</mat-radio-button>
+    <mat-radio-button value="false">No</mat-radio-button>
+  </mat-radio-group>
 
-    <div>
-        <label for="additional-water-source">Additional Water Source</label>
-        <input id="additional-water-source" type="text" formControlName="additionalWaterSource"/>
-    </div>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Motor Capacity</mat-label>
+    <mat-select formControlName="motorCapacity" required>
+      <mat-option value="" disabled>Select Motor Capacity</mat-option>
+      <mat-option value="5.5 HP">5.5 HP</mat-option>
+      <mat-option value="7.5 HP">7.5 HP</mat-option>
+      <mat-option value="10 HP">10 HP</mat-option>
+    </mat-select>
+  </mat-form-field>
 
-    <!-- <div>
-        <label for="water-test-certificate">Water Test Certificate</label>
-        <input id="water-test-certificate" type="file" (change)="onFileChange($event)" />
-        <app-file-upload requiredFileType="image/png" formControlName="waterTestCertificateUrl"></app-file-upload>
-    </div> -->
-    <div>
-      <h2>Upload a document for this section:</h2>
-      <app-file-upload (fileUploaded)="handleFileUploaded($event)"></app-file-upload>
-    </div>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Additional Water Source</mat-label>
+    <input matInput type="text" formControlName="additionalWaterSource" />
+  </mat-form-field>
 
-    <div>
-        <label>IsSinglePhasePower?</label>
-        <label>
-            <input type="radio" formControlName="isSinglePhasePower" [value]="true" /> Yes
-        </label>
-        <label>
-            <input type="radio" formControlName="isSinglePhasePower" [value]="false" /> No
-        </label>
-    </div>
+  <!-- You can continue like this for other inputs in your form -->
 
-    <div>
-        <label>IsThreePhasePower?</label>
-        <label>
-            <input type="radio" formControlName="isThreePhasePower" [value]="true" /> Yes
-        </label>
-        <label>
-            <input type="radio" formControlName="isThreePhasePower" [value]="false" /> No
-        </label>
-    </div>
+  <div appearance="fill" class="full-width">
+    <label for="Water-test-certificate">Upload Water Test Certificate</label>
+    <app-file-upload id="Water-test-certificate" (fileUploaded)="handleFileUploaded($event)"></app-file-upload>
+  </div>
 
-    <!-- TODO
-    <div>
-        <label for="grid-power-unavailability">Grid Power Unavailability Time Slots</label>
-        <input id="grid-power-unavailability" type="text" formControlName="gridPowerUnAvailability" placeholder="e.g., 2 PM - 4 PM, 6 PM - 8 PM" />
-    </div> -->
+  <mat-slide-toggle formControlName="isSinglePhasePower">Single Phase Power</mat-slide-toggle>
+  <mat-slide-toggle formControlName="isThreePhasePower">Three Phase Power</mat-slide-toggle>
 
-    <div>
-        <label for="automation-room-size">Automation Room Size (sq. ft)</label>
-        <input id="automation-room-size" type="number" formControlName="automationRoomSize" required />
-    </div>
+  <!-- <label>Is Single Phase Power?</label>
+  <mat-radio-group formControlName="isSinglePhasePower" class="radio-group">
+    <mat-radio-button value="true">Yes</mat-radio-button>
+    <mat-radio-button value="false">No</mat-radio-button>
+  </mat-radio-group>
 
-    <!-- TODO
-    <div>
-        <label for="farmhouse-note">Farmhouse Note</label>
-        <input id="farmhouse-note" type="text" formControlName="farmhouseNote"/>
-    </div> -->
+  <label>Is Three Phase Power?</label>
+  <mat-radio-group formControlName="isThreePhasePower" class="radio-group">
+    <mat-radio-button value="true">Yes</mat-radio-button>
+    <mat-radio-button value="false">No</mat-radio-button>
+  </mat-radio-group> -->
 
-    <div>
-        <label for="storage-area-note">Storage Area Note</label>
-        <input id="storage-area-note" type="text" formControlName="storageAreaNote" required />
-    </div>
+  <!-- <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Grid Power Unavailability Time Slots</mat-label>
+    <input matInput type="text" formControlName="gridPowerUnAvailability" placeholder="e.g., 2 PM - 4 PM, 6 PM - 8 PM" />
+  </mat-form-field> -->
 
-    <div style="margin-top:1rem">
-        <button type="submit" [disabled]="farmRegistrationForm.invalid">Register</button>
-        <button type="button" (click)="farmRegistrationForm.reset()">Reset</button>
-    </div>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Automation Room Size (sq. ft)</mat-label>
+    <input matInput type="number" formControlName="automationRoomSize" required />
+  </mat-form-field>
+
+  <!-- <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Farmhouse Note</mat-label>
+    <input matInput type="text" formControlName="farmhouseNote" />
+  </mat-form-field> -->
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Storage Area Note</mat-label>
+    <input matInput type="text" formControlName="storageAreaNote" required />
+  </mat-form-field>
+
+  <div style="margin-top: 1rem;">
+    <button mat-raised-button color="primary" type="submit" [disabled]="farmRegistrationForm.invalid">
+      Register
+    </button>
+    <button mat-button type="button" (click)="farmRegistrationForm.reset()">
+      Reset
+    </button>
+  </div>
+
 </form>
+</div>
+<div class="childcol2">
+  <app-location></app-location>
+</div>
+</div>

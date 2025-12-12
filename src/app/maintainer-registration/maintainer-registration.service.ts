@@ -2,16 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Maintainer } from './maintainer';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MaintainerRegistrationService {
-  private apiUrl = `${environment.baseApiUrl}/api/`; // Update with your actual API endpoint
+  private apiUrl = `${environment.baseApiUrl}api`; // Update with your actual API endpoint
 
   constructor(private http: HttpClient) {}
 
-  registerMaintainer(data: any): Observable<any> {
+  registerMaintainer(data: Maintainer): Observable<any> {
     return this.http.post(`${this.apiUrl}/maintainer`, data);
   }
 

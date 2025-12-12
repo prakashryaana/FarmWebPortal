@@ -1,0 +1,37 @@
+<app-farm-lookup (selectedFarm)="onSelectedFarmEvent($event)"></app-farm-lookup>
+<form class="container" [formGroup]="cropRegistrationForm" (ngSubmit)="registerCrop()" class="crop-registration-form">
+
+  <h2>Crop Registration</h2>
+  @if (selectedFarm.farmId) {
+  <p>Registering crop for Farm : <strong>{{ selectedFarm.farmName }} (farmId : {{ selectedFarm.farmId }})</strong></p>
+  } @else {
+    <p class="warning-text">Please select a farm to register a crop.</p>
+  }
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Crop Name</mat-label>
+    <input matInput type="text" formControlName="cropName" required />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Crop Area (in sq. mt)</mat-label>
+    <input matInput type="number" formControlName="area" required />
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Date of Sowing</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="dateOfSowing">
+    <mat-hint></mat-hint>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    
+  <div style="margin-top: 1rem;">
+    <button mat-raised-button color="primary" type="submit" [disabled]="cropRegistrationForm.invalid">
+      Register
+    </button>
+    <button mat-button type="button" (click)="cropRegistrationForm.reset()">
+      Reset
+    </button>
+  </div>
+
+</form>

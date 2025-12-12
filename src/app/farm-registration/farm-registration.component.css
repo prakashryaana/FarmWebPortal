@@ -1,6 +1,17 @@
+.parentrow{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.childcol2 {
+    width: 200px;
+    margin: 2rem;
+}
 
 form {
-    max-width: 500px;
+    max-width: 900px;
     margin: 2rem auto;
     padding: 2rem;
     border: 1px solid #ddd;
@@ -10,7 +21,7 @@ form {
 
 h2 {
     margin-top: 0;
-    color: #333;
+    /* color: #333; */
 }
 
 div {
@@ -21,7 +32,7 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #555;
+    /* color: #555; */
 }
 
 input {
@@ -46,11 +57,11 @@ button {
     border-radius: 4px;
     font-size: 1rem;
     cursor: pointer;
-    background-color: #007bff;
-    color: white;
+    /* background-color: #007bff;
+    color: white; */
 }
 
-button:hover:not(:disabled) {
+/* button:hover:not(:disabled) {
     background-color: #0056b3;
 }
 
@@ -60,9 +71,24 @@ button[type="button"] {
 
 button[type="button"]:hover {
     background-color: #545b62;
-}
+} */
 
 button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.radio-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.mat-mdc-slide-toggle {
+    display: block;
+    margin-bottom: 1rem;
 }

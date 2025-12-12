@@ -1,8 +1,25 @@
 <main>
     <header class="brand-name">
-      <img class="brand-logo" src="./assets/favicon/icons8-vegetables-box-pastel-color-32.png" alt="EasyGrow" aria-hidden="true">
+      <!-- <img class="brand-logo" src="./assets/favicon/icons8-vegetables-box-pastel-color-32.png" alt="EasyGrow" aria-hidden="true"> -->
+      <h1>
+        <a href="/home">EasyGrow</a>
+      </h1>
+      <app-crop-farm-selector-toolbar class="toolbar-right"></app-crop-farm-selector-toolbar>
     </header>
+    <!-- <nav class="main-nav">
+      <a routerLink="/dashboard" routerLinkActive="active-link">Dashboard</a>
+      <a routerLink="/add-activity" routerLinkActive="active-link">Add Activity</a>
+      <a routerLink="/view-activities" routerLinkActive="active-link">View Activities</a>
+      <a routerLink="/analytics" routerLinkActive="active-link">Analytics</a>
+      <a routerLink="/settings" routerLinkActive="active-link">Settings</a>
+    </nav>
+    <aside class="side-panel">
+      "aside panel for future use"
+    </aside> -->
     <section class="content">
       <router-outlet></router-outlet>
     </section>
-  </main>
+    <footer>
+      <!-- <p>© 2025 EasyGrow. All rights reserved.</p> -->
+    </footer>
+  </main> 

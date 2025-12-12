@@ -19,9 +19,7 @@ export class FarmRegistrationService {
     return this.http.get(`${this.apiUrl}/${id}`);
   }
 
-  updateFarm(id: string, data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, data);
-  }
+  
 
   deleteFarm(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);

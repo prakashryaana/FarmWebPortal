@@ -1,0 +1,113 @@
+<form [formGroup]="farmRegistrationForm" (submit)="registerFarm()">
+    <h2>Farm Registration</h2>
+
+    <!-- Full name -->
+    <div>
+        <label for="farm-name">Farm Name</label>
+        <input id="farm-name" type="text" formControlName="farmName" required />
+    </div>
+
+    <div>
+        <label for="survey-number">Survey No.</label>
+        <input id="survey-number" type="text" formControlName="surveyNumber" required />
+    </div>
+
+    <div>
+        <label for="address">Address</label>
+        <input id="address" type="text" formControlName="address" required />
+    </div>
+
+    <!-- TODO
+    <div>
+        <label for="geo-tag">Geo Tag</label>
+        <input id="geo-tag" type="text" formControlName="geoTag" />
+    </div> -->
+
+    <div>
+        <label for="shade-net-area">Shade-net Area (sq. mt)</label>
+        <input id="shade-net-area" type="number" formControlName="shadeNetArea" required />
+    </div>
+
+    <div>
+        <label for="farm-pond-volume">Farm Pond Volume (cu. mt)</label>
+        <input id="farm-pond-volume" type="number" formControlName="farmPondVolume" required />
+    </div>
+
+    <div>
+        <label>Is Solar Power Available?</label>
+        <input type="radio" formControlName="isSolarPowerAvailable" [value]="true" /> Yes
+        <input type="radio" formControlName="isSolarPowerAvailable" [value]="false" /> No
+    </div>
+
+    <div>
+        <label for="motor-capacity">Motor Capacity</label>
+        <select id="motor-capacity" formControlName="motorCapacity" required>
+            <option value="" disabled>Select Motor Capacity</option>
+            <option value="5">5 HP</option>
+            <option value="7.5">7.5 HP</option>
+            <option value="10">10 HP</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="additional-water-source">Additional Water Source</label>
+        <input id="additional-water-source" type="text" formControlName="additionalWaterSource"/>
+    </div>
+
+    <!-- <div>
+        <label for="water-test-certificate">Water Test Certificate</label>
+        <input id="water-test-certificate" type="file" (change)="onFileChange($event)" />
+        <app-file-upload requiredFileType="image/png" formControlName="waterTestCertificateUrl"></app-file-upload>
+    </div> -->
+    <div>
+      <label for="Water-test-certificate">Water Test Certificate</label>
+      <app-file-upload id="Water-test-certificate" (fileUploaded)="handleFileUploaded($event)"></app-file-upload>
+    </div>
+
+    <div>
+        <label>IsSinglePhasePower?</label>
+        <label>
+            <input type="radio" formControlName="isSinglePhasePower" [value]="true" /> Yes
+        </label>
+        <label>
+            <input type="radio" formControlName="isSinglePhasePower" [value]="false" /> No
+        </label>
+    </div>
+
+    <div>
+        <label>IsThreePhasePower?</label>
+        <label>
+            <input type="radio" formControlName="isThreePhasePower" [value]="true" /> Yes
+        </label>
+        <label>
+            <input type="radio" formControlName="isThreePhasePower" [value]="false" /> No
+        </label>
+    </div>
+
+    <!-- TODO
+    <div>
+        <label for="grid-power-unavailability">Grid Power Unavailability Time Slots</label>
+        <input id="grid-power-unavailability" type="text" formControlName="gridPowerUnAvailability" placeholder="e.g., 2 PM - 4 PM, 6 PM - 8 PM" />
+    </div> -->
+
+    <div>
+        <label for="automation-room-size">Automation Room Size (sq. ft)</label>
+        <input id="automation-room-size" type="number" formControlName="automationRoomSize" required />
+    </div>
+
+    <!-- TODO
+    <div>
+        <label for="farmhouse-note">Farmhouse Note</label>
+        <input id="farmhouse-note" type="text" formControlName="farmhouseNote"/>
+    </div> -->
+
+    <div>
+        <label for="storage-area-note">Storage Area Note</label>
+        <input id="storage-area-note" type="text" formControlName="storageAreaNote" required />
+    </div>
+
+    <div style="margin-top:1rem">
+        <button type="submit" [disabled]="farmRegistrationForm.invalid">Register</button>
+        <button type="button" (click)="farmRegistrationForm.reset()">Reset</button>
+    </div>
+</form>
