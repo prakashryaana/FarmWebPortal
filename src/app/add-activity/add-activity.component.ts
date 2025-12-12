@@ -29,10 +29,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class AddActivityComponent implements AfterViewInit {
   @ViewChild('scannerContainer', { static: false }) scannerContainer!: ElementRef;
 
+  private snackBar = inject(MatSnackBar);
   //#region gets the global selected crop farm
   // inject the service
   private readonly cropFarmSelector = inject(CropFarmSelectorService);
-  private snackBar = inject(MatSnackBar);
 
   // convenient getter for template / code
   get selectedCropFarm() {

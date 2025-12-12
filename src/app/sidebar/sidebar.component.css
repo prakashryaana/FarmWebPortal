@@ -1,0 +1,26 @@
+.sidebar {
+      width: 240px;
+      height: 100vh;
+      background: #1f2933;
+      color: #fff;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    .sidebar-title {
+      margin: 0 0 1rem;
+      font-size: 1.1rem;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #e5e7eb;
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+
+    .sidebar a:hover {
+      background: #111827;
+    }

@@ -1,0 +1,61 @@
+<!-- home-dashboard.component.html -->
+<div class="dashboard-container" *ngIf="summary$ | async as summary; else loading">
+  <div class="cards">
+    <mat-card class="card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar color="primary">agriculture</mat-icon>
+        <mat-card-title>Total Farms</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="value">{{ summary.totalFarms }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar color="primary">eco</mat-icon>
+        <mat-card-title>Total Crops</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="value">{{ summary.totalCrops }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- <mat-card class="card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar color="primary">public</mat-icon>
+        <mat-card-title>Distinct States</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="value">{{ summary.distinctStates.length }}</div>
+        <mat-nav-list>
+          <a mat-list-item *ngFor="let s of summary.distinctStates">
+            {{ s }}
+          </a>
+        </mat-nav-list>
+      </mat-card-content>
+    </mat-card> -->
+
+    <mat-card class="card live-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar color="warn">notifications_active</mat-icon>
+        <mat-card-title>Live Activities Today</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <ng-container *ngIf="liveActivitiesToday$ | async as liveCount; else liveLoading">
+          <div class="value live">{{ liveCount }}</div>
+          <div class="hint">Auto-refreshing every 15 seconds</div>
+        </ng-container>
+        <ng-template #liveLoading>
+          <mat-progress-spinner diameter="28"></mat-progress-spinner>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="loading">
+    <mat-progress-spinner diameter="40"></mat-progress-spinner>
+  </div>
+</ng-template>

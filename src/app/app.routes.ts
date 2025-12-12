@@ -10,12 +10,14 @@ import { FarmWeatherComponent } from './farm-weather/farm-weather.component';
 import { LeafletMapComponent } from './leaflet-map/leaflet-map.component';
 //import { HierarchicalCropSelectorComponent } from './hierarchical-crop-selector/hierarchical-crop-selector.component';
 import { AddActivityComponent } from './add-activity/add-activity.component';
+import { ListActivityComponent } from './list-activity/list-activity.component';
+import { HomeDashboardComponent } from './home-dashboard/home-dashboard.component';
 
 export const routes: Routes = [
     {
-        path:'',
-        component: HomeComponent,
-        title: 'Home'
+        path: '',
+        component: HomeDashboardComponent,
+        title: 'Dashboard'
     },
     {
         path:'home',
@@ -66,5 +68,15 @@ export const routes: Routes = [
         path: 'add-activity',
         component: AddActivityComponent,
         title: 'Add Activity'
+    },
+    {
+        path: 'list-activity',
+        component: ListActivityComponent,
+        title: 'List Activity'
+    },
+    {
+        path: 'home-dashboard',
+        component: HomeDashboardComponent,
+        title: 'Dashboard'
     }
 ];

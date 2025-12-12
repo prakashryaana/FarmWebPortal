@@ -1,0 +1,31 @@
+/* home-dashboard.component.css */
+.dashboard-container {
+  padding: 16px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.card .value {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+.live-card .value.live {
+  color: #d32f2f; /* Material red 700-ish */
+}
+
+.live-card .hint {
+  font-size: 0.8rem;
+  color: rgba(0,0,0,0.6);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
