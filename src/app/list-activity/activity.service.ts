@@ -31,5 +31,4 @@ export interface Activity {
   createdAt: string;        // ISO string from backend
   updatedAt: string;        // ISO string from backend
   message: string;
-  details?: string;
 }

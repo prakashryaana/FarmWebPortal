@@ -1,5 +1,5 @@
 // components/list-activity/list-activity.component.ts
-import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, inject, effect } from '@angular/core';
 import { NgIf, NgFor, DatePipe, AsyncPipe, TitleCasePipe } from '@angular/common';
 import { ActivityService } from './activity.service';
 import { Activity } from './activity.service';
@@ -8,18 +8,24 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Observable } from 'rxjs';
 import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selector.service';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-list-activity',
   standalone: true,
-  imports: [NgIf, NgFor, DatePipe, MatListModule, MatIconModule, MatProgressSpinnerModule, AsyncPipe, TitleCasePipe],
+  imports: [NgIf, NgFor, DatePipe, MatListModule, MatIconModule, MatProgressSpinnerModule, MatTableModule],
   templateUrl: './list-activity.component.html',
   styleUrls: ['./list-activity.component.css']
 })
-export class ListActivityComponent implements OnChanges {
-
+export class ListActivityComponent {
+  @Input() cropId!: string;
 
   private activityService = inject(ActivityService);
+
+  displayedColumns: string[] = ['createdAt', 'activityType', 'message'];
+  dataSource = new MatTableDataSource<Activity>([]);
+  loading = false;
+
   activities$!: Observable<Activity[]>;
 
   //#region gets the global selected crop farm
@@ -38,30 +44,41 @@ export class ListActivityComponent implements OnChanges {
   get selectedFarmName(){ return this.cropFarmSelector.selectedFarmName(); }
   get selectedCropName(){ return this.cropFarmSelector.selectedCropName(); }
   //#endregion gets the global selected crop farm
-  @Input() cropId: string = this.cropFarmSelector.selectedCropId();
 
   constructor() {
-    // Initial load if cropId is already set
-    this.cropId = this.cropFarmSelector.selectedCropId() || '';
-    if (this.cropId) {
-      this.activities$ = this.activityService.getByCrop(this.cropId);
-      console.log('ListActivityComponent initialized :', this.activities$);
-    }
+    // React to changes in selected crop via signal
+    effect(() => {
+      const selection = this.cropFarmSelector.selectedCropFarm();
+      const cropId = selection?.cropId;
+
+      if (!cropId) {
+        this.dataSource.data = [];
+        return;
+      }
+
+      this.loadActivities(cropId);
+    });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['cropId'] && this.cropId) {
-      this.activities$ = this.activityService.getByCrop(this.cropId);
-    }
-  }
 
-  iconFor(type: Activity['activityType']): string {
-    switch (type) {
-      case 'watering': return 'water_drop';
-      case 'spraying': return 'spray_can';   // choose an icon you have
-      case 'fertilizing': return 'science';
-      case 'weeding': return 'yard';
-      default: return 'event_note';
-    }
+  // ngOnChanges(changes: SimpleChanges): void {
+  //   if (changes['cropId'] && this.cropId) {
+  //     this.loadActivities();
+  //   }
+  // }
+
+  private loadActivities(cropId: string): void {
+    this.loading = true;
+
+    this.activityService.getByCrop(cropId).subscribe({
+      next: (activities) => {
+        this.dataSource.data = activities;
+        this.loading = false;
+      },
+      error: () => {
+        this.dataSource.data = [];
+        this.loading = false;
+      },
+    });
   }
 }
