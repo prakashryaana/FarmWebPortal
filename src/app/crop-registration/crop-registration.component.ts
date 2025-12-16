@@ -90,7 +90,7 @@ export class CropRegistrationComponent {
               console.error('Failed to update Farm with Crop ID', err);
             }});
 
-          this.router.navigate(['/home']);
+          this.router.navigate(['/home-dashboard']);
         },
         error: (error) => {
           console.error('Crop Registration failed', error);

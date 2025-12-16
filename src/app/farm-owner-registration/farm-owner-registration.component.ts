@@ -69,7 +69,7 @@ export class FarmOwnerRegistrationComponent implements OnInit {
         next: (response) => {
           console.log('Farm Owner Registration successful', response);
           this.snackBar.open('Farm Owner Registration successful!', 'Close', { duration: 5000 });
-          this.router.navigate(['home']);
+          this.router.navigate(['home-dashboard']);
         },
         error: (error) => {
           console.error('Farm Owner Registration failed', error);
