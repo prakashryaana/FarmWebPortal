@@ -1,0 +1,7 @@
+<div>
+  <h2>Enable Fingerprint</h2>
+  <button *ngIf="canUseBiometric" (click)="enable()">
+    Enable fingerprint on this device
+  </button>
+  <p>{{ message }}</p>
+</div>

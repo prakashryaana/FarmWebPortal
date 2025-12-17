@@ -1,0 +1,21 @@
+<div>
+  <h2>Login</h2>
+
+  <div *ngIf="stage === 'mobile'">
+    <label>Mobile:</label>
+    <input [(ngModel)]="mobile" type="tel" />
+    <button (click)="sendOtp()">Send OTP</button>
+
+    <button *ngIf="canUseBiometric" (click)="biometricLogin()">
+      Login with fingerprint
+    </button>
+  </div>
+
+  <div *ngIf="stage === 'otp'">
+    <label>OTP:</label>
+    <input [(ngModel)]="otp" type="text" />
+    <button (click)="verifyOtp()">Verify OTP</button>
+  </div>
+
+  <p>{{ message }}</p>
+</div>
