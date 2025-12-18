@@ -12,13 +12,18 @@ import { LeafletMapComponent } from './leaflet-map/leaflet-map.component';
 import { AddActivityComponent } from './add-activity/add-activity.component';
 import { ListActivityComponent } from './list-activity/list-activity.component';
 import { HomeDashboardComponent } from './home-dashboard/home-dashboard.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
+import { MagicCallbackComponent } from './magic-callback/magic-callback.component';
+import { MagicRequestComponent } from './magic-request/magic-request.component';
+
 
 export const routes: Routes = [
-    {
-        path: '',
-        component: HomeDashboardComponent,
-        title: 'Dashboard'
-    },
+    // {
+    //     path: '',
+    //     component: HomeDashboardComponent,
+    //     title: 'Dashboard'
+    // },
     {
         path:'home',
         component: HomeComponent,
@@ -78,5 +83,10 @@ export const routes: Routes = [
         path: 'home-dashboard',
         component: HomeDashboardComponent,
         title: 'Dashboard'
-    }
+    },
+    { path: 'register', component: RegisterComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'magic-request', component: MagicRequestComponent },
+  { path: 'auth/magic/callback', component: MagicCallbackComponent },
+  { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];

@@ -1,22 +1,45 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+
+export interface AuthResponse {
+  token: string;
+  userId: string;
+  mobile: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private baseUrl = '/api/auth';
+  private baseUrl = `${environment.baseApiUrl}api/auth`;
+  //private baseUrl = '/api/auth';
 
   constructor(private http: HttpClient) {}
 
-  sendOtp(mobile: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/send-otp`, { mobile });
+  registerWithPassword(
+    mobile: string,
+    password: string,
+    email?: string,
+    asOwner = true,
+    ownerId?: string
+  ) {
+    return this.http.post<AuthResponse>(
+      `${this.baseUrl}/register-with-password`,
+      { mobile, password, email, asOwner, ownerId }
+    ).pipe(
+      tap(res => {
+        // localStorage.setItem('authToken', res.token);
+        // localStorage.setItem('userId', res.userId);
+        // localStorage.setItem('mobile', res.mobile);
+      })
+    );
   }
 
-  verifyOtp(mobile: string, otp: string) {
-    return this.http.post<{ token: string; userId: string; mobile: string }>(
-      `${this.baseUrl}/verify-otp`,
-      { mobile, otp }
+  loginWithPassword(mobile: string, password: string) {
+    return this.http.post<AuthResponse>(
+      `${this.baseUrl}/login-with-password`,
+      { mobile, password }
     ).pipe(
       tap(res => {
         localStorage.setItem('authToken', res.token);
@@ -26,11 +49,32 @@ export class AuthService {
     );
   }
 
-  get token(): string | null {
-    return localStorage.getItem('authToken');
+  register(mobile: string, email?: string, asOwner = true, ownerId?: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/register`, {
+      mobile,
+      email,
+      asOwner,
+      ownerId
+    }).pipe(
+      tap(res => {
+        localStorage.setItem('authToken', res.token);
+        localStorage.setItem('userId', res.userId);
+        localStorage.setItem('mobile', res.mobile);
+      })
+    );
   }
 
-  logout() {
-    localStorage.clear();
+  requestMagicLink(email: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/magic/request`, { email });
+  }
+
+  validateMagicLink(token: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/magic/validate`, { token }).pipe(
+      tap(res => {
+        localStorage.setItem('authToken', res.token);
+        localStorage.setItem('userId', res.userId);
+        localStorage.setItem('mobile', res.mobile);
+      })
+    );
   }
 }

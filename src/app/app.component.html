@@ -1,3 +1,7 @@
+@if (!isLoggedIn) {
+  <router-outlet></router-outlet>
+}
+@if (isLoggedIn) {
 <main>
     <header class="brand-name">
       <!-- <img class="brand-logo" src="./assets/favicon/icons8-vegetables-box-pastel-color-32.png" alt="EasyGrow" aria-hidden="true"> -->
@@ -16,3 +20,4 @@
       <!-- <p>© 2025 EasyGrow. All rights reserved.</p> -->
     </footer>
   </main> 
+}

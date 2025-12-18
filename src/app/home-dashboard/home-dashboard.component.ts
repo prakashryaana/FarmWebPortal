@@ -7,6 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AuthTokenService } from '../login/auth-token.service';
 
 @Component({
   selector: 'app-home-dashboard',
@@ -29,4 +30,23 @@ export class HomeDashboardComponent {
   summary$: Observable<SummaryDto> = this.dashboardService.getSummary();
   liveActivitiesToday$: Observable<number> =
     this.dashboardService.pollTodayLiveActivitiesCount(15); // every 15s
+
+  constructor(private auth: AuthTokenService) {}
+
+  get user() {
+    return this.auth.getCurrentUser();
+  }
+
+  get isOwner() {
+    return this.auth.isInRole('Owner');
+  }
+
+  get isMaintainer() {
+    return this.auth.isInRole('Maintainer');
+  }
+
+  logout() {
+    this.auth.logout();
+    window.location.href = '/login';
+  }
 }

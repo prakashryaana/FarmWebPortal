@@ -1,21 +1,97 @@
-<div>
-  <h2>Login</h2>
+<div class="auth-shell">
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <div mat-card-avatar class="auth-avatar">
+        <mat-icon>spa</mat-icon>
+      </div>
+      <mat-card-title>Sign in to EasyGrow</mat-card-title>
+      <mat-card-subtitle>
+        Use your password, or sign in with a passkey or magic link if enabled.
+      </mat-card-subtitle>
+    </mat-card-header>
 
-  <div *ngIf="stage === 'mobile'">
-    <label>Mobile:</label>
-    <input [(ngModel)]="mobile" type="tel" />
-    <button (click)="sendOtp()">Send OTP</button>
+    <mat-card-content>
+      <form (ngSubmit)="loginWithPassword()" #loginForm="ngForm" class="auth-form" novalidate>
+        <!-- Mobile -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Mobile number</mat-label>
+          <input
+            matInput
+            id="mobile"
+            name="mobile"
+            type="tel"
+            required
+            [(ngModel)]="mobile"
+            placeholder="+91 98765 43210"
+          />
+        </mat-form-field>
 
-    <button *ngIf="canUseBiometric" (click)="biometricLogin()">
-      Login with fingerprint
-    </button>
-  </div>
+        <!-- Password -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            id="password"
+            name="password"
+            type="password"
+            required
+            [(ngModel)]="password"
+            placeholder="Your password"
+          />
+          <mat-icon matSuffix>lock</mat-icon>
+        </mat-form-field>
 
-  <div *ngIf="stage === 'otp'">
-    <label>OTP:</label>
-    <input [(ngModel)]="otp" type="text" />
-    <button (click)="verifyOtp()">Verify OTP</button>
-  </div>
+        <button
+          mat-raised-button
+          color="primary"
+          class="full-width primary-button"
+          type="submit"
+          [disabled]="!loginForm.form.valid"
+        >
+          Sign in
+        </button>
+      </form>
 
-  <p>{{ message }}</p>
+      <div class="divider">
+        <span>or</span>
+      </div>
+
+      <!-- Secondary sign-in options -->
+       @if (canUsePasskey) {
+      <div class="secondary-actions">
+        <button
+          mat-stroked-button
+          color="primary"
+          class="full-width"
+          type="button"
+          (click)="loginWithPasskey()"
+        >
+          <mat-icon>fingerprint</mat-icon>
+          <span>Sign in with passkey</span>
+        </button>
+
+        <button
+          mat-button
+          color="primary"
+          class="full-width"
+          type="button"
+          (click)="goToMagic()"
+        >
+          <mat-icon>mail</mat-icon>
+          <span>Send me a magic link</span>
+        </button>
+      </div>
+    }
+      @if (message) {
+      <p class="auth-message">{{ message }}</p>
+      }
+    </mat-card-content>
+
+    <mat-card-actions align="end" class="auth-footer">
+      <span>New to EasyGrow?</span>
+      <button mat-button color="primary" routerLink="/register">
+        Create an account
+      </button>
+    </mat-card-actions>
+  </mat-card>
 </div>

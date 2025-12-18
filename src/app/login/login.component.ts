@@ -1,48 +1,46 @@
 import { Component } from '@angular/core';
-import { AuthService } from './auth.service';
+import { Router } from '@angular/router';
 import { WebAuthnService } from '../enable-fingerprint/web-authn.service';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from './auth.service';
+import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-login',
+  imports:[FormsModule,MatCard,MatCardHeader,MatCardTitle,MatCardContent,MatIcon,MatCardSubtitle,MatFormField,MatLabel,MatCardActions],
   templateUrl: './login.component.html'
 })
 export class LoginComponent {
   mobile = '';
-  otp = '';
-  stage: 'mobile' | 'otp' = 'mobile';
+  password = '';
+  canUsePasskey = !!(window as any).PublicKeyCredential;
   message = '';
-  canUseBiometric = !!(window as any).PublicKeyCredential;
 
   constructor(
-    private auth: AuthService,
-    private webAuthn: WebAuthnService
+    private webAuthn: WebAuthnService,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
-  sendOtp() {
-    this.auth.sendOtp(this.mobile).subscribe({
-      next: () => {
-        this.stage = 'otp';
-        this.message = 'OTP sent';
-      },
-      error: err => this.message = err.error || 'Error sending OTP'
+  async loginWithPassword(){
+    this.authService.loginWithPassword(this.mobile, this.password).subscribe({
+      next: () => this.router.navigate(['/home-dashboard']),
+      error: err => this.message = err.error || 'Invalid credentials'
     });
   }
 
-  verifyOtp() {
-    this.auth.verifyOtp(this.mobile, this.otp).subscribe({
-      next: () => {
-        this.message = 'Logged in; you can now enable fingerprint on settings.';
-      },
-      error: err => this.message = err.error || 'Invalid OTP'
-    });
-  }
-
-  async biometricLogin() {
+  async loginWithPasskey() {
     try {
-      await this.webAuthn.loginWithBiometric(this.mobile);
-      this.message = 'Logged in with fingerprint';
+      await this.webAuthn.loginWithPasskey(this.mobile);
+      this.router.navigate(['/home-dashboard']);
     } catch (e: any) {
-      this.message = e.message || 'Biometric login failed';
+      this.message = e.message || 'Passkey login failed';
     }
+  }
+
+  goToMagic() {
+    this.router.navigate(['/magic-request']);
   }
 }
