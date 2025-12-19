@@ -1,105 +1,118 @@
-<div class="auth-shell">
-  <mat-card class="auth-card">
-    <mat-card-header>
-      <div mat-card-avatar class="auth-avatar">
-        <mat-icon>spa</mat-icon>
+<!-- register.component.html - Professional Angular 21 Material Design -->
+<div class="auth-container">
+  <mat-card class="register-card">
+    <mat-card-header class="card-header">
+      <div mat-card-avatar class="avatar">
+        <mat-icon>sprout</mat-icon>
       </div>
-      <mat-card-title>Create your EasyGrow account</mat-card-title>
-      <mat-card-subtitle>
+      <mat-card-title class="title">Create EasyGrow Account</mat-card-title>
+      <mat-card-subtitle class="subtitle">
         Sign up with your mobile number and password. You can enable passkeys and magic links later.
       </mat-card-subtitle>
     </mat-card-header>
 
-    <mat-card-content>
-      <form (ngSubmit)="register()" [formGroup]="registrationForm" class="auth-form">
-        <!-- Mobile -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Mobile number</mat-label>
-          <input matInput id="mobile" name="mobile" type="tel" required placeholder="+91 98765 43210"
-            formControlName="mobile" />
+    <mat-card-content class="card-content">
+      <form [formGroup]="registrationForm" (ngSubmit)="register()" class="form">
+        <!-- Mobile Number -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Mobile Number</mat-label>
+          <input matInput type="tel" formControlName="mobile" placeholder="+91 98765 43210">
+          @if (registrationForm.get('mobile')?.touched && registrationForm.get('mobile')?.errors?.['required']) {
+            <mat-error>Mobile number is required</mat-error>
+          }
+          @if (registrationForm.get('mobile')?.touched && registrationForm.get('mobile')?.errors?.['pattern']) {
+            <mat-error>Enter valid 10-digit mobile number</mat-error>
+          }
         </mat-form-field>
 
         <!-- Email -->
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Email (optional)</mat-label>
-          <input matInput id="email" name="email" type="email" placeholder="you@example.com" formControlName="email" />
+          <input matInput type="email" formControlName="email" placeholder="you@example.com">
+          @if (registrationForm.get('email')?.touched && registrationForm.get('email')?.errors?.['email']) {
+            <mat-error>Enter valid email address</mat-error>
+          }
         </mat-form-field>
 
         <!-- Password -->
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Password</mat-label>
-          <input matInput id="password" name="password" type="password" required minlength="8"
-            placeholder="At least 8 characters" formControlName="password" />
-          <mat-icon matSuffix>lock</mat-icon>
+          <input matInput [type]="showPassword ? 'text' : 'password'" formControlName="password">
+          <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword">
+            <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if (registrationForm.get('password')?.touched && registrationForm.get('password')?.errors?.['required']) {
+            <mat-error>Password is required</mat-error>
+          }
+          @if (registrationForm.get('password')?.touched && registrationForm.get('password')?.errors?.['minlength']) {
+            <mat-error>Minimum 8 characters required</mat-error>
+          }
         </mat-form-field>
 
-        <!-- Confirm password -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Confirm password</mat-label>
-          <input matInput id="confirmPassword" name="confirmPassword" type="password" required
-            placeholder="Re-enter your password" formControlName="confirmPassword" />
-          <mat-icon matSuffix>lock_reset</mat-icon>
+        <!-- Confirm Password -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword">
+          <button mat-icon-button matSuffix type="button" (click)="showConfirmPassword = !showConfirmPassword">
+            <mat-icon>{{showConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if (registrationForm.get('confirmPassword')?.touched && registrationForm.get('confirmPassword')?.errors?.['required']) {
+            <mat-error>Please confirm your password</mat-error>
+          }
+          @if (registrationForm.touched && registrationForm.errors?.['passwordMismatch']) {
+            <mat-error>Passwords do not match</mat-error>
+          }
         </mat-form-field>
 
-        <!-- Role selection -->
-        <!-- <div class="role-row">
-          <span class="role-label">Account type</span>
-          <mat-button-toggle-group
-            name="accountType"
-            [(ngModel)]="asOwner"
-            class="role-toggle-group"
-          >
-            <mat-button-toggle [value]="true">Owner</mat-button-toggle>
-            <mat-button-toggle [value]="false">Maintainer</mat-button-toggle>
-          </mat-button-toggle-group>
+        <!-- Account Type -->
+        <!-- <div class="account-type-section">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Account Type</mat-label>
+            <mat-select formControlName="accountType">
+              <mat-option value="owner">Farm Owner</mat-option>
+              <mat-option value="maintainer">Farm Maintainer</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          @if (getAccountType() === 'maintainer') {
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Owner ID</mat-label>
+              <input matInput formControlName="ownerId" placeholder="Enter owner account ID">
+              @if (registrationForm.get('ownerId')?.touched && registrationForm.get('ownerId')?.errors?.['required']) {
+                <mat-error>Owner ID is required</mat-error>
+              }
+            </mat-form-field>
+          }
         </div> -->
 
-        <!-- OwnerId for maintainer -->
-        <!-- @if (!asOwner) {
-        <mat-form-field
-          appearance="outline"
-          class="full-width"
-        >
-          <mat-label>Owner ID</mat-label>
-          <input
-            matInput
-            id="ownerId"
-            name="ownerId"
-            type="text"
-            [(ngModel)]="ownerId"
-            placeholder="Owner account ID"
-          />
-        </mat-form-field>
-      } -->
-
-        <!-- Primary action -->
-        <button mat-raised-button color="primary" class="full-width primary-button" type="submit"
-          [disabled]="!registrationForm.valid">
-          Create account
+        <!-- Submit Button -->
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="submit-button"
+          type="submit" 
+          [disabled]="!registrationForm.valid || isLoading">
+          @if (isLoading) {
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Creating Account...</span>
+          } @else {
+            <span>Create Account</span>
+          }
         </button>
 
-        <!-- Secondary actions -->
-        @if (canUsePasskey) {
-        <div class="secondary-actions">
-          <button mat-stroked-button color="primary" class="full-width" type="button" (click)="enablePasskey()">
-            <mat-icon>fingerprint</mat-icon>
-            <span>Enable passkey on this device</span>
-          </button>
-        </div>
-        }
-
-        <!-- Message / errors -->
+        <!-- Status Message -->
         @if (message) {
-        <p class="auth-message">{{ message }}</p>
+          <mat-card class="status-message" [class.error]="error" [class.success]="!error">
+            <mat-icon>{{error ? 'error' : 'check_circle'}}</mat-icon>
+            {{message}}
+          </mat-card>
         }
       </form>
     </mat-card-content>
 
-    <mat-card-actions align="end" class="auth-footer">
-      <span>Already have an account?</span>
-      <button mat-button color="primary" routerLink="/login">
-        Sign in
-      </button>
+    <mat-card-actions class="card-actions">
+      <span class="action-text">Already have an account?</span>
+      <button mat-button color="primary" [routerLink]="['/login']">Sign In</button>
     </mat-card-actions>
   </mat-card>
 </div>
