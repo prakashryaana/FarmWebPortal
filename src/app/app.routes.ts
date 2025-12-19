@@ -16,6 +16,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MagicCallbackComponent } from './magic-callback/magic-callback.component';
 import { MagicRequestComponent } from './magic-request/magic-request.component';
+import { authGuard } from './auth-guard';
 
 
 export const routes: Routes = [
@@ -82,7 +83,7 @@ export const routes: Routes = [
     {
         path: 'home-dashboard',
         component: HomeDashboardComponent,
-        title: 'Dashboard'
+        canActivate: [authGuard] //This will check if user is loggedIn or not before redirecting to the link - TODO use this on all links
     },
     { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },

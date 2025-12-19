@@ -27,6 +27,7 @@ export class LoginComponent {
   canUsePasskey = !!(window as any).PublicKeyCredential;
   message = '';
   loginForm!: FormGroup;
+  canUseMagicLinks = false;
 
   constructor(
     private webAuthn: WebAuthnService,

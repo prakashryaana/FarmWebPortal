@@ -75,10 +75,12 @@
         </div>
       }
 
-      <button mat-button class="magic-link" type="button" (click)="goToMagic()">
-        <mat-icon>mail</mat-icon>
-        Send Magic Link
-      </button>
+      @if(canUseMagicLinks){
+        <button mat-button class="magic-link" type="button" (click)="goToMagic()">
+          <mat-icon>mail</mat-icon>
+          Send Magic Link
+        </button>
+      }
     </mat-card-content>
 
     <mat-card-actions class="footer">

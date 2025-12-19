@@ -15,6 +15,15 @@ export class AuthTokenService {
     return localStorage.getItem('authToken');
   }
 
+  /*
+  //Use this as guard against illigal/unauthenticated url calls/changes
+  //returns true if loggedIn
+  //returns false if not loggedIn
+  */
+  get isLoggedIn() {
+    return !!this.token;
+  }
+
   getCurrentUser(): CurrentUser | null {
     const token = this.token;
     if (!token) return null;
