@@ -59,6 +59,12 @@
       <!-- Secondary sign-in options -->
        @if (canUsePasskey) {
       <div class="secondary-actions">
+        <!-- <div class="secondary-actions"> -->
+        <button mat-stroked-button color="primary" class="full-width" type="button" (click)="enablePasskey()">
+          <mat-icon>fingerprint</mat-icon>
+          <span>Enable passkey on this device</span>
+        </button>
+        <!-- </div> -->
         <button
           mat-stroked-button
           color="primary"
