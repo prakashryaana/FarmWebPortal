@@ -54,11 +54,11 @@ export class WebAuthnService {
   }
 
   async registerForCurrentUser() {
-    const userId = localStorage.getItem('userId');
-    if (!userId) throw new Error('Not logged in');
+    // const userId = localStorage.getItem('userId');
+    // if (!userId) throw new Error('Not logged in');
 
     const options = await firstValueFrom(
-      this.http.post<any>(`${this.baseUrl}/register-options`, { userId }, { withCredentials:true})
+      this.http.post<any>(`${this.baseUrl}/register-options`, { withCredentials:true})
     );
 
     const publicKey = this.decodeCreationOptions(options);
@@ -94,9 +94,9 @@ export class WebAuthnService {
       )
     );
 
-    localStorage.setItem('authToken', res.token);
-    localStorage.setItem('userId', res.userId);
-    localStorage.setItem('mobile', res.mobile);
+    // localStorage.setItem('authToken', res.token);
+    // localStorage.setItem('userId', res.userId);
+    // localStorage.setItem('mobile', res.mobile);
   }
 
   async loginWithPasskey(mobile: string) {
@@ -137,8 +137,8 @@ export class WebAuthnService {
       )
     );
 
-    localStorage.setItem('authToken', res.token);
-    localStorage.setItem('userId', res.userId);
-    localStorage.setItem('mobile', res.mobile);
+    // localStorage.setItem('authToken', res.token);
+    // localStorage.setItem('userId', res.userId);
+    // localStorage.setItem('mobile', res.mobile);
   }
 }

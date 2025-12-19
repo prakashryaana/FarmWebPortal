@@ -2,20 +2,21 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CropFarmSelectorToolbarComponent } from './crop-farm-selector/crop-farm-selector-toolbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import { AuthTokenService } from './login/auth-token.service';
+import { AuthService } from '../app/login/auth.service';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CropFarmSelectorToolbarComponent, SidebarComponent],
+  imports: [RouterOutlet, CropFarmSelectorToolbarComponent, SidebarComponent, AsyncPipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class App {
   protected readonly title = signal('FarmWebPortal');
 
-  constructor(private auth:AuthTokenService) {}
+  constructor(public auth:AuthService) {}
 
-  get isLoggedIn() {
-    return !!this.auth.token;
+  logout(){
+    this.auth.logout();
   }
 }

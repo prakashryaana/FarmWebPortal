@@ -89,5 +89,11 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'magic-request', component: MagicRequestComponent },
   { path: 'auth/magic/callback', component: MagicCallbackComponent },
-  { path: '', redirectTo: 'login', pathMatch: 'full' }
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+    // {
+    // path: 'admin/users',
+    // component: AdminUsersComponent,
+    // canActivate: [authGuard, roleGuard],
+    // data: { roles: ['Admin'] } //using role guard
+    // }
 ];

@@ -49,8 +49,13 @@ export class LoginComponent {
 
   async loginWithPassword(){
     if (this.loginForm.valid){
-      this.authService.loginWithPassword(this.loginForm.get('mobile').value, this.loginForm.get('password').value).subscribe({
-        next: () => this.router.navigate(['/home-dashboard']),
+      const credentials = this.loginForm.value;
+      this.authService.loginWithPassword(credentials).subscribe({
+        next: (e) => {
+          console.log(e);
+          this.authService.afterLogin(); //to get the current loggedin user
+          this.router.navigate(['/home-dashboard'])
+        },
         error: err => this.message = err.error || 'Invalid credentials'
       });
     }
@@ -69,6 +74,7 @@ export class LoginComponent {
   async loginWithPasskey() {
     try {
       await this.webAuthn.loginWithPasskey(this.mobile);
+      this.authService.afterLogin(); //to get the current loggedin user
       this.router.navigate(['/home-dashboard']);
     } catch (e: any) {
       this.message = e.message || 'Passkey login failed';

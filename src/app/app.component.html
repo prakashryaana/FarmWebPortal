@@ -1,7 +1,4 @@
-@if (!isLoggedIn) {
-  <router-outlet></router-outlet>
-}
-@if (isLoggedIn) {
+@if (auth.isAuthenticated$ | async){
 <main>
     <header class="brand-name">
       <!-- <img class="brand-logo" src="./assets/favicon/icons8-vegetables-box-pastel-color-32.png" alt="EasyGrow" aria-hidden="true"> -->
@@ -9,6 +6,7 @@
         <a href="/home-dashboard">EasyGrow</a>
       </h1>
       <app-crop-farm-selector-toolbar class="toolbar-right"></app-crop-farm-selector-toolbar>
+      <button (click)="logout()">Logout</button>
     </header>
     <div class="layout">
     <app-sidebar class="sidebar-left"></app-sidebar>
@@ -20,4 +18,6 @@
       <!-- <p>© 2025 EasyGrow. All rights reserved.</p> -->
     </footer>
   </main> 
+} @else {
+<router-outlet></router-outlet>
 }
