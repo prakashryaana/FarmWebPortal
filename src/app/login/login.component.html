@@ -1,103 +1,89 @@
-<div class="auth-shell">
-  <mat-card class="auth-card">
-    <mat-card-header>
-      <div mat-card-avatar class="auth-avatar">
-        <mat-icon>spa</mat-icon>
+<!-- login.component.html - Professional Angular 21 Login -->
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header class="header">
+      <div mat-card-avatar class="avatar">
+        <mat-icon>sprout</mat-icon>
       </div>
-      <mat-card-title>Sign in to EasyGrow</mat-card-title>
-      <mat-card-subtitle>
-        Use your password, or sign in with a passkey or magic link if enabled.
+      <mat-card-title class="title">Sign in to EasyGrow</mat-card-title>
+      <mat-card-subtitle class="subtitle">
+        Welcome back! Manage your farms efficiently
       </mat-card-subtitle>
     </mat-card-header>
 
-    <mat-card-content>
-      <form (ngSubmit)="loginWithPassword()" #loginForm="ngForm" class="auth-form" novalidate>
-        <!-- Mobile -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Mobile number</mat-label>
-          <input
-            matInput
-            id="mobile"
-            name="mobile"
-            type="tel"
-            required
-            [(ngModel)]="mobile"
-            placeholder="+91 98765 43210"
-          />
+    <mat-card-content class="content">
+      <form [formGroup]="loginForm" (ngSubmit)="loginWithPassword()" class="form">
+        <!-- Mobile Number -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Mobile Number</mat-label>
+          <input matInput type="tel" formControlName="mobile" placeholder="+91 98765 43210">
+          @if (loginForm.get('mobile')?.touched && loginForm.get('mobile')?.errors?.['required']) {
+            <mat-error>Mobile number is required</mat-error>
+          }
+          @if (loginForm.get('mobile')?.touched && loginForm.get('mobile')?.errors?.['pattern']) {
+            <mat-error>Enter valid 10-digit number</mat-error>
+          }
         </mat-form-field>
 
         <!-- Password -->
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="form-field">
           <mat-label>Password</mat-label>
-          <input
-            matInput
-            id="password"
-            name="password"
-            type="password"
-            required
-            [(ngModel)]="password"
-            placeholder="Your password"
-          />
-          <mat-icon matSuffix>lock</mat-icon>
+          <input matInput [type]="showPassword ? 'text' : 'password'" formControlName="password">
+          <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword">
+            <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if (loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['required']) {
+            <mat-error>Password is required</mat-error>
+          }
         </mat-form-field>
 
-        <button
-          mat-raised-button
-          color="primary"
-          class="full-width primary-button"
-          type="submit"
-          [disabled]="!loginForm.form.valid"
-        >
-          Sign in
+        <!-- Submit Button -->
+        <button mat-raised-button color="primary" class="submit-btn" type="submit" 
+                [disabled]="loginForm.invalid || isLoading">
+          @if (isLoading) {
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Signing in...</span>
+          } @else {
+            <span>Sign In</span>
+          }
         </button>
+
+        <!-- Error Message -->
+        @if (message) {
+          <div class="error-message">
+            <mat-icon>error_outline</mat-icon>
+            {{message}}
+          </div>
+        }
       </form>
 
       <div class="divider">
         <span>or</span>
       </div>
 
-      <!-- Secondary sign-in options -->
-       @if (canUsePasskey) {
-      <div class="secondary-actions">
-        <!-- <div class="secondary-actions"> -->
-        <button mat-stroked-button color="primary" class="full-width" type="button" (click)="enablePasskey()">
-          <mat-icon>fingerprint</mat-icon>
-          <span>Enable passkey on this device</span>
-        </button>
-        <!-- </div> -->
-        <button
-          mat-stroked-button
-          color="primary"
-          class="full-width"
-          type="button"
-          (click)="loginWithPasskey()"
-        >
-          <mat-icon>fingerprint</mat-icon>
-          <span>Sign in with passkey</span>
-        </button>
-
-        <button
-          mat-button
-          color="primary"
-          class="full-width"
-          type="button"
-          (click)="goToMagic()"
-        >
-          <mat-icon>mail</mat-icon>
-          <span>Send me a magic link</span>
-        </button>
-      </div>
-    }
-      @if (message) {
-      <p class="auth-message">{{ message }}</p>
+      <!-- Passkey Options -->
+      @if (canUsePasskey) {
+        <div class="passkey-actions">
+          <button mat-stroked-button class="secondary-btn" type="button" (click)="enablePasskey()">
+            <mat-icon>fingerprint</mat-icon>
+            Enable Passkey
+          </button>
+          <button mat-stroked-button class="secondary-btn" type="button" (click)="loginWithPasskey()">
+            <mat-icon>fingerprint</mat-icon>
+            Sign in with Passkey
+          </button>
+        </div>
       }
+
+      <button mat-button class="magic-link" type="button" (click)="goToMagic()">
+        <mat-icon>mail</mat-icon>
+        Send Magic Link
+      </button>
     </mat-card-content>
 
-    <mat-card-actions align="end" class="auth-footer">
+    <mat-card-actions class="footer">
       <span>New to EasyGrow?</span>
-      <button mat-button color="primary" routerLink="/register">
-        Create an account
-      </button>
+      <button mat-button color="primary" routerLink="/register">Create Account</button>
     </mat-card-actions>
   </mat-card>
 </div>
