@@ -17,6 +17,8 @@ import { inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltip } from "@angular/material/tooltip";
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { lastValueFrom } from 'rxjs';
 
 interface UserRow extends User {
   displayRoles: string;
@@ -41,6 +43,7 @@ export class UserManagementComponent {
   private userService = inject(UserService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private confirmDialog = inject(MatDialog);
   
   users = signal<UserRow[]>([]);
   loading = signal(false);
@@ -68,29 +71,6 @@ export class UserManagementComponent {
       )
       .subscribe(users => this.users.set(users));
   }
-  
-  // openCreateDialog() {
-  //   const dialogRef = this.dialog.open(UserDialogComponent, {
-  //     //width: '500px', 
-  //     data: { mode: 'create' }
-  //   });
-    
-  //   dialogRef.afterClosed().pipe(
-  //     switchMap(result => result ? this.userService.createUser(result) : of(null)),
-  //     catchError(err => {
-  //       this.snackBar.open('Create failed', 'Close', { duration: 3000 });
-  //       return of(null);
-  //     })
-  //   ).subscribe({ 
-  //     next:() => {
-  //     this.loadUsers();
-  //     this.snackBar.open('User created', 'Close', { duration: 2000 });
-  //   },
-  //   error:(err) => {
-  //     this.snackBar.open('Create failed', 'Close', { duration: 3000 });
-  //   }
-  // });
-  // }
 
   openCreateDialog() {
   const dialogRef = this.dialog.open(UserDialogComponent, {
@@ -160,21 +140,43 @@ export class UserManagementComponent {
         }});
   }
 
+  private showConfirmDialog(title: string, message: string, action: string): Promise<boolean> {
+    const dialogRef = this.confirmDialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { title, message, action }
+    });
+    
+    return lastValueFrom(dialogRef.afterClosed());  // Convert Observable to Promise
+  }
+
   setSystemStatus(user: User) {
-    //this.snackBar.open('Do you want to action this ?','Yes',con)
-    const newStatus = user.systemStatus === 'ACTIVE' ? 'DEACTIVATED' : 'ACTIVE';
-    this.userService.setSystemStatus(user.userId!, newStatus)
-    .subscribe({
-      next: result => {
-        this.users.update(users => 
-        users.map(u => u.userId === user.userId ? { ...u, status: newStatus } : u)
-        );
-        this.snackBar.open(`User is ${newStatus.toLowerCase()}`, 'Close');
-      },
-      error: err => {
-        this.snackBar.open(`Update failed`, 'Close');
-        console.error('Update failed', err);
+    const dialogRef = this.confirmDialog.open(ConfirmDialogComponent, {
+    width: '400px',
+    data: { 
+      title: 'Confirm Status Change',
+      message: `Are you sure you want to ${user.systemStatus === 'ACTIVE' ? 'deactivate' : 'activate'} user "${user.name}"?`,
+      action: user.systemStatus === 'ACTIVE' ? 'Deactivate' : 'Activate'
       }
+    });
+
+    dialogRef.afterClosed()
+    .subscribe(confirmed => {
+      if (!confirmed) return;  // User cancelled
+
+      const newStatus = user.systemStatus === 'ACTIVE' ? 'DEACTIVATED' : 'ACTIVE';
+      this.userService.setSystemStatus(user.userId!, newStatus)
+      .subscribe({
+        next: result => {
+          this.users.update(users => 
+          users.map(u => u.userId === user.userId ? { ...u, status: newStatus } : u)
+          );
+          this.snackBar.open(`User is ${newStatus.toLowerCase()}`, 'Close');
+        },
+        error: err => {
+          this.snackBar.open(`Update failed`, 'Close');
+          console.error('Update failed', err);
+        }
+      });
     });
   }
   
