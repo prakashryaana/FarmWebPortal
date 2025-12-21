@@ -1,0 +1,9 @@
+<div>
+  <h2>Enable Fingerprint</h2>
+  @if (canUseBiometric) {
+  <button (click)="enable()">
+    Enable fingerprint on this device
+  </button>
+}
+  <p>{{ message }}</p>
+</div>

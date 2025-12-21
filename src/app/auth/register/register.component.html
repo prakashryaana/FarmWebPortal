@@ -1,0 +1,110 @@
+<!-- register.component.html - Professional Angular 21 Material Design -->
+<div class="auth-container">
+  <mat-card class="register-card">
+    <mat-card-header class="card-header">
+      <div mat-card-avatar class="avatar">
+        <mat-icon>sprout</mat-icon>
+      </div>
+      <mat-card-title class="title">Create EasyGrow Account</mat-card-title>
+      <mat-card-subtitle class="subtitle">
+        Sign up with your mobile number and password. You can enable passkeys and magic links later.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="card-content">
+      <form [formGroup]="registrationForm" (ngSubmit)="register()" class="form">
+
+        <!-- UserName -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>UserName</mat-label>
+          <input matInput type="text" formControlName="name" placeholder="svijay">
+          @if (registrationForm.get('name')?.touched && registrationForm.get('name')?.errors?.['required']) {
+            <mat-error>username is required</mat-error>
+          }
+          @if (registrationForm.get('name')?.touched && registrationForm.get('name')?.errors?.['minlength']) {
+            <mat-error>Minimum 5 characters required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Mobile Number -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Mobile Number</mat-label>
+          <input matInput type="tel" formControlName="mobile" placeholder="+91 98765 43210">
+          @if (registrationForm.get('mobile')?.touched && registrationForm.get('mobile')?.errors?.['required']) {
+            <mat-error>Mobile number is required</mat-error>
+          }
+          @if (registrationForm.get('mobile')?.touched && registrationForm.get('mobile')?.errors?.['pattern']) {
+            <mat-error>Enter valid 10-digit mobile number</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Email -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email (optional)</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="you@example.com">
+          @if (registrationForm.get('email')?.touched && registrationForm.get('email')?.errors?.['email']) {
+            <mat-error>Enter valid email address</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Password -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="showPassword ? 'text' : 'password'" formControlName="password">
+          <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword">
+            <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if (registrationForm.get('password')?.touched && registrationForm.get('password')?.errors?.['required']) {
+            <mat-error>Password is required</mat-error>
+          }
+          @if (registrationForm.get('password')?.touched && registrationForm.get('password')?.errors?.['minlength']) {
+            <mat-error>Minimum 8 characters required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Confirm Password -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword">
+          <button mat-icon-button matSuffix type="button" (click)="showConfirmPassword = !showConfirmPassword">
+            <mat-icon>{{showConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if (registrationForm.get('confirmPassword')?.touched && registrationForm.get('confirmPassword')?.errors?.['required']) {
+            <mat-error>Please confirm your password</mat-error>
+          }
+          @if (registrationForm.touched && registrationForm.errors?.['passwordMismatch']) {
+            <mat-error>Passwords do not match</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Submit Button -->
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="submit-button"
+          type="submit" 
+          [disabled]="!registrationForm.valid || isLoading">
+          @if (isLoading) {
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Creating Account...</span>
+          } @else {
+            <span>Create Account</span>
+          }
+        </button>
+
+        <!-- Status Message -->
+        @if (message) {
+          <mat-card class="status-message" [class.error]="error" [class.success]="!error">
+            <mat-icon>{{error ? 'error' : 'check_circle'}}</mat-icon>
+            {{message}}
+          </mat-card>
+        }
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions class="card-actions">
+      <span class="action-text">Already have an account?</span>
+      <button mat-button color="primary" [routerLink]="['/login']">Sign In</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

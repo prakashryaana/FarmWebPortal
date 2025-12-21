@@ -59,3 +59,16 @@
     <mat-progress-spinner diameter="40"></mat-progress-spinner>
   </div>
 </ng-template>
+
+<!-- @if (user) {
+<div>
+  <p>Mobile: {{ user.mobile }}</p>
+  <p>Email: {{ user.email || 'none' }}</p>
+  <p>Roles: {{ user.roles.join(', ') }}</p>
+  <p>OwnerId: {{ user.ownerId }}</p>
+  @if (user.maintainerId) {<p>MaintainerId: {{ user.maintainerId }}</p>}
+  @if (isOwner) {<button>Owner settings</button>}
+  @if (isMaintainer || isOwner) {<button>Manage projects</button>}
+  <button (click)="logout()">Logout</button>
+</div>
+} -->

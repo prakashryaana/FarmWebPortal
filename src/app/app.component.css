@@ -1,51 +1,159 @@
+:host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
 main {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100%;
+}
+
+.auth-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  flex: 1;
 }
 
 header.brand-name {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
-  background-color: #fafafa;
+  padding: 0 1.5rem;
+  background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  height: 70px;
+  flex-shrink: 0;
+  gap: 1rem;
 }
 
 header.brand-name h1 {
   margin: 0;
-  padding: 1rem 0;
-  font-size: 28px;
-  font-weight: 500;
-  color: #333;
+  padding: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2933;
   flex: 1;
-}
-
-.toolbar-right {
-  flex-shrink: 0;
   min-width: 0;
 }
 
-section {
-  margin: 2rem;
-  flex: 1;
-  overflow-y: auto;
-}
-
-h1 a {
+header.brand-name h1 a {
   color: inherit;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+header.brand-name h1 a:hover {
+  color: #22c55e;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+header button {
+  padding: 0.6rem 1.2rem;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+header button:hover {
+  background: #16a34a;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 .layout {
-      display: flex;
-      min-height: 100vh;
-    }
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
 
-    .content {
-      flex: 1;
-      padding: 1rem;
-      box-sizing: border-box;
-    }
+.content {
+  flex: 1;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  header.brand-name {
+    padding: 0 1rem;
+    height: 65px;
+  }
+
+  header.brand-name h1 {
+    font-size: 20px;
+  }
+
+  .content {
+    padding: 1.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  header.brand-name {
+    padding: 0 0.8rem;
+    height: 60px;
+    gap: 0.5rem;
+  }
+
+  header.brand-name h1 {
+    font-size: 18px;
+  }
+
+  .toolbar-right {
+    gap: 0.5rem;
+  }
+
+  header button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header.brand-name {
+    padding: 0 0.5rem;
+    height: 56px;
+  }
+
+  header.brand-name h1 {
+    font-size: 16px;
+  }
+
+  .toolbar-right {
+    gap: 0.3rem;
+  }
+
+  header button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .content {
+    padding: 0.8rem;
+  }
+}
