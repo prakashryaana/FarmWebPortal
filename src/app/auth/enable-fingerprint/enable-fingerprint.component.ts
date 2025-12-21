@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { WebAuthnService } from './web-authn.service';
+import { WebAuthnService } from '../web-authn.service';
 
 @Component({
   selector: 'app-enable-fingerprint',

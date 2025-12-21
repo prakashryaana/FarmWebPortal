@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CropFarmSelectorToolbarComponent } from './crop-farm-selector/crop-farm-selector-toolbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import { AuthService } from '../app/login/auth.service';
+import { AuthService } from './auth/auth.service';
 import { AsyncPipe } from '@angular/common';
 
 @Component({

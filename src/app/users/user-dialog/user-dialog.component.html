@@ -1,0 +1,76 @@
+<h2 mat-dialog-title>
+      {{ data.mode === 'create' ? 'Create User' : 'Edit User' }}
+    </h2>
+    
+    <mat-dialog-content>
+      <form [formGroup]="userForm()">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" required>
+          @if (nameControl()?.hasError('required') && nameControl()?.touched) {
+            <mat-error>Mobile is required</mat-error>
+          }
+          @if (nameControl()?.hasError('minlength') && nameControl()?.touched) {
+              <mat-error>Password must be at least 5 characters</mat-error>
+            }
+        </mat-form-field>
+
+        @if (data.mode === 'create') {
+            <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Mobile</mat-label>
+            <input matInput formControlName="mobile" [disabled]="true" required>
+            @if (mobileControl()?.hasError('required') && mobileControl()?.touched) {
+                <mat-error>Mobile is required</mat-error>
+            }
+            @if (mobileControl()?.hasError('pattern') && mobileControl()?.touched) {
+                <mat-error>Invalid mobile number</mat-error>
+            }
+            </mat-form-field>
+        }
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email">
+          @if (emailControl()?.hasError('email') && emailControl()?.touched) {
+            <mat-error>Invalid email</mat-error>
+          }
+        </mat-form-field>
+        
+        @if (data.mode === 'create') {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password</mat-label>
+            <input matInput formControlName="password" type="password" required>
+            @if (passwordControl()?.hasError('required') && passwordControl()?.touched) {
+              <mat-error>Password is required (min 6 chars)</mat-error>
+            }
+            @if (passwordControl()?.hasError('minlength') && passwordControl()?.touched) {
+              <mat-error>Password must be at least 6 characters</mat-error>
+            }
+          </mat-form-field>
+        }
+        
+        <div class="roles-section">
+          <h3>Roles</h3>
+          <div class="role-checkboxes">
+            @for (role of availableRoles(); track role; let i = $index) {
+              <mat-checkbox 
+                class="role-checkbox"
+                [formControlName]="'role_' + role"
+                [id]="'role_' + role">
+                {{ getRoleDisplayName(role) }}
+              </mat-checkbox>
+            }
+          </div>
+        </div>
+      </form>
+    </mat-dialog-content>
+    
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-raised-button color="primary" 
+              [disabled]="userForm().invalid || isSubmitting()"
+              (click)="onSave()">
+        {{ data.mode === 'create' ? 'Create User' : 'Update User' }}
+      </button>
+    </mat-dialog-actions>

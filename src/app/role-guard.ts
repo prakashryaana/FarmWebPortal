@@ -1,7 +1,7 @@
 // src/app/guards/role.guard.ts
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
-import { AuthService } from '../app/login/auth.service';
+import { AuthService } from './auth/auth.service';
 import { of } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 

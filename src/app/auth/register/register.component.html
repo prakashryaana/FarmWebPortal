@@ -13,6 +13,19 @@
 
     <mat-card-content class="card-content">
       <form [formGroup]="registrationForm" (ngSubmit)="register()" class="form">
+
+        <!-- UserName -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>UserName</mat-label>
+          <input matInput type="text" formControlName="name" placeholder="svijay">
+          @if (registrationForm.get('name')?.touched && registrationForm.get('name')?.errors?.['required']) {
+            <mat-error>username is required</mat-error>
+          }
+          @if (registrationForm.get('name')?.touched && registrationForm.get('name')?.errors?.['minlength']) {
+            <mat-error>Minimum 5 characters required</mat-error>
+          }
+        </mat-form-field>
+
         <!-- Mobile Number -->
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Mobile Number</mat-label>
@@ -63,27 +76,6 @@
             <mat-error>Passwords do not match</mat-error>
           }
         </mat-form-field>
-
-        <!-- Account Type -->
-        <!-- <div class="account-type-section">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Account Type</mat-label>
-            <mat-select formControlName="accountType">
-              <mat-option value="owner">Farm Owner</mat-option>
-              <mat-option value="maintainer">Farm Maintainer</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          @if (getAccountType() === 'maintainer') {
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Owner ID</mat-label>
-              <input matInput formControlName="ownerId" placeholder="Enter owner account ID">
-              @if (registrationForm.get('ownerId')?.touched && registrationForm.get('ownerId')?.errors?.['required']) {
-                <mat-error>Owner ID is required</mat-error>
-              }
-            </mat-form-field>
-          }
-        </div> -->
 
         <!-- Submit Button -->
         <button 

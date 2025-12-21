@@ -93,10 +93,6 @@ export class WebAuthnService {
         {withCredentials:true}
       )
     );
-
-    // localStorage.setItem('authToken', res.token);
-    // localStorage.setItem('userId', res.userId);
-    // localStorage.setItem('mobile', res.mobile);
   }
 
   async loginWithPasskey(mobile: string) {
@@ -136,9 +132,5 @@ export class WebAuthnService {
         { withCredentials: true }
       )
     );
-
-    // localStorage.setItem('authToken', res.token);
-    // localStorage.setItem('userId', res.userId);
-    // localStorage.setItem('mobile', res.mobile);
   }
 }

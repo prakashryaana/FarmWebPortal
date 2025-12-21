@@ -1,4 +1,3 @@
-<!-- login.component.html - Professional Angular 21 Login -->
 <div class="login-container">
   <mat-card class="login-card">
     <mat-card-header class="header">
@@ -57,12 +56,13 @@
         }
       </form>
 
-      <div class="divider">
-        <span>or</span>
-      </div>
+      
 
       <!-- Passkey Options -->
-      @if (canUsePasskey) {
+      @if (canUsePasskey && enabledPasskeys) {
+        <div class="divider">
+        <span>or</span>
+      </div>
         <div class="passkey-actions">
           <button mat-stroked-button class="secondary-btn" type="button" (click)="enablePasskey()">
             <mat-icon>fingerprint</mat-icon>
@@ -75,7 +75,7 @@
         </div>
       }
 
-      @if(canUseMagicLinks){
+      @if(enabledMagicLinks){
         <button mat-button class="magic-link" type="button" (click)="goToMagic()">
           <mat-icon>mail</mat-icon>
           Send Magic Link

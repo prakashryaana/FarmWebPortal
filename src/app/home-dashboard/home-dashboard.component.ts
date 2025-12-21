@@ -7,7 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '../login/auth.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-home-dashboard',

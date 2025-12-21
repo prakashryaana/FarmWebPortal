@@ -12,11 +12,12 @@ import { LeafletMapComponent } from './leaflet-map/leaflet-map.component';
 import { AddActivityComponent } from './add-activity/add-activity.component';
 import { ListActivityComponent } from './list-activity/list-activity.component';
 import { HomeDashboardComponent } from './home-dashboard/home-dashboard.component';
-import { LoginComponent } from './login/login.component';
-import { RegisterComponent } from './register/register.component';
-import { MagicCallbackComponent } from './magic-callback/magic-callback.component';
-import { MagicRequestComponent } from './magic-request/magic-request.component';
+import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
+import { MagicCallbackComponent } from './auth/magic-callback/magic-callback.component';
+import { MagicRequestComponent } from './auth/magic-request/magic-request.component';
 import { authGuard } from './auth-guard';
+import { UserManagementComponent } from './users/user-management/user-management.component';
 
 
 export const routes: Routes = [
@@ -90,6 +91,11 @@ export const routes: Routes = [
   { path: 'magic-request', component: MagicRequestComponent },
   { path: 'auth/magic/callback', component: MagicCallbackComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
+  {
+        path: 'user-management',
+        component: UserManagementComponent,
+        canActivate: [authGuard] //This will check if user is loggedIn or not before redirecting to the link - TODO use this on all links
+    },
     // {
     // path: 'admin/users',
     // component: AdminUsersComponent,

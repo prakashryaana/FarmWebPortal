@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { WebAuthnService } from '../enable-fingerprint/web-authn.service';
-import { FormsModule, ReactiveFormsModule, FormGroup,Validators,FormControl } from '@angular/forms';
-import { AuthService } from './auth.service';
+import { WebAuthnService } from '../web-authn.service';
+import { ReactiveFormsModule, FormGroup,Validators,FormControl } from '@angular/forms';
+import { AuthService } from '../auth.service';
 import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardModule, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
 import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
-import { AuthTokenService } from './auth-token.service';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,17 +26,14 @@ export class LoginComponent {
   canUsePasskey = !!(window as any).PublicKeyCredential;
   message = '';
   loginForm!: FormGroup;
-  canUseMagicLinks = false;
+  enabledMagicLinks = false;
+  enabledPasskeys = false;
 
   constructor(
     private webAuthn: WebAuthnService,
     private authService: AuthService,
-    private authTokenService: AuthTokenService,
     private router: Router
   ) {
-    if (this.authTokenService.getCurrentUser()){
-      this.router.navigate(['/home-dashboard']);
-    }
   }
 
   ngOnInit() {
