@@ -1,12 +1,23 @@
-<nav class="sidebar">
-      <h2 class="sidebar-title">Menu</h2>
-      <a routerLink="/farm-registration">New On-boarding</a>
-      <a routerLink="/crop-registration">Setup Crop</a>
-      <a routerLink="/add-activity">Add Activity</a>
-      <a routerLink="/list-activity">View Activities</a>
-      <a routerLink="/user-management">Manage Users</a>
-      <!-- <a routerLink="/farms">Farms</a>
-      <a routerLink="/crops">Crops</a>
-      <a routerLink="/activities">Activities</a>
-      <a routerLink="/reports">Activities</a> -->
-    </nav>
+<nav class="sidebar" [class.collapsed]="isCollapsed()">
+  <div class="sidebar-header">
+    <h2 class="sidebar-title" *ngIf="!isCollapsed()">Menu</h2>
+    <button class="toggle-btn" (click)="toggleSidebar()" 
+            [matTooltip]="isCollapsed() ? 'Expand' : 'Collapse'"
+            matTooltipPosition="right">
+      <mat-icon>{{ isCollapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+    </button>
+  </div>
+
+  <div class="sidebar-menu">
+    <a *ngFor="let item of menuItems" 
+       [routerLink]="item.route"
+       routerLinkActive="active"
+       class="menu-item"
+       [matTooltip]="item.label"
+       [matTooltipDisabled]="!isCollapsed()"
+       matTooltipPosition="right">
+      <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
+      <span class="menu-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
+    </a>
+  </div>
+</nav>
