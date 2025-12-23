@@ -2,28 +2,63 @@
   <button (click)="getFarmWeather()" [disabled]="isLoading">
     {{ isLoading ? 'Loading Weather...' : 'Get Farm Weather Data' }}
   </button>
-@if (errorMessage) {<div class="error">{{ errorMessage }}</div>}
+  @if (errorMessage) {<div class="error">{{ errorMessage }}</div>}
 
-@if (location && weatherData) {
+  @if (location && weatherData) {
   <div class="weather-results">
     <h3>Farm at {{ location.latitude.toFixed(4) }}, {{ location.longitude.toFixed(4) }}</h3>
-    
+
     <div class="current-weather">
       <h4>Current Conditions</h4>
       <p>🌡️ Temp: {{ weatherData.current.temperature }}°C</p>
       <p>💨 Wind: {{ weatherData.current.wind_speed }} km/h</p>
       <p>🌧️ Precip: {{ weatherData.current.precipitation }} mm</p>
     </div>
-    
+
     @if (weatherData.historical) {
     <div class="historical-weather">
-      <h4>2024 Historical Summary</h4>
-      <p>🌡️ Mean Temps (Jan-Dec): {{ weatherData.historical.monthlyMeanTemp.join(', ') }}°C</p>
+      <h4>Historical Summary Range : {{this.formattedStartDate}} - {{this.formattedEndDate}}</h4>
+      <!-- <p>🌡️ Mean Temps (Jan-Dec): {{ weatherData.historical.monthlyMeanTemp.join(', ') }}°C</p> -->
       <p>🌧️ Rainy Months (>50mm): {{ weatherData.historical.rainyMonths.join(', ') }}</p>
       <p>❄️ Winter Months: {{ weatherData.historical.winterMonths.join(', ') }}</p>
-      <p>💨 Avg Wind Speed: {{ weatherData.historical.avgWindSpeed.toFixed(1) }} km/h</p>
+      <!-- <p>💨 Avg Wind Speed: {{ weatherData.historical.avgWindSpeed.toFixed(1) }} km/h</p> -->
+
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Monthly Weather Summary</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <table mat-table [dataSource]="weatherData.historical.monthly" class="mat-elevation-z8">
+            <ng-container matColumnDef="month">
+              <th mat-header-cell *matHeaderCellDef>Month</th>
+              <td mat-cell *matCellDef="let item">{{ item.month }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="temp">
+              <th mat-header-cell *matHeaderCellDef>🌡️ Mean Temp (°C)</th>
+              <td mat-cell *matCellDef="let item">{{ item.meanTemp }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="rain">
+              <th mat-header-cell *matHeaderCellDef>🌧️ Total Rainfall (mm)</th>
+              <td mat-cell *matCellDef="let item" [class.rainy]="item.totalRain > 50">
+                {{ item.totalRain }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="wind">
+              <th mat-header-cell *matHeaderCellDef>💨 Avg. Wind Speed (km/h)</th>
+              <td mat-cell *matCellDef="let item">{{ item.meanWind }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </mat-card-content>
+      </mat-card>
+
     </div>
     }
   </div>
-}
+  }
 </div>

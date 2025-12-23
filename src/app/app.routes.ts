@@ -26,25 +26,24 @@ export const routes: Routes = [
     //     component: HomeDashboardComponent,
     //     title: 'Dashboard'
     // },
-    {
-        path:'home',
-        component: HomeComponent,
-        title: 'Home'
-    },
+    // {
+    //     path: 'home',
+    //     component: HomeComponent,
+    //     title: 'Home'
+    // },
     {
         path: 'farm-registration',   // set this to blank to make it default route
-        component: FarmRegistrationComponent,
-        title: 'Farm Registration'
+        component: FarmRegistrationComponent
     },
     {
         path: 'farm-owner-registration',
         component: FarmOwnerRegistrationComponent,
-        title: 'Farm Owner Registration'
+        canActivate: [authGuard]
     },
     {
         path: 'maintainer-registration/:farmId',
         component: MaintainerRegistrationComponent,
-        title: 'Maintainer Registration'
+        canActivate: [authGuard]
     },
     {
         path: 'crop-registration',
@@ -87,11 +86,11 @@ export const routes: Routes = [
         canActivate: [authGuard] //This will check if user is loggedIn or not before redirecting to the link - TODO use this on all links
     },
     { path: 'register', component: RegisterComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'magic-request', component: MagicRequestComponent },
-  { path: 'auth/magic/callback', component: MagicCallbackComponent },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  {
+    { path: 'login', component: LoginComponent },
+    { path: 'magic-request', component: MagicRequestComponent },
+    { path: 'auth/magic/callback', component: MagicCallbackComponent },
+    { path: '', redirectTo: 'login', pathMatch: 'full' },
+    {
         path: 'user-management',
         component: UserManagementComponent,
         canActivate: [authGuard] //This will check if user is loggedIn or not before redirecting to the link - TODO use this on all links
