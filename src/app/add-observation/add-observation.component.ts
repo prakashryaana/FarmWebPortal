@@ -1,5 +1,5 @@
 import { Component, signal, computed, effect, OnDestroy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,6 +14,16 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ObservationService } from './observation.service';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selector.service';
+import { ObservationRequest } from './observation.service';
+import { UploadService } from '../file-upload/upload.service';
+import { HttpEventType, HttpEvent } from '@angular/common/http';
+import { lastValueFrom } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+
+export interface UploadResult {
+  photoPath: string | null;
+  voiceNotePath: string | null;
+}
 
 @Component({
   selector: 'app-add-observation',
@@ -32,6 +42,8 @@ export class AddObservationComponent implements OnDestroy {
   private readonly observationService = inject(ObservationService);
   private readonly fb = inject(FormBuilder);
   private readonly snackBar = inject(MatSnackBar);
+  private uploadService = inject(UploadService);
+
   
   readonly observationTypes = [
     { value: 'DiseaseInsectAttack', label: 'Disease Insect Attack' },
@@ -78,8 +90,7 @@ export class AddObservationComponent implements OnDestroy {
   // Initialize IMMEDIATELY (no queueMicrotask)
   this.observationForm = this.fb.group({
     observationType: ['DiseaseInsectAttack', Validators.required],
-    dateTime: [new Date(), Validators.required],
-    notes: ['']
+    message: ['']
   });
 
   // Error handling effect (unchanged)
@@ -190,39 +201,58 @@ export class AddObservationComponent implements OnDestroy {
     reader.readAsDataURL(file);
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     const form = this.observationForm;
-    if (!form || form.invalid) {
+    if (!form || form.invalid || !this.selectedCropId) {
       this.snackBar.open('Please fill required fields', 'Close', { duration: 3000 });
       return;
     }
-
-    const formData = new FormData();
-    const formValue = form.value;
-
-    formData.append('observationType', formValue.observationType);
-    formData.append('dateTime', formValue.dateTime.toISOString().split('T')[0]);
-    formData.append('notes', formValue.notes || '');
+    let photoPath = '';
+    let voiceNotePath = '';
 
     const imageFile = this.imageFile();
-    if (imageFile) {
-      formData.append('photo', imageFile, imageFile.name);
-    }
+    try {
+      if (imageFile) {
+        photoPath = await this.uploadFile(imageFile);
+      }
 
-    const audioUrl = this.audioUrl();
-    if (audioUrl) {
-      fetch(audioUrl)
-        .then(res => res.blob())
-        .then(blob => {
-          const audioFile = new File([blob], `obs_${Date.now()}.webm`, { type: 'audio/webm' });
-          formData.append('voiceNote', audioFile);
-          this.observationService.createObservation(formData);
-        })
-        .catch(() => {
-          this.snackBar.open('Audio processing failed', 'Close', { duration: 3000 });
-        });
-    } else {
-      this.observationService.createObservation(formData);
+      const audioUrl = this.audioUrl();
+      if (audioUrl) {
+        const res = await fetch(audioUrl);
+        const blob = await res.blob();
+        const audioFile = new File([blob], `obs_${Date.now()}.webm`, { type: 'audio/webm' });
+        voiceNotePath = await this.uploadFile(audioFile);
+      }
+
+      const request: ObservationRequest = {
+        observationType: form.value.observationType,
+        message: form.value.message,
+        cropId: this.selectedCropId,
+        voiceNote: voiceNotePath,
+        photo: photoPath
+      };
+
+      // Create observation after uploads complete
+      this.observationService.createObservation(request);
+
+    } catch (err: any) {
+      console.error('Submission failed', err);
+      this.snackBar.open('Save failed: ' + (err?.message || 'Unknown'), 'Close', { duration: 4000 });
+    }
+  }
+
+  async uploadFile(file: File): Promise<string> {
+    try {
+      const body = await lastValueFrom(
+        this.uploadService.upload(file).pipe(
+          filter((e: HttpEvent<any>) => e.type === HttpEventType.Response),
+          map((e: any) => e.body)
+        )
+      );
+      return body?.fullPath || '';
+    } catch (err) {
+      console.error('Upload failed', err);
+      throw err;
     }
   }
 
@@ -231,8 +261,7 @@ export class AddObservationComponent implements OnDestroy {
     const form = this.observationForm;
     if (form) {
       form.reset({
-        observationType: 'DiseaseInsectAttack',
-        dateTime: new Date()
+        observationType: 'DiseaseInsectAttack'
       });
     }
     
@@ -247,6 +276,18 @@ export class AddObservationComponent implements OnDestroy {
       this.mediaStream.set(null);
     }
   }
+
+  //EMPTY PLACEHOLDER FILES - Always valid File objects
+  readonly emptyPhotoFile = new File([''], 'noPhoto.jpg', { 
+    type: 'image/jpeg',
+    lastModified: Date.now()
+  });
+
+  //EMPTY PLACEHOLDER FILES - Always valid File objects
+  readonly emptyVoiceFile = new File([''], 'noAudio.webm', { 
+    type: 'audio/webm', 
+    lastModified: Date.now()
+  });
 
   ngOnDestroy(): void {
     const interval = this.recordingInterval();

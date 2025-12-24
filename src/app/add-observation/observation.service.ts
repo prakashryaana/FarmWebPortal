@@ -16,18 +16,25 @@ export interface ObservationResponse {
 export class ObservationService {
   readonly isLoading = signal(false);
   readonly lastError = signal<string | null>(null);
-  private apiUrl = `${environment.baseApiUrl}api/observations`;
+  private apiUrl = `${environment.baseApiUrl}api/observation`;
 
   constructor(
     private http: HttpClient,
     private datePipe: DatePipe
   ) {}
 
-  createObservation(formData: FormData): void {
+  createObservation(request: ObservationRequest): any {
     this.isLoading.set(true);
     this.lastError.set(null);
-
-    this.http.post<ObservationResponse>(this.apiUrl, formData)
+    console.log(request);
+    // const formData = new FormData();
+    // formData.append('observationType', request.observationType);
+    // formData.append('message', request.message || '');
+    // formData.append('cropId', request.cropId);
+    // formData.append('voiceNote', request.voiceNote);
+    // formData.append('photo', request.photo);
+    
+    this.http.post<any>(`${this.apiUrl}/AddObservation`, request)
       .subscribe({
         next: (response) => {
           this.isLoading.set(false);
@@ -40,4 +47,12 @@ export class ObservationService {
         }
       });
   }
+}
+
+export interface ObservationRequest {
+  observationType: string;
+  message?: string;
+  cropId: string;
+  voiceNote?: string;
+  photo?: string;
 }

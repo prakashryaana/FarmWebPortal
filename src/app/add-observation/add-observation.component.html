@@ -7,20 +7,12 @@
     
     <!-- Observation Type -->
     <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 16px;">
-      <mat-label>Observation Type *</mat-label>
+      <mat-label>Observation Type</mat-label>
       <mat-select formControlName="observationType">
         @for (o of observationTypes; track o.value) {
           <mat-option [value]="o.value">{{o.label}}</mat-option>
         }
       </mat-select>
-    </mat-form-field>
-
-    <!-- Date -->
-    <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 16px;">
-      <mat-label>Date *</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="dateTime">
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
 
     <!-- Photo Section - VISIBLE CONSTRAINTS -->
@@ -41,10 +33,10 @@
       }
     </div>
 
-    <!-- Notes -->
+    <!-- Message -->
     <mat-form-field appearance="fill" style="width: 100%; margin: 16px 0;">
-      <mat-label>Notes</mat-label>
-      <textarea matInput rows="4" formControlName="notes"></textarea>
+      <mat-label>Message/Notes</mat-label>
+      <textarea matInput rows="3" formControlName="message"></textarea>
     </mat-form-field>
 
     <!-- Voice Recording - PROMINENT PROGRESS BAR -->
