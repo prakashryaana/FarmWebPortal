@@ -1,0 +1,34 @@
+<mat-card>
+      <mat-card-header>
+        <mat-card-title></mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <!-- Tab Selection -->
+        <div class="tab-selection">
+          <button mat-raised-button 
+                  color="primary"
+                  [class.active]="currentMode() === 'activity'"
+                  (click)="setMode('activity')">
+            Add Activity
+          </button>
+          <button mat-raised-button 
+                  color="accent"
+                  [class.active]="currentMode() === 'observation'"
+                  (click)="setMode('observation')">
+            Add Observation
+          </button>
+        </div>
+
+        <!-- Active Content -->
+        @if (currentMode() === 'activity') {
+          <div class="content-area">
+            <app-add-activity />
+          </div>
+        } @if (currentMode() === 'observation') {
+          <div class="content-area">
+            <app-add-observation />
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>

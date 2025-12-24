@@ -1,0 +1,24 @@
+.tab-selection {
+      display: flex;
+      gap: 12px;
+      margin: 24px 0;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .tab-selection button {
+      min-height: 48px;
+      padding: 0 24px;
+      border-radius: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-selection button.active {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
+    }
+    
+    .content-area {
+      padding: 24px 0;
+      min-height: 400px;
+    }

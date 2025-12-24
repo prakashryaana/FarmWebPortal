@@ -18,83 +18,29 @@ import { MagicCallbackComponent } from './auth/magic-callback/magic-callback.com
 import { MagicRequestComponent } from './auth/magic-request/magic-request.component';
 import { authGuard } from './auth-guard';
 import { UserManagementComponent } from './users/user-management/user-management.component';
+import { ActionsComponent } from './actions/actions.component';
 
 
 export const routes: Routes = [
-    // {
-    //     path: '',
-    //     component: HomeDashboardComponent,
-    //     title: 'Dashboard'
-    // },
-    // {
-    //     path: 'home',
-    //     component: HomeComponent,
-    //     title: 'Home'
-    // },
-    {
-        path: 'farm-registration',   // set this to blank to make it default route
-        component: FarmRegistrationComponent
-    },
-    {
-        path: 'farm-owner-registration',
-        component: FarmOwnerRegistrationComponent,
-        canActivate: [authGuard]
-    },
-    {
-        path: 'maintainer-registration/:farmId',
-        component: MaintainerRegistrationComponent,
-        canActivate: [authGuard]
-    },
-    {
-        path: 'crop-registration',
-        component: CropRegistrationComponent,
-        title: 'Crop Registration'
-    },
-    {
-        path: 'farm-lookup',
-        component: FarmLookupComponent,
-        title: 'Farm Lookup'
-    },
-    {
-        path: 'location',
-        component: LocationComponent,
-        title: 'Geolocation'
-    },
-    {
-        path: 'farm-weather',
-        component: FarmWeatherComponent,
-        title: 'Farm Weather'
-    },
-    {
-        path: 'leaflet-map',
-        component: LeafletMapComponent,
-        title: 'Leaflet Map'
-    },
-    {
-        path: 'add-activity',
-        component: AddActivityComponent,
-        title: 'Add Activity'
-    },
-    {
-        path: 'list-activity',
-        component: ListActivityComponent,
-        title: 'List Activity'
-    },
-    {
-        path: 'home-dashboard',
-        component: HomeDashboardComponent,
-        canActivate: [authGuard] //This will check if user is loggedIn or not before redirecting to the link - TODO use this on all links
-    },
+    { path: 'farm-registration', component: FarmRegistrationComponent, canActivate: [authGuard] },
+    { path: 'farm-owner-registration', component: FarmOwnerRegistrationComponent, canActivate: [authGuard] },
+    { path: 'maintainer-registration/:farmId', component: MaintainerRegistrationComponent, canActivate: [authGuard] },
+    { path: 'crop-registration', component: CropRegistrationComponent, canActivate: [authGuard] },
+    { path: 'farm-lookup', component: FarmLookupComponent, canActivate: [authGuard] },
+    { path: 'location', component: LocationComponent, canActivate: [authGuard] },
+    { path: 'farm-weather', component: FarmWeatherComponent, canActivate: [authGuard] },
+    { path: 'leaflet-map', component: LeafletMapComponent, canActivate: [authGuard] },
+    { path: 'add-activity', component: AddActivityComponent, canActivate: [authGuard] },
+    { path: 'list-activity', component: ListActivityComponent, canActivate: [authGuard] },
+    { path: 'home-dashboard', component: HomeDashboardComponent, canActivate: [authGuard] },
     { path: 'register', component: RegisterComponent },
     { path: 'login', component: LoginComponent },
-    { path: 'magic-request', component: MagicRequestComponent },
-    { path: 'auth/magic/callback', component: MagicCallbackComponent },
-    { path: '', redirectTo: 'login', pathMatch: 'full' },
-    {
-        path: 'user-management',
-        component: UserManagementComponent,
-        canActivate: [authGuard] //This will check if user is loggedIn or not before redirecting to the link - TODO use this on all links
-    },
+    { path: 'magic-request', component: MagicRequestComponent, canActivate: [authGuard] },
+    { path: 'auth/magic/callback', component: MagicCallbackComponent, canActivate: [authGuard] },
+    // { path: '', redirectTo: 'login', pathMatch: 'full' },
+    { path: '', component: HomeDashboardComponent, canActivate: [authGuard] },
+    { path: 'user-management', component: UserManagementComponent, canActivate: [authGuard] },
+    { path: 'actions', component: ActionsComponent, canActivate: [authGuard] }
     // {
     // path: 'admin/users',
     // component: AdminUsersComponent,

@@ -5,8 +5,8 @@ import { AuthService } from './auth/auth.service';
 import { take, map, catchError, of } from 'rxjs';
 
 export const authGuard: CanActivateFn = (route, state) => {
-console.log('[GUARD] Protecting route:', state.url);
-  
+  console.log('[GUARD] Protecting route:', state.url);
+
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -25,15 +25,3 @@ console.log('[GUARD] Protecting route:', state.url);
     })
   );
 };
-//   const authService = inject(AuthService);
-//   const router = inject(Router);
-  
-//   return authService.validate().pipe(
-//     take(1),
-//     map(isValid => {
-//       if (isValid) return true;
-//       return router.createUrlTree(['/login']);
-//     }),
-//     catchError(() => of(router.createUrlTree(['/login'])))
-//   );
-// };
