@@ -1,9 +1,12 @@
+import { HistoricalWeatherRange } from "../farm-weather/weather.service";
+import { Coordinates } from "../location/geolocation.service";
+
 export interface FarmDto {
     farmName: string | null | undefined;
     surveyNumber: string | null | undefined;
     address: string | null | undefined;
     shadeNetArea: number;
-    //geoTag: string | null | undefined;
+    geoLocation: Coordinates | null | undefined;
     farmPondVolume: number | null | undefined;
     isSolarPowerAvailable: boolean | null | undefined;
     motorCapacity: string | null | undefined;
@@ -15,6 +18,7 @@ export interface FarmDto {
     automationRoomSize: number | null | undefined;
     //farmhouseNote: string | null | undefined;
     storageAreaNote: string | null | undefined;
+    historicalWeather: HistoricalWeatherRange | null;
 }
 
 export interface UpdateFarmDto extends FarmDto {

@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, signal, computed } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 
 export interface Coordinates {
   latitude: number;
@@ -10,6 +10,11 @@ export interface Coordinates {
   providedIn: 'root',
 })
 export class GeolocationService {
+  private farmCoordinates = signal<Coordinates | null>(null);
+
+  readonly coordinates = this.farmCoordinates.asReadonly();
+  readonly hasLocationData = computed(() => this.coordinates() !== null);
+
   getCurrentPosition(): Observable<Coordinates> {
     return new Observable<Coordinates>((observer) => {
       if (!navigator.geolocation) {
@@ -34,6 +39,10 @@ export class GeolocationService {
           maximumAge: 0
         }
       );
-    });
+    }).pipe(
+      tap(coords => {
+        this.farmCoordinates.set(coords);
+      })
+    );
   }
 }

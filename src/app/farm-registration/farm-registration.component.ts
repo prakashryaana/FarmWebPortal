@@ -14,6 +14,8 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { LocationComponent } from '../location/location.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { inject } from '@angular/core';
+import { WeatherService } from '../farm-weather/weather.service';
+import { Coordinates, GeolocationService } from '../location/geolocation.service';
 
 @Component({
   selector: 'app-farm-registration',
@@ -26,6 +28,10 @@ export class FarmRegistrationComponent {
   constructor(private router: Router, private farmRegistrationService: FarmRegistrationService) {}
 
   private snackBar = inject(MatSnackBar);
+  private weatherService = inject(WeatherService);
+  private geoLocationService = inject(GeolocationService);
+
+  coords:Coordinates;
   
   farmRegistrationForm = new FormGroup({
     farmName: new FormControl('', [Validators.required]),
@@ -51,16 +57,24 @@ export class FarmRegistrationComponent {
   isFileUploaded: boolean = false;
 
   registerFarm(){
-    // this.farmId = Date.now().toString();
-    // this.router.navigate(['/maintainer-registration', this.farmId]);
-    if (this.farmRegistrationForm.valid && this.isFileUploaded){
+    console.log(this.weatherService.historicalWeatherData);
+    console.log(this.geoLocationService.coordinates);
+    console.log(this.weatherService.hasWeatherData());
+    console.log(this.geoLocationService.hasLocationData());
+    if (this.farmRegistrationForm.valid 
+        && this.isFileUploaded 
+        && this.weatherService.hasWeatherData() 
+        && this.geoLocationService.hasLocationData()){
       this.farm = {
         farmId: Date.now().toString(),
         farmName: this.farmRegistrationForm.get('farmName')?.value,
         surveyNumber: this.farmRegistrationForm.get('surveyNumber')?.value,
         address: this.farmRegistrationForm.get('address')?.value,
         shadeNetArea: Number(this.farmRegistrationForm.get('shadeNetArea')?.value ?? undefined),
-        //geoTag: this.farmRegistrationForm.get('geoTag')?.value,
+        geoLocation: {
+          latitude: this.geoLocationService.coordinates().latitude,
+          longitude: this.geoLocationService.coordinates().longitude
+        },
         farmPondVolume: Number(this.farmRegistrationForm.get('farmPondVolume')?.value ?? undefined),
         isSolarPowerAvailable: Boolean(this.farmRegistrationForm.get('isSolarPowerAvailable')?.value ?? undefined),
         motorCapacity: this.farmRegistrationForm.get('motorCapacity')?.value,
@@ -71,9 +85,17 @@ export class FarmRegistrationComponent {
         //gridPowerUnAvailability: this.farmRegistrationForm.get('gridPowerUnAvailability')?.value,
         automationRoomSize: Number(this.farmRegistrationForm.get('automationRoomSize')?.value ?? undefined),
         //farmhouseNote: this.farmRegistrationForm.get('farmhouseNote')?.value,
-        storageAreaNote: this.farmRegistrationForm.get('storageAreaNote')?.value
+        storageAreaNote: this.farmRegistrationForm.get('storageAreaNote')?.value,
+        historicalWeather: {
+          startDate: this.weatherService.historicalWeatherData().startDate,
+          endDate: this.weatherService.historicalWeatherData().endDate,
+          rainyMonths: this.weatherService.historicalWeatherData().rainyMonths,
+          winterMonths: this.weatherService.historicalWeatherData().winterMonths,
+          monthly: this.weatherService.historicalWeatherData().monthly,
+        }
       };
       console.log(this.farmRegistrationForm.value);
+      console.log(this.farm);
 
       this.farmRegistrationService.registerFarm(this.farm).subscribe({
         next: (response) => {

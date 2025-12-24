@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpBackend, HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Injector } from '@angular/core';
+import { computed } from '@angular/core';
+import { DatePipe } from '@angular/common';
 
 export interface Coordinates {
   latitude: number;
@@ -28,12 +30,25 @@ export interface HistoricalWeather {
   winterMonths: string[];
 }
 
+export interface HistoricalWeatherRange {
+  startDate: string,
+  endDate: string,
+  monthly: { month: string; meanTemp: number; totalRain: number; meanWind: number }[];
+  rainyMonths: string[];
+  winterMonths: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class WeatherService {
   private apiBase = 'https://api.open-meteo.com/v1';
   private http: HttpClient;
+  private datePipe = inject(DatePipe);
+
+  historicalWeatherRangeData = signal<HistoricalWeatherRange | null>(null);
+  readonly historicalWeatherData = this.historicalWeatherRangeData.asReadonly();
+  readonly hasWeatherData = computed(() => this.historicalWeatherData() !== null);
 
   constructor(private injector: Injector) {
     // Create HttpClient WITHOUT interceptors
@@ -118,6 +133,9 @@ export class WeatherService {
           .slice(0, 6) || ['Jun', 'Jul', 'Aug', 'Sep']; // Prioritize monsoon months
         
         const winterMonths = ['Dec', 'Jan', 'Feb'];
+        const startDate_DateOnly = this.datePipe.transform(startDate, 'dd-MM-yyyy');
+        const endDate_DateOnly = this.datePipe.transform(endDate, 'dd-MM-yyyy');
+        this.historicalWeatherRangeData.set({startDate:startDate_DateOnly, endDate:endDate_DateOnly, monthly: monthlyData, rainyMonths, winterMonths });
         return { monthly: monthlyData, rainyMonths, winterMonths };
       })
     );

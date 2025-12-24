@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
 import { GeolocationService, Coordinates } from '../location/geolocation.service';
-import { WeatherService, WeatherData } from './weather.service';
+import { WeatherService, WeatherData, HistoricalWeather } from './weather.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 
@@ -22,6 +22,8 @@ export class FarmWeatherComponent {
   formattedStartDate:string;
   formattedEndDate:string;
   displayedColumns = ['month', 'temp', 'rain', 'wind'];
+
+  //private historicalWeatherData = signal<HistoricalWeather | null>(null);
 
   constructor(
     private geoService: GeolocationService,
@@ -52,6 +54,7 @@ export class FarmWeatherComponent {
       await this.weatherService.getHistoricalWeather(this.location, this.startDate, this.endDate).subscribe({
         next:data => {
           this.weatherData.historical = data;
+          //this.historicalWeatherData.set(data);
         },
         error:err => {
           console.error(err?.message);
