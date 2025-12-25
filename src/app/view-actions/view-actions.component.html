@@ -1,0 +1,17 @@
+<mat-card>
+  <mat-card-title>Actions - {{selectedFarmName}} / {{selectedCropName}}</mat-card-title>
+  <mat-card-content>
+    <div class="actions-toolbar">
+      <button mat-stroked-button color="primary" (click)="generateReport()"><mat-icon>description</mat-icon> Generate Report</button>
+    </div>
+
+    <mat-tab-group>
+      <mat-tab label="Activities">
+        <app-list-activity></app-list-activity>
+      </mat-tab>
+      <mat-tab label="Observations">
+        <app-list-observation></app-list-observation>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>

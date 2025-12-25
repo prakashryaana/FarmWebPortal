@@ -24,9 +24,10 @@ export class SidebarComponent {
   menuItems: MenuItem[] = [
     { label: 'On-boarding', route: '/farm-registration', icon: 'business' },
     { label: 'Setup Crop', route: '/crop-registration', icon: 'agriculture' },
-    { label: 'Actions', route: '/actions', icon: 'add_circle' },
+    { label: 'Add Actions', route: '/actions', icon: 'add_circle' },
     //{ label: 'Add Activity', route: '/add-activity', icon: 'add_circle' },
-    { label: 'View Activities', route: '/list-activity', icon: 'list' },
+    // { label: 'View Activities', route: '/list-activity', icon: 'list' },
+    { label: 'View Actions', route: '/view-actions', icon: 'list' },
     { label: 'Manage Users', route: '/user-management', icon: 'group' },
   ];
 

@@ -1,0 +1,11 @@
+.list-observation {
+  padding: 8px;
+}
+
+table.mat-table {
+  width: 100%;
+}
+
+mat-progress-spinner {
+  margin: 8px 0;
+}

@@ -47,6 +47,10 @@ export class ObservationService {
         }
       });
   }
+
+    getByCrop(cropId: string) {
+      return this.http.get<Observation[]>(`${this.apiUrl}/cropId/${cropId}`);
+    }
 }
 
 export interface ObservationRequest {
@@ -55,4 +59,13 @@ export interface ObservationRequest {
   cropId: string;
   voiceNote?: string;
   photo?: string;
+}
+
+export interface Observation {
+  observationId?: string;
+  cropId: string;
+  observationType: string;
+  createdAt: string;
+  updatedAt?: string;
+  message?: string;
 }

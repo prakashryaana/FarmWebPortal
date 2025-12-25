@@ -19,6 +19,7 @@ import { MagicRequestComponent } from './auth/magic-request/magic-request.compon
 import { authGuard } from './auth-guard';
 import { UserManagementComponent } from './users/user-management/user-management.component';
 import { ActionsComponent } from './actions/actions.component';
+import { ViewActionsComponent } from './view-actions/view-actions.component';
 
 
 export const routes: Routes = [
@@ -40,7 +41,8 @@ export const routes: Routes = [
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: '', component: HomeDashboardComponent, canActivate: [authGuard] },
     { path: 'user-management', component: UserManagementComponent, canActivate: [authGuard] },
-    { path: 'actions', component: ActionsComponent, canActivate: [authGuard] }
+    { path: 'actions', component: ActionsComponent, canActivate: [authGuard] },
+    { path: 'view-actions', component: ViewActionsComponent, canActivate: [authGuard] }
     // {
     // path: 'admin/users',
     // component: AdminUsersComponent,
