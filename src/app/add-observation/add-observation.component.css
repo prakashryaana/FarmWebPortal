@@ -1,10 +1,27 @@
 /* Section Styling */
-.photo-section, .voice-section {
+/* .photo-section, .voice-section {
   margin: 24px 0;
   padding: 20px;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border-radius: 12px;
   border-left: 4px solid #1976d2;
+} */
+
+.photo-section .section-label .voice-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.constraints {
+  font-size: 0.8em;
+  color: #666;
+  background: #e3f2fd;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
 }
 
 .section-label {
@@ -17,14 +34,14 @@
   color: #1976d2;
 }
 
-.constraints {
+/* .constraints {
   background: #e3f2fd;
   color: #1565c0;
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 0.85em;
   font-weight: 500;
-}
+} */
 
 /* Photo Upload */
 .file-input {
@@ -42,7 +59,7 @@
   background: #f0f8ff;
 }
 
-.preview {
+/* .preview {
   margin-top: 12px;
   padding: 12px;
   background: white;
@@ -55,6 +72,18 @@
   max-height: 200px;
   border-radius: 8px;
   display: block;
+} */
+
+.preview {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.preview img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .preview-info {
@@ -205,4 +234,64 @@
   .recording-buttons { flex-direction: column; }
   .progress-container { flex-direction: column; gap: 12px; }
   .section-label { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .photo-buttons {
+    flex-direction: column;
+  }
+  
+  .photo-section button[color="warn"] {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .camera-controls {
+    flex-direction: column;
+    align-items: center;
+  }
 }
+
+
+.photo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.photo-section button[color="warn"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.photo-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.photo-buttons button {
+  flex: 1;
+  min-width: 140px;
+}
+
+.camera-preview {
+  margin: 12px 0;
+  text-align: center;
+}
+
+.camera-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.camera-controls button {
+  min-width: 140px;
+}
+

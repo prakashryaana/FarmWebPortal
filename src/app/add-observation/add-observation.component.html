@@ -15,23 +15,65 @@
       </mat-select>
     </mat-form-field>
 
-    <!-- Photo Section - VISIBLE CONSTRAINTS -->
+    <!-- Photo Section - DUAL BUTTONS + RETAKE -->
+    <!-- Photo Section - WEB + MOBILE -->
+    <!-- Photo Section - NO .click() REFERENCES -->
     <div class="photo-section">
       <label class="section-label">
-        📷 Photo Upload
+        Photo Upload
         <span class="constraints">JPEG/PNG only, Max 1MB</span>
       </label>
-      <input type="file" accept="image/jpeg,image/png" (change)="handleImage($event)" 
-             class="file-input">
+      
+      <!-- ✅ Gallery (file input - NO click needed) -->
+      <button mat-stroked-button type="button" (click)="openGallery()" 
+              [disabled]="imageFile() || isUploading()">
+        📱 Select from Gallery
+      </button>
+      
+      <!-- ✅ Live Camera (no input needed) -->
+      @if (!imageFile()) {
+        <div class="camera-preview">
+          <video #videoElement autoplay playsinline muted 
+                [hidden]="!showCameraPreview()"
+                style="width: 100%; max-width: 320px; height: auto; border-radius: 8px;"></video>
+          
+          @if (showCameraPreview()) {
+            <div class="camera-controls">
+              <button mat-raised-button color="primary" (click)="capturePhoto()" 
+                      [disabled]="!videoStream()">
+                📸 Capture Photo
+              </button>
+              <button mat-stroked-button color="warn" (click)="stopCamera()">
+                <mat-icon>close</mat-icon> Cancel
+              </button>
+            </div>
+          } @else {
+            <button mat-stroked-button type="button" (click)="startCamera()">
+              📷 Use Camera
+            </button>
+          }
+        </div>
+      }
+      
+      <!-- ✅ Retake -->
+      @if (imageFile()) {
+        <button mat-outlined-button type="button" color="warn" (click)="clearPhoto()">
+          <mat-icon>close</mat-icon> Retake Photo
+        </button>
+      }
+      
+      <!-- ✅ Hidden file input (gallery only - NO #fileInput reference needed) -->
+      <input type="file" #galleryInput accept="image/jpeg,image/png" 
+            (change)="handleImage($event)" class="file-input" hidden>
+      
+      <!-- ✅ Preview -->
       @if (imagePreview()) {
         <div class="preview">
           <img [src]="imagePreview()!" alt="Photo preview">
-          <span class="preview-info">
-            {{imageFile()?.name}} ({{(imageFile()?.size! / 1024).toFixed(0)}}KB)
-          </span>
         </div>
       }
     </div>
+
 
     <!-- Message -->
     <mat-form-field appearance="fill" style="width: 100%; margin: 16px 0;">

@@ -19,6 +19,8 @@ import { UploadService } from '../file-upload/upload.service';
 import { HttpEventType, HttpEvent } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+import { ViewChild } from '@angular/core';
+import { ElementRef } from '@angular/core';
 
 export interface UploadResult {
   photoPath: string | null;
@@ -85,6 +87,16 @@ export class AddObservationComponent implements OnDestroy {
   private readonly cropFarmSelector = inject(CropFarmSelectorService);
   get selectedCropName(){ return this.cropFarmSelector.selectedCropName(); }
   get selectedCropId()  { return this.cropFarmSelector.selectedCropId(); }
+
+  // @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  // @ViewChild('cameraInput') cameraInput!: ElementRef<HTMLInputElement>;
+
+  readonly isUploading = computed(() => this.serviceLoading() || this.recordingTime() > 0);
+
+  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
+
+  readonly showCameraPreview = signal(false);
+  readonly videoStream = signal<MediaStream | null>(null);
 
   constructor() {
   // Initialize IMMEDIATELY (no queueMicrotask)
@@ -178,6 +190,66 @@ export class AddObservationComponent implements OnDestroy {
     }
   }
 
+
+  async startCamera(): Promise<void> {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { width: 640, height: 480, facingMode: 'user' } 
+      });
+      this.videoStream.set(stream);
+      this.videoElement.nativeElement.srcObject = stream;
+      this.showCameraPreview.set(true);
+    } catch (err) {
+      this.snackBar.open('❌ Camera access denied', 'Close');
+      console.error('Camera error:', err);
+    }
+  }
+
+  stopCamera(): void {
+    const stream = this.videoStream();
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      this.videoStream.set(null);
+    }
+    this.showCameraPreview.set(false);
+  }
+
+  async capturePhoto(): Promise<void> {
+    const video = this.videoElement.nativeElement;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(video, 0, 0);
+    
+    // ✅ Convert to JPEG (compress to <1MB)
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const file = new File([blob], `capture-${Date.now()}.jpg`, { type: 'image/jpeg' });
+        
+        // ✅ Your existing validation
+        if (file.size > 1024 * 1024) {
+          this.snackBar.open('❌ Photo too large (compressing...)', 'Close');
+          return;
+        }
+        
+        this.imageFile.set(file);
+        const reader = new FileReader();
+        reader.onload = () => this.imagePreview.set(reader.result as string);
+        reader.readAsDataURL(file);
+        
+        this.stopCamera();
+      }
+    }, 'image/jpeg', 0.8); // 80% quality
+  }
+
+  openGallery(): void {
+    // ✅ Programmatically trigger file input
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (input) input.click();
+  }
+
   handleImage(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -199,7 +271,26 @@ export class AddObservationComponent implements OnDestroy {
     const reader = new FileReader();
     reader.onload = () => this.imagePreview.set(reader.result as string);
     reader.readAsDataURL(file);
+
+    //Clear BOTH inputs for re-selection
+    // this.fileInput.nativeElement.value = '';
+    // this.cameraInput.nativeElement.value = '';
   }
+
+  clearPhoto(): void {
+    //Clear signals
+    this.imageFile.set(null);
+    this.imagePreview.set(null);
+    
+    //Cleanup URL if exists
+    if (this.imagePreview()) {
+      URL.revokeObjectURL(this.imagePreview()!);
+    }
+    
+    //Show snackbar feedback
+    this.snackBar.open('🗑️ Photo cleared', 'Close', { duration: 2000 });
+  }
+
 
   async onSubmit(): Promise<void> {
     const form = this.observationForm;
@@ -294,5 +385,6 @@ export class AddObservationComponent implements OnDestroy {
     if (interval) clearInterval(interval);
     
     this.stopRecording();
+    this.stopCamera();
   }
 }
