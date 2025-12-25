@@ -1,10 +1,10 @@
 import { Component, inject, effect } from '@angular/core';
 import { NgIf, NgFor, DatePipe } from '@angular/common';
-import { ObservationService, Observation } from '../add-observation/observation.service';
+import { ObservationService, Observation } from '../../add-actions/add-observation/observation.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
-import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selector.service';
+import { CropFarmSelectorService } from '../../../crop-farm-selector/crop-farm-selector.service';
 
 @Component({
   selector: 'app-list-observation',

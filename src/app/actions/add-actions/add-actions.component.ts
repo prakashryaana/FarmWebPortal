@@ -3,22 +3,22 @@ import { CommonModule } from '@angular/common';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { AddActivityComponent } from '../add-activity/add-activity.component';
-import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selector.service';
+import { AddActivityComponent } from './add-activity/add-activity.component';
+import { CropFarmSelectorService } from '../../crop-farm-selector/crop-farm-selector.service';
 import { inject } from '@angular/core';
-import { AddObservationComponent } from '../add-observation/add-observation.component';
+import { AddObservationComponent } from './add-observation/add-observation.component';
 
 export type ActionMode = 'activity' | 'observation';
 
 @Component({
-  selector: 'app-actions',
+  selector: 'app-add-actions',
   standalone: true,
   imports: [CommonModule, MatTabsModule, MatButtonModule, MatCardModule,
     AddActivityComponent, AddObservationComponent],
-  templateUrl: './actions.component.html',
-  styleUrls: ['./actions.component.css']
+  templateUrl: './add-actions.component.html',
+  styleUrls: ['./add-actions.component.css']
 })
-export class ActionsComponent {
+export class AddActionsComponent {
   private readonly cropFarmSelector = inject(CropFarmSelectorService);
   get selectedCropName(){ return this.cropFarmSelector.selectedCropName(); }
   

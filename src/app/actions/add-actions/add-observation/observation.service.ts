@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../../environments/environment';
 
 export interface ObservationResponse {
   readonly success: boolean;

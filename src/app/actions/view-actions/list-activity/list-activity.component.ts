@@ -7,7 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Observable } from 'rxjs';
-import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selector.service';
+import { CropFarmSelectorService } from '../../../crop-farm-selector/crop-farm-selector.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 
 @Component({

@@ -10,7 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
 import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode';
-import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selector.service';
+import { CropFarmSelectorService } from '../../../crop-farm-selector/crop-farm-selector.service';
 import { AddActivityService } from './add-activity.service';
 import { Activity } from './add-activity.service';
 import { MatSnackBar } from '@angular/material/snack-bar';

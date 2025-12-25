@@ -4,11 +4,11 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { ListActivityComponent } from '../list-activity/list-activity.component';
-import { ListObservationComponent } from '../list-observation/list-observation.component';
-import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selector.service';
-import { ActivityService } from '../list-activity/activity.service';
-import { ObservationService } from '../add-observation/observation.service';
+import { ListActivityComponent } from './list-activity/list-activity.component';
+import { ListObservationComponent } from './list-observation/list-observation.component';
+import { CropFarmSelectorService } from '../../crop-farm-selector/crop-farm-selector.service';
+import { ActivityService } from './list-activity/activity.service';
+import { ObservationService } from '../add-actions/add-observation/observation.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
