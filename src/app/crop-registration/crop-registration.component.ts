@@ -16,6 +16,8 @@ import { UpdateFarmDto } from '../farm-registration/farm';
 import { FarmPartial } from '../farm-lookup/farm-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { inject } from '@angular/core';
+import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selector.service';
+import { effect } from '@angular/core';
 
 @Component({
   selector: 'app-crop-registration',
@@ -30,8 +32,30 @@ import { inject } from '@angular/core';
   styleUrl: './crop-registration.component.css',
 })
 export class CropRegistrationComponent {
-  constructor(private router: Router, private cropRegistrationService: CropRegistrationService, private farmService: FarmService) {}
   private snackBar = inject(MatSnackBar);
+  private readonly cropFarmSelector = inject(CropFarmSelectorService);
+  crop: Crop = {} as Crop;
+  cropId: string = '';
+  selectedFarm: FarmPartial = {} as FarmPartial;
+  isFarmSelected: boolean = false;
+
+  constructor(private router: Router, private cropRegistrationService: CropRegistrationService, private farmService: FarmService) {
+    effect(() => {
+      const selection = this.cropFarmSelector.selectedCropFarm();
+      const farmId = selection?.farmId;
+      console.log('selected farm: ',farmId);
+      if(!farmId) {
+        this.isFarmSelected = false;
+        this.selectedFarm.farmId = '';
+        this.selectedFarm.farmName = '';
+      }
+      else {
+        this.selectedFarm.farmId = selection?.farmId;
+        this.selectedFarm.farmName = selection?.farmName;
+        this.isFarmSelected = true;
+      }
+    });
+  }
 
   cropRegistrationForm = new FormGroup({
     cropName: new FormControl('', [Validators.required]),
@@ -39,10 +63,7 @@ export class CropRegistrationComponent {
     dateOfSowing: new FormControl(null, [Validators.required])
   });
 
-  crop: Crop = {} as Crop;
-  cropId: string = '';
-  selectedFarm: FarmPartial = {} as FarmPartial;
-  isFarmSelected: boolean = false;
+  
 
   registerCrop(){
     // this.cropId = Date.now().toString();
