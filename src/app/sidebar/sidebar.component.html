@@ -9,15 +9,42 @@
   </div>
 
   <div class="sidebar-menu">
-    <a *ngFor="let item of menuItems" 
-       [routerLink]="item.route"
-       routerLinkActive="active"
-       class="menu-item"
-       [matTooltip]="item.label"
-       [matTooltipDisabled]="!isCollapsed()"
-       matTooltipPosition="right">
-      <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
-      <span class="menu-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
-    </a>
+    <ng-container *ngFor="let item of menuItems">
+      <!-- Regular menu item -->
+      <a *ngIf="!item.submenu" 
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         class="menu-item"
+         [matTooltip]="item.label"
+         [matTooltipDisabled]="!isCollapsed()"
+         matTooltipPosition="right">
+        <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
+        <span class="menu-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
+      </a>
+
+      <!-- Submenu item -->
+      <div *ngIf="item.submenu" class="submenu-container">
+        <button class="menu-item submenu-toggle" 
+                (click)="toggleSubmenu(item.label)"
+                [matTooltip]="item.label"
+                [matTooltipDisabled]="!isCollapsed()"
+                matTooltipPosition="right">
+          <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
+          <span class="menu-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
+          <mat-icon class="submenu-arrow" *ngIf="!isCollapsed()" 
+                    [class.expanded]="isMenuExpanded(item.label)">expand_more</mat-icon>
+        </button>
+
+        <div class="submenu" *ngIf="isMenuExpanded(item.label) && !isCollapsed()">
+          <a *ngFor="let subItem of item.submenu"
+             [routerLink]="subItem.route"
+             routerLinkActive="active"
+             class="submenu-item">
+            <mat-icon class="submenu-icon">{{ subItem.icon }}</mat-icon>
+            <span>{{ subItem.label }}</span>
+          </a>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </nav>

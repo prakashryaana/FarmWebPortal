@@ -1,66 +1,121 @@
-<div class="card">
-  <h2>Crop Master (Create / Update / Delete)</h2>
-  <form [formGroup]="form" (ngSubmit)="create()">
-    <input formControlName="cropId" type="hidden" />
+<div class="container">
+  <h1>Crop Master Management</h1>
 
-    <label>Crop Name</label>
-    <input formControlName="cropName" type="text" maxlength="100" />
+  <!-- Create Button -->
+  <button class="create-btn" (click)="openCreateForm()" *ngIf="!isFormExpanded">
+    <mat-icon>add</mat-icon> Create New Crop
+  </button>
 
-    <label>Duration (days)</label>
-    <input formControlName="duration" type="number" min="0" />
+  <!-- Create/Edit Form (Collapsible) -->
+  <div class="form-section" *ngIf="isFormExpanded">
+    <h2>{{ editingId ? 'Edit Crop' : 'Create New Crop' }}</h2>
+    <form [formGroup]="form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Crop Name</label>
+          <input formControlName="cropName" type="text" maxlength="100" />
+        </div>
 
-    <label>Expected Yield (kgs/ sqmt)</label>
-    <input formControlName="expectedYield" type="number" step="0.01" />
+        <div class="form-group">
+          <label>Duration (days)</label>
+          <input formControlName="duration" type="number" min="0" />
+        </div>
 
-    <label>Sowing Time (From - To Month)</label>
-    <div class="month-range">
-      <select formControlName="sowingTimeFromMonth">
-        <option value="">Select From Month</option>
-        <option *ngFor="let m of months" [value]="m">{{ m }}</option>
-      </select>
-      <span>to</span>
-      <select formControlName="sowingTimeToMonth">
-        <option value="">Select To Month</option>
-        <option *ngFor="let m of months" [value]="m">{{ m }}</option>
-      </select>
+        <div class="form-group">
+          <label>Expected Yield (kgs/sqmt)</label>
+          <input formControlName="expectedYield" type="number" step="0.01" />
+        </div>
+
+        <div class="form-group">
+          <label>Sowing Method</label>
+          <select formControlName="sowingMethod">
+            <option value="Rizomes">Rizomes</option>
+            <option value="Seedlings">Seedlings</option>
+          </select>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Sowing Time (From - To Month)</label>
+          <div class="month-range">
+            <select formControlName="sowingTimeFromMonth">
+              <option value="">Select From Month</option>
+              <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+            </select>
+            <span>to</span>
+            <select formControlName="sowingTimeToMonth">
+              <option value="">Select To Month</option>
+              <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Harvest Time (From - To Month)</label>
+          <div class="month-range">
+            <select formControlName="harvestTimeFromMonth">
+              <option value="">Select From Month</option>
+              <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+            </select>
+            <span>to</span>
+            <select formControlName="harvestTimeToMonth">
+              <option value="">Select To Month</option>
+              <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Molecules To Add</label>
+          <textarea formControlName="moleculesToAdd" maxlength="250"></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Pests And Diseases</label>
+          <textarea formControlName="pestsAndDiseases" maxlength="250"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" (click)="submit()">{{ editingId ? 'Update' : 'Create' }}</button>
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table of existing items -->
+  <div class="table-section">
+    <h2>Existing Crops</h2>
+    <table class="data-table" *ngIf="list.length > 0">
+      <thead>
+        <tr>
+          <th>Crop Name</th>
+          <th>Duration (days)</th>
+          <th>Expected Yield</th>
+          <th>Sowing Method</th>
+          <th>Harvest Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of list">
+          <td>{{ item.cropName }}</td>
+          <td>{{ item.duration }}</td>
+          <td>{{ item.expectedYield }}</td>
+          <td>{{ item.sowingMethod }}</td>
+          <td>{{ item.harvestTime }}</td>
+          <td class="actions-cell">
+            <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="list.length === 0" class="no-data">
+      No crops found. Create one to get started.
     </div>
-
-    <label>Harvest Time (From - To Month)</label>
-    <div class="month-range">
-      <select formControlName="harvestTimeFromMonth">
-        <option value="">Select From Month</option>
-        <option *ngFor="let m of months" [value]="m">{{ m }}</option>
-      </select>
-      <span>to</span>
-      <select formControlName="harvestTimeToMonth">
-        <option value="">Select To Month</option>
-        <option *ngFor="let m of months" [value]="m">{{ m }}</option>
-      </select>
-    </div>
-
-    <label>Sowing Method</label>
-    <select formControlName="sowingMethod">
-      <option value="Rizomes">Rizomes</option>
-      <option value="Seedlings">Seedlings</option>
-    </select>
-
-    <label>Molecules To Add</label>
-    <textarea formControlName="moleculesToAdd" maxlength="250"></textarea>
-
-    <label>Pests And Diseases</label>
-    <textarea formControlName="pestsAndDiseases" maxlength="250"></textarea>
-
-    <div class="actions">
-      <button type="button" (click)="create()">Create</button>
-      <button type="button" (click)="update()">Update</button>
-      <button type="button" (click)="delete()">Delete</button>
-    </div>
-  </form>
-
-  <h3>Existing Items</h3>
-  <ul class="list">
-    <li *ngFor="let item of list">
-      <button (click)="selectForEdit(item)">{{item.cropName}} — {{item.sowingMethod}}</button>
-    </li>
-  </ul>
+  </div>
 </div>

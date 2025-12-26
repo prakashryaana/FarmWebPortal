@@ -1,31 +1,83 @@
-<div class="card">
-  <h2>Disease Control Inventory</h2>
-  <form [formGroup]="diseaseControlInventoryForm">
-    <input formControlName="id" type="hidden" />
-    <label>Name</label>
-    <input formControlName="diseaseControlName" type="text" maxlength="100" />
+<div class="container">
+  <h1>Disease Control Inventory Management</h1>
 
-    <label>Quantity Supplied</label>
-    <input formControlName="quantitySupplied" type="number" step="0.01" />
+  <!-- Create Button -->
+  <button class="create-btn" (click)="openCreateForm()" *ngIf="!isFormExpanded">
+    <mat-icon>add</mat-icon> Add Disease Control
+  </button>
 
-    <label>Supplied Date</label>
-    <input formControlName="suppliedDate" type="datetime-local" />
+  <!-- Create/Edit Form (Collapsible) -->
+  <div class="form-section" *ngIf="isFormExpanded">
+    <h2>{{ editingId ? 'Edit Disease Control' : 'Add New Disease Control' }}</h2>
+    <form [formGroup]="form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Disease Control Name</label>
+          <input formControlName="diseaseControlName" type="text" maxlength="100" />
+        </div>
 
-    <label>Quantity Used</label>
-    <input formControlName="quantityUsed" type="number" step="0.01" />
+        <div class="form-group">
+          <label>Quantity Supplied</label>
+          <input formControlName="quantitySupplied" type="number" step="0.01" />
+        </div>
 
-    <label>Used Date</label>
-    <input formControlName="usedDate" type="datetime-local" />
+        <div class="form-group">
+          <label>Supplied Date</label>
+          <input formControlName="suppliedDate" type="datetime-local" />
+        </div>
 
-    <div class="actions">
-      <button type="button" (click)="create()">Create</button>
-      <button type="button" (click)="update()">Update</button>
-      <button type="button" (click)="delete()">Delete</button>
+        <div class="form-group">
+          <label>Quantity Used</label>
+          <input formControlName="quantityUsed" type="number" step="0.01" />
+        </div>
+
+        <div class="form-group">
+          <label>Used Date</label>
+          <input formControlName="usedDate" type="datetime-local" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" (click)="submit()">{{ editingId ? 'Update' : 'Create' }}</button>
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table of existing items -->
+  <div class="table-section">
+    <h2>Existing Disease Controls</h2>
+    <table class="data-table" *ngIf="list.length > 0">
+      <thead>
+        <tr>
+          <th>Disease Control Name</th>
+          <th>Quantity Supplied</th>
+          <th>Supplied Date</th>
+          <th>Quantity Used</th>
+          <th>Used Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of list">
+          <td>{{ item.diseaseControlName }}</td>
+          <td>{{ item.quantitySupplied }}</td>
+          <td>{{ item.suppliedDate ? (item.suppliedDate | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
+          <td>{{ item.quantityUsed }}</td>
+          <td>{{ item.usedDate ? (item.usedDate | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
+          <td class="actions-cell">
+            <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="list.length === 0" class="no-data">
+      No disease controls found. Add one to get started.
     </div>
-  </form>
-
-  <h3>Existing</h3>
-  <ul class="list">
-    <li *ngFor="let i of list"><button (click)="select(i)">{{i.diseaseControlName}} — {{i.quantitySupplied}}</button></li>
-  </ul>
+  </div>
 </div>

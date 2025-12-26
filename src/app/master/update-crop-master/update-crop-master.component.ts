@@ -5,17 +5,19 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../users/confirm-dialog/confirm-dialog.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-update-crop-master',
   templateUrl: './update-crop-master.component.html',
   styleUrls: ['./update-crop-master.component.css'],
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, MatIconModule, MatButtonModule],
 })
 export class UpdateCropMasterComponent {
   private snackBar = inject(MatSnackBar);
   private service = inject(CropMasterService);
-  private confirmDialog = inject(MatDialog)
+  private confirmDialog = inject(MatDialog);
 
   months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -34,6 +36,9 @@ export class UpdateCropMasterComponent {
   });
 
   list: CropMaster[] = [];
+  isFormExpanded = false;
+  editingId: string | null = null;
+  displayColumns = ['cropName', 'duration', 'expectedYield', 'sowingMethod', 'harvestTime', 'actions'];
 
   constructor() {
     this.loadList();
@@ -44,6 +49,18 @@ export class UpdateCropMasterComponent {
       next: (res) => this.list = res,
       error: (err) => console.error('Failed to load crop master list', err)
     });
+  }
+
+  openCreateForm() {
+    this.form.reset({ sowingMethod: 'Seedlings' });
+    this.editingId = null;
+    this.isFormExpanded = true;
+  }
+
+  closeForm() {
+    this.isFormExpanded = false;
+    this.editingId = null;
+    this.form.reset({ sowingMethod: 'Seedlings' });
   }
 
   selectForEdit(item: CropMaster) {
@@ -68,49 +85,56 @@ export class UpdateCropMasterComponent {
       moleculesToAdd: item.moleculesToAdd,
       pestsAndDiseases: item.pestsAndDiseases
     });
+    this.editingId = item.cropId || null;
+    this.isFormExpanded = true;
   }
 
-  create() {
-    if (this.form.valid) {
-      const payload: CropMaster = this.normalizedForm();
+  submit() {
+    if (!this.form.valid) {
+      this.snackBar.open('Please fill all required fields', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const payload = this.normalizedForm();
+    
+    if (this.editingId) {
+      this.service.update(this.editingId, payload).subscribe({
+        next: () => {
+          this.snackBar.open('Updated successfully', 'Close', { duration: 3000 });
+          this.loadList();
+          this.closeForm();
+        },
+        error: (e) => { console.error(e); this.snackBar.open('Update failed', 'Close', { duration: 4000 }); }
+      });
+    } else {
       this.service.create(payload).subscribe({
-        next: () => { this.snackBar.open('Created', 'Close', { duration: 3000 }); this.loadList(); this.form.reset(); },
+        next: () => {
+          this.snackBar.open('Created successfully', 'Close', { duration: 3000 });
+          this.loadList();
+          this.closeForm();
+        },
         error: (e) => { console.error(e); this.snackBar.open('Create failed', 'Close', { duration: 4000 }); }
       });
     }
   }
 
-  update() {
-    const cropId = this.form.get('cropId')?.value;
-    if (!cropId) { this.snackBar.open('Select an item to update', 'Close', { duration: 3000 }); return; }
-    if (this.form.valid) {
-      const payload: CropMaster = this.normalizedForm();
-      this.service.update(cropId, payload).subscribe({
-        next: () => { this.snackBar.open('Updated', 'Close', { duration: 3000 }); this.loadList(); this.form.reset(); },
-        error: (e) => { console.error(e); this.snackBar.open('Update failed', 'Close', { duration: 4000 }); }
-      });
-    }
-  }
-
-  delete() {
-    const cropId = this.form.get('cropId')?.value;
-    if (!cropId) { this.snackBar.open('Select an item to delete', 'Close', { duration: 3000 }); return; }
-
+  delete(item: CropMaster) {
     const dialogRef = this.confirmDialog.open(ConfirmDialogComponent, {
-        width: '400px',
-        data: { 
-          title: 'Confirm Deletion',
-          message: `Are you sure you want to delete "${this.form.get('cropName')?.value}"?`,
-          action: 'Delete'
-          }
-        });
+      width: '400px',
+      data: { 
+        title: 'Confirm Deletion',
+        message: `Are you sure you want to delete "${item.cropName}"?`,
+        action: 'Delete'
+      }
+    });
     
-    dialogRef.afterClosed()
-    .subscribe(confirmed => {
-      if (!confirmed) return;  // User cancelled
-
-      this.service.delete(cropId).subscribe({
-        next: () => { this.snackBar.open('Deleted', 'Close', { duration: 3000 }); this.loadList(); this.form.reset(); },
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.service.delete(item.cropId || '').subscribe({
+        next: () => {
+          this.snackBar.open('Deleted successfully', 'Close', { duration: 3000 });
+          this.loadList();
+        },
         error: (e) => { console.error(e); this.snackBar.open('Delete failed', 'Close', { duration: 4000 }); }
       });
     });
@@ -135,3 +159,4 @@ export class UpdateCropMasterComponent {
     };
   }
 }
+

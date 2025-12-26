@@ -64,6 +64,11 @@
   gap: 0.5rem;
 }
 
+.submenu-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .menu-item {
   display: flex;
   align-items: center;
@@ -77,6 +82,9 @@
   cursor: pointer;
   position: relative;
   white-space: nowrap;
+  border: none;
+  background: none;
+  font-family: inherit;
 }
 
 .menu-item:hover {
@@ -87,6 +95,66 @@
 .menu-item.active {
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: #fff;
+}
+
+.submenu-toggle {
+  justify-content: space-between;
+}
+
+.submenu-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease;
+  margin-left: auto;
+}
+
+.submenu-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.submenu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #94a3b8;
+  text-decoration: none;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  padding-left: 3rem;
+}
+
+.submenu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+.submenu-item.active {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #fff;
+}
+
+.submenu-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 .menu-icon {
