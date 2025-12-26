@@ -19,7 +19,7 @@ Keywords and their meaning mentioned below:
 FreeText - it means textbox with max 100 characters
 FreeTextLong - it means textbox with max 250 characters
 DateTime - format 'dd-MM-yyyy hh:mm:ss' in 24hr format UTC
-DateOnly - format 'dd-MM-yyyy' in UTC
-TimeOnly - format 'hh-mm-ss' in 24hr format UTC
+DateOnly - format 'dd-MM-yyyy', display local
+TimeOnly - format 'hh-mm-ss' in 24hr format UTC, display local
 
 NOTE - all datetimes selected/shown/displayed in UI will be in Local datetime, but should be sent as UTC to backend
