@@ -13,7 +13,7 @@ Use these features wherever applicable:
 a. signal
 b. subscribe(next,error)
 c. ReactiveFormsModule
-d. @if(){}
+d. @if(){}, @for
 
 Keywords and their meaning mentioned below:
 FreeText - it means textbox with max 100 characters
