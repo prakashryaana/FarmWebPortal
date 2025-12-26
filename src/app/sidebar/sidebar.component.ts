@@ -25,10 +25,11 @@ export class SidebarComponent {
     { label: 'On-boarding', route: '/farm-registration', icon: 'business' },
     { label: 'Setup Crop', route: '/crop-registration', icon: 'agriculture' },
     { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
-    //{ label: 'Add Activity', route: '/add-activity', icon: 'add_circle' },
-    // { label: 'View Activities', route: '/list-activity', icon: 'list' },
     { label: 'View Actions', route: '/view-actions', icon: 'list' },
     { label: 'Manage Users', route: '/user-management', icon: 'group' },
+    { label: 'Manage Crop Master', route: '/crop-master', icon: 'group' },
+    { label: 'Manage Fertilizer Inventory', route: '/fertilizer-inventory', icon: 'group' },
+    { label: 'Manage Disease Control Inventory', route: '/disease-control-inventory', icon: 'group' },
   ];
 
   toggleSidebar() {

@@ -1,0 +1,31 @@
+<div class="card">
+  <h2>Disease Control Inventory</h2>
+  <form [formGroup]="diseaseControlInventoryForm">
+    <input formControlName="id" type="hidden" />
+    <label>Name</label>
+    <input formControlName="diseaseControlName" type="text" maxlength="100" />
+
+    <label>Quantity Supplied</label>
+    <input formControlName="quantitySupplied" type="number" step="0.01" />
+
+    <label>Supplied Date</label>
+    <input formControlName="suppliedDate" type="datetime-local" />
+
+    <label>Quantity Used</label>
+    <input formControlName="quantityUsed" type="number" step="0.01" />
+
+    <label>Used Date</label>
+    <input formControlName="usedDate" type="datetime-local" />
+
+    <div class="actions">
+      <button type="button" (click)="create()">Create</button>
+      <button type="button" (click)="update()">Update</button>
+      <button type="button" (click)="delete()">Delete</button>
+    </div>
+  </form>
+
+  <h3>Existing</h3>
+  <ul class="list">
+    <li *ngFor="let i of list"><button (click)="select(i)">{{i.diseaseControlName}} — {{i.quantitySupplied}}</button></li>
+  </ul>
+</div>

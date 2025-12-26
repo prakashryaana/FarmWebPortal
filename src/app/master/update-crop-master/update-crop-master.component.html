@@ -1,0 +1,66 @@
+<div class="card">
+  <h2>Crop Master (Create / Update / Delete)</h2>
+  <form [formGroup]="form" (ngSubmit)="create()">
+    <input formControlName="cropId" type="hidden" />
+
+    <label>Crop Name</label>
+    <input formControlName="cropName" type="text" maxlength="100" />
+
+    <label>Duration (days)</label>
+    <input formControlName="duration" type="number" min="0" />
+
+    <label>Expected Yield (kgs/ sqmt)</label>
+    <input formControlName="expectedYield" type="number" step="0.01" />
+
+    <label>Sowing Time (From - To Month)</label>
+    <div class="month-range">
+      <select formControlName="sowingTimeFromMonth">
+        <option value="">Select From Month</option>
+        <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+      </select>
+      <span>to</span>
+      <select formControlName="sowingTimeToMonth">
+        <option value="">Select To Month</option>
+        <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+      </select>
+    </div>
+
+    <label>Harvest Time (From - To Month)</label>
+    <div class="month-range">
+      <select formControlName="harvestTimeFromMonth">
+        <option value="">Select From Month</option>
+        <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+      </select>
+      <span>to</span>
+      <select formControlName="harvestTimeToMonth">
+        <option value="">Select To Month</option>
+        <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+      </select>
+    </div>
+
+    <label>Sowing Method</label>
+    <select formControlName="sowingMethod">
+      <option value="Rizomes">Rizomes</option>
+      <option value="Seedlings">Seedlings</option>
+    </select>
+
+    <label>Molecules To Add</label>
+    <textarea formControlName="moleculesToAdd" maxlength="250"></textarea>
+
+    <label>Pests And Diseases</label>
+    <textarea formControlName="pestsAndDiseases" maxlength="250"></textarea>
+
+    <div class="actions">
+      <button type="button" (click)="create()">Create</button>
+      <button type="button" (click)="update()">Update</button>
+      <button type="button" (click)="delete()">Delete</button>
+    </div>
+  </form>
+
+  <h3>Existing Items</h3>
+  <ul class="list">
+    <li *ngFor="let item of list">
+      <button (click)="selectForEdit(item)">{{item.cropName}} — {{item.sowingMethod}}</button>
+    </li>
+  </ul>
+</div>

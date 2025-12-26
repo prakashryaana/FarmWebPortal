@@ -19,29 +19,35 @@ import { authGuard } from './auth-guard';
 import { UserManagementComponent } from './users/user-management/user-management.component';
 import { ViewActionsComponent } from './actions/view-actions/view-actions.component';
 import { AddActionsComponent } from './actions/add-actions/add-actions.component';
+import { UpdateCropMasterComponent } from './master/update-crop-master/update-crop-master.component';
+import { UpdateFertilizerInventoryComponent } from './inventory/update-fertilizer-inventory/update-fertilizer-inventory.component';
+import { UpdateDiseaseControlInventoryComponent } from './inventory/update-disease-control-inventory/update-disease-control-inventory.component';
 
 
 export const routes: Routes = [
-    { path: 'farm-registration', component: FarmRegistrationComponent, canActivate: [authGuard] },
-    { path: 'farm-owner-registration', component: FarmOwnerRegistrationComponent, canActivate: [authGuard] },
-    { path: 'maintainer-registration/:farmId', component: MaintainerRegistrationComponent, canActivate: [authGuard] },
-    { path: 'crop-registration', component: CropRegistrationComponent, canActivate: [authGuard] },
+    { path: 'farm-registration', component: FarmRegistrationComponent, canActivate: [authGuard] }
+    ,{ path: 'farm-owner-registration', component: FarmOwnerRegistrationComponent, canActivate: [authGuard] }
+    ,{ path: 'maintainer-registration/:farmId', component: MaintainerRegistrationComponent, canActivate: [authGuard] }
+    ,{ path: 'crop-registration', component: CropRegistrationComponent, canActivate: [authGuard] }
     // { path: 'farm-lookup', component: FarmLookupComponent, canActivate: [authGuard] },
     // { path: 'location', component: LocationComponent, canActivate: [authGuard] },
     // { path: 'farm-weather', component: FarmWeatherComponent, canActivate: [authGuard] },
     // { path: 'leaflet-map', component: LeafletMapComponent, canActivate: [authGuard] },
     // { path: 'add-activity', component: AddActivityComponent, canActivate: [authGuard] },
     // { path: 'list-activity', component: ListActivityComponent, canActivate: [authGuard] },
-    { path: 'home-dashboard', component: HomeDashboardComponent, canActivate: [authGuard] },
-    { path: 'register', component: RegisterComponent },
-    { path: 'login', component: LoginComponent },
+    ,{ path: 'home-dashboard', component: HomeDashboardComponent, canActivate: [authGuard] }
+    ,{ path: 'register', component: RegisterComponent }
+    ,{ path: 'login', component: LoginComponent }
     // { path: 'magic-request', component: MagicRequestComponent, canActivate: [authGuard] },
     // { path: 'auth/magic/callback', component: MagicCallbackComponent, canActivate: [authGuard] },
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
-    { path: '', component: HomeDashboardComponent, canActivate: [authGuard] },
-    { path: 'user-management', component: UserManagementComponent, canActivate: [authGuard] },
-    { path: 'add-actions', component: AddActionsComponent, canActivate: [authGuard] },
-    { path: 'view-actions', component: ViewActionsComponent, canActivate: [authGuard] }
+    ,{ path: '', component: HomeDashboardComponent, canActivate: [authGuard] }
+    ,{ path: 'user-management', component: UserManagementComponent, canActivate: [authGuard] }
+    ,{ path: 'add-actions', component: AddActionsComponent, canActivate: [authGuard] }
+    ,{ path: 'view-actions', component: ViewActionsComponent, canActivate: [authGuard] }
+    ,{ path: 'crop-master', component: UpdateCropMasterComponent, canActivate: [authGuard] }
+    ,{ path: 'fertilizer-inventory', component: UpdateFertilizerInventoryComponent, canActivate: [authGuard] }
+    ,{ path: 'disease-control-inventory', component: UpdateDiseaseControlInventoryComponent, canActivate: [authGuard] }
     // {
     // path: 'admin/users',
     // component: AdminUsersComponent,
