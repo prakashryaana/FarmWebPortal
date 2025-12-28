@@ -7,7 +7,7 @@ d. MongoDb
 
 Do not use these features:
 a. deprecated/obsolete features
-b. ngif, ngFor, ngForof, ngModule, FormsModule
+b. *ngIf, *ngFor, ngForof, ngModule, FormsModule
 
 Use these features wherever applicable:
 a. signal
