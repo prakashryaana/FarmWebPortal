@@ -1,69 +1,116 @@
-<form [formGroup]="farmMaintainerRegistrationForm" (submit)="registerFarmMaintainer()">
-    <h2>Farm Maintainer Registration</h2>
-
-    <!-- Full name -->
-    <div>
-        <label for="full-name">Full Name</label>
-        <input id="full-name" type="text" formControlName="fullName" required />
+<div class="registration-container">
+  <form [formGroup]="farmMaintainerRegistrationForm" (submit)="registerFarmMaintainer()" class="registration-form">
+    <div class="form-header">
+      <h1>Farm Maintainer Registration</h1>
+      <p class="subtitle">Register as a farm maintainer and manage farm operations</p>
     </div>
 
-    <!-- Primary contact number (exactly 10 digits) -->
-    <div>
-        <label for="contact-number">Contact Number</label>
-        <input id="contact-number" type="tel" formControlName="contactNumber" required />
+    <!-- Personal Information Section -->
+    <div class="form-section">
+      <h3 class="section-title">Personal Information</h3>
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Full Name</mat-label>
+          <input matInput id="full-name" type="text" formControlName="fullName" required />
+          @if(farmMaintainerRegistrationForm.get('fullName')?.hasError('required')){
+          <mat-error>Full name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contact Number</mat-label>
+          <input matInput id="contact-number" type="tel" formControlName="contactNumber" required placeholder="10-digit mobile number" />
+          @if (farmMaintainerRegistrationForm.get('contactNumber')?.hasError('required')) {
+          <mat-error>Contact number is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Alternate Contact Number</mat-label>
+          <input matInput id="alternate-contact-number" formControlName="alternateContactNumber" type="tel" placeholder="Optional alternate number" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Address</mat-label>
+          <input matInput id="address" type="text" formControlName="address" required />
+          @if (farmMaintainerRegistrationForm.get('address')?.hasError('required')) {
+          <mat-error>Address is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
     </div>
 
-    <!-- Alternate contact number (also 10 digits) -->
-    <div>
-        <label for="alternate-contact-number">Alternate Contact Number</label>
-        <input id="alternate-contact-number" formControlName="alternateContactNumber" type="tel" />
-    </div>
+    <!-- Education & Qualification Section -->
+    <div class="form-section">
+      <h3 class="section-title">Education & Qualification</h3>
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Education</mat-label>
+          <mat-select id="education" formControlName="education" required>
+            <mat-option value="" disabled>Select Your Education Level</mat-option>
+            <mat-option value="UnEducated">Un-Educated</mat-option>
+            <mat-option value="10">10th Pass</mat-option>
+            <mat-option value="12">12th Pass</mat-option>
+            <mat-option value="Graduate">Graduate</mat-option>
+            <mat-option value="PostGraduate">Post-Graduate</mat-option>
+            <mat-option value="other">Other</mat-option>
+          </mat-select>
+          @if (farmMaintainerRegistrationForm.get('education')?.hasError('required')) {
+          <mat-error>Education is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
 
-    <div>
-        <label for="address">Address</label>
-        <input id="address" type="text" formControlName="address" required />
-    </div>
-
-    <div appearance="fill" class="full-width">
-        <label for="training-certificate">Upload Training Certificate</label>
+      <div class="upload-container">
+        <label for="training-certificate" class="upload-label">
+          <mat-icon class="upload-icon">cloud_upload</mat-icon>
+          Training Certificate
+        </label>
+        <p class="upload-hint">Upload your training certificate for verification</p>
         <app-file-upload id="training-certificate" (fileUploaded)="handleFileUploaded($event)"></app-file-upload>
+      </div>
     </div>
 
-    <!-- Education -->
-    <div>
-        <label for="education">Education</label>
-        <select id="education" formControlName="education" required>
-            <option value="" disabled selected>Select Applicable Education</option>
-            <option value="UnEducated">Un-Educated</option>
-            <option value="10">10th Pass</option>
-            <option value="12">12th Pass</option>
-            <option value="Graduate">Graduate</option>
-            <option value="PostGraduate">Post-Graduate</option>
-            <option value="other">Other</option>
-        </select>
+    <!-- Government ID Section -->
+    <div class="form-section">
+      <h3 class="section-title">Government Identity</h3>
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Government ID Type</mat-label>
+          <mat-select id="govt-id-type" formControlName="identityProofDocument" required>
+            <mat-option value="" disabled>Select ID Type</mat-option>
+            <mat-option value="aadhaar">Aadhaar Card</mat-option>
+            <mat-option value="pan">PAN Card</mat-option>
+            <mat-option value="voter">Voter ID</mat-option>
+            <mat-option value="passport">Passport</mat-option>
+            <mat-option value="driving">Driving License</mat-option>
+            <mat-option value="other">Other</mat-option>
+          </mat-select>
+          @if (farmMaintainerRegistrationForm.get('identityProofDocument')?.hasError('required')) {
+          <mat-error>ID type is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Government ID Number</mat-label>
+          <input matInput id="govt-id-number" formControlName="identityProofNumber" type="text" required placeholder="Enter your ID number" />
+          @if (farmMaintainerRegistrationForm.get('identityProofNumber')?.hasError('required')) {
+          <mat-error>ID number is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
     </div>
 
-    <!-- Government issued identity -->
-    <div>
-        <label for="govt-id-type">Government ID Type</label>
-        <select id="govt-id-type" formControlName="identityProofDocument" required>
-            <option value="" disabled selected>Select ID type</option>
-            <option value="aadhaar">Aadhaar Card</option>
-            <option value="pan">PAN Card</option>
-            <option value="voter">Voter ID</option>
-            <option value="passport">Passport</option>
-            <option value="driving">Driving License</option>
-            <option value="other">Other</option>
-        </select>
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="farmMaintainerRegistrationForm.invalid" class="btn-submit">
+        <mat-icon>check_circle</mat-icon>
+        Register as Maintainer
+      </button>
+      <button mat-stroked-button type="button" (click)="farmMaintainerRegistrationForm.reset()" class="btn-reset">
+        <mat-icon>refresh</mat-icon>
+        Reset Form
+      </button>
     </div>
-
-    <div>
-        <label for="govt-id-number">Government ID Number</label>
-        <input id="govt-id-number" formControlName="identityProofNumber" type="text" required />
-    </div>
-
-    <div style="margin-top:1rem">
-        <button type="submit" [disabled]="farmMaintainerRegistrationForm.invalid">Register</button>
-        <button type="button" (click)="farmMaintainerRegistrationForm.reset()">Reset</button>
-    </div>
-</form>
+  </form>
+</div>

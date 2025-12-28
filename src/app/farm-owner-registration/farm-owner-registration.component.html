@@ -1,55 +1,82 @@
-<form [formGroup]="farmOwnerRegistrationForm" (submit)="registerFarmOwner()">
-    <h2>Farm Owner Registration</h2>
-
-    <!-- Full name -->
-    <div>
-        <label for="full-name">Full Name</label>
-        <input id="full-name" type="text" formControlName="fullName" required />
+<div class="registration-container">
+  <form [formGroup]="farmOwnerRegistrationForm" (submit)="registerFarmOwner()" class="registration-form">
+    <div class="form-header">
+      <h1>Farm Owner Registration</h1>
+      <p class="subtitle">Register your farm ownership and manage your agricultural operations</p>
     </div>
 
-    <!-- Primary contact number (exactly 10 digits) -->
-    <div>
-        <label for="contact-number">Contact Number</label>
-        <input id="contact-number" type="tel" formControlName="contactNumber" required />
+    <!-- Personal Information Section -->
+    <div class="form-section">
+      <h3 class="section-title">Personal Information</h3>
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Full Name</mat-label>
+          <input matInput id="full-name" type="text" formControlName="fullName" required />
+          <mat-error *ngIf="farmOwnerRegistrationForm.get('fullName')?.hasError('required')">Full name is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contact Number</mat-label>
+          <input matInput id="contact-number" type="tel" formControlName="contactNumber" required placeholder="10-digit mobile number" />
+          <mat-error *ngIf="farmOwnerRegistrationForm.get('contactNumber')?.hasError('required')">Contact number is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Alternate Contact Number</mat-label>
+          <input matInput id="alternate-contact-number" formControlName="alternateContactNumber" type="tel" placeholder="Optional alternate number" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email ID</mat-label>
+          <input matInput id="email-id" type="email" formControlName="emailId" required />
+          <mat-error *ngIf="farmOwnerRegistrationForm.get('emailId')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="farmOwnerRegistrationForm.get('emailId')?.hasError('email')">Invalid email format</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Address</mat-label>
+          <input matInput id="address" type="text" formControlName="address" required />
+          <mat-error *ngIf="farmOwnerRegistrationForm.get('address')?.hasError('required')">Address is required</mat-error>
+        </mat-form-field>
+      </div>
     </div>
 
-    <!-- Alternate contact number (also 10 digits) -->
-    <div>
-        <label for="alternate-contact-number">Alternate Contact Number</label>
-        <input id="alternate-contact-number" formControlName="alternateContactNumber" type="tel" />
+    <!-- Government ID Section -->
+    <div class="form-section">
+      <h3 class="section-title">Government Identity</h3>
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Government ID Type</mat-label>
+          <mat-select id="govt-id-type" formControlName="identityProofDocument" required>
+            <mat-option value="" disabled>Select ID Type</mat-option>
+            <mat-option value="aadhaar">Aadhaar Card</mat-option>
+            <mat-option value="pan">PAN Card</mat-option>
+            <mat-option value="voter">Voter ID</mat-option>
+            <mat-option value="passport">Passport</mat-option>
+            <mat-option value="driving">Driving License</mat-option>
+            <mat-option value="other">Other</mat-option>
+          </mat-select>
+          <mat-error *ngIf="farmOwnerRegistrationForm.get('identityProofDocument')?.hasError('required')">ID type is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Government ID Number</mat-label>
+          <input matInput id="govt-id-number" formControlName="identityProofNumber" type="text" required placeholder="Enter your ID number" />
+          <mat-error *ngIf="farmOwnerRegistrationForm.get('identityProofNumber')?.hasError('required')">ID number is required</mat-error>
+        </mat-form-field>
+      </div>
     </div>
 
-    <div>
-        <label for="email-id">Email ID</label>
-        <input id="email-id" type="email" formControlName="emailId" required />
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="farmOwnerRegistrationForm.invalid" class="btn-submit">
+        <mat-icon>check_circle</mat-icon>
+        Register as Farm Owner
+      </button>
+      <button mat-stroked-button type="button" (click)="farmOwnerRegistrationForm.reset()" class="btn-reset">
+        <mat-icon>refresh</mat-icon>
+        Reset Form
+      </button>
     </div>
-
-    <div>
-        <label for="address">Address</label>
-        <input id="address" type="text" formControlName="address" required />
-    </div>
-
-    <!-- Government issued identity -->
-    <div>
-        <label for="govt-id-type">Government ID Type</label>
-        <select id="govt-id-type" formControlName="identityProofDocument" required>
-            <option value="" disabled selected>Select ID type</option>
-            <option value="aadhaar">Aadhaar Card</option>
-            <option value="pan">PAN Card</option>
-            <option value="voter">Voter ID</option>
-            <option value="passport">Passport</option>
-            <option value="driving">Driving License</option>
-            <option value="other">Other</option>
-        </select>
-    </div>
-
-    <div>
-        <label for="govt-id-number">Government ID Number</label>
-        <input id="govt-id-number" formControlName="identityProofNumber" type="text" required />
-    </div>
-
-    <div style="margin-top:1rem">
-        <button type="submit" [disabled]="farmOwnerRegistrationForm.invalid">Register</button>
-        <button type="button" (click)="farmOwnerRegistrationForm.reset()">Reset</button>
-    </div>
-</form>
+  </form>
+</div>

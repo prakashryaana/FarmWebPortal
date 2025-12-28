@@ -11,11 +11,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { inject } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-farm-owner-registration',
   imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatButtonModule],
+    MatSelectModule, MatButtonModule, MatIconModule],
   templateUrl: './farm-owner-registration.component.html',
   styleUrl: './farm-owner-registration.component.css',
 })

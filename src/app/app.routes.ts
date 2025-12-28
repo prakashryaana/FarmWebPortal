@@ -22,6 +22,7 @@ import { AddActionsComponent } from './actions/add-actions/add-actions.component
 import { UpdateCropMasterComponent } from './master/update-crop-master/update-crop-master.component';
 import { UpdateFertilizerInventoryComponent } from './inventory/update-fertilizer-inventory/update-fertilizer-inventory.component';
 import { UpdateDiseaseControlInventoryComponent } from './inventory/update-disease-control-inventory/update-disease-control-inventory.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
 
 
 export const routes: Routes = [
@@ -48,6 +49,7 @@ export const routes: Routes = [
     ,{ path: 'crop-master', component: UpdateCropMasterComponent, canActivate: [authGuard] }
     ,{ path: 'fertilizer-inventory', component: UpdateFertilizerInventoryComponent, canActivate: [authGuard] }
     ,{ path: 'disease-control-inventory', component: UpdateDiseaseControlInventoryComponent, canActivate: [authGuard] }
+    ,{ path: 'user-profile', component: UserProfileComponent, canActivate: [authGuard] }
     // {
     // path: 'admin/users',
     // component: AdminUsersComponent,

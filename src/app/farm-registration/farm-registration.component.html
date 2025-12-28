@@ -1,115 +1,136 @@
-<div class="parentrow">
-<div class="childcol">
-<form class="container" [formGroup]="farmRegistrationForm" (ngSubmit)="registerFarm()" class="farm-registration-form">
-
-  <h2>Farm Registration</h2>
-
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Farm Name</mat-label>
-    <input matInput type="text" formControlName="farmName" required />
-  </mat-form-field>
-
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Survey No.</mat-label>
-    <input matInput type="text" formControlName="surveyNumber" required />
-  </mat-form-field>
-
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Address</mat-label>
-    <input matInput type="text" formControlName="address" required />
-  </mat-form-field>
-
-  <!-- Geo Tag input (optional) -->
-  <!-- <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Geo Tag</mat-label>
-    <input matInput type="text" formControlName="geoTag" />
-  </mat-form-field> -->
-
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Shade-net Area (sq. mt)</mat-label>
-    <input matInput type="number" formControlName="shadeNetArea" required />
-  </mat-form-field>
-
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Farm Pond Volume (cu. mt)</mat-label>
-    <input matInput type="number" formControlName="farmPondVolume" required />
-  </mat-form-field>
-
-  <label>Is Solar Power Available?</label>
-  <mat-radio-group formControlName="isSolarPowerAvailable" class="radio-group">
-    <mat-radio-button value="true">Yes</mat-radio-button>
-    <mat-radio-button value="false">No</mat-radio-button>
-  </mat-radio-group>
-
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Motor Capacity</mat-label>
-    <mat-select formControlName="motorCapacity" required>
-      <mat-option value="" disabled>Select Motor Capacity</mat-option>
-      <mat-option value="5.5 HP">5.5 HP</mat-option>
-      <mat-option value="7.5 HP">7.5 HP</mat-option>
-      <mat-option value="10 HP">10 HP</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Additional Water Source</mat-label>
-    <input matInput type="text" formControlName="additionalWaterSource" />
-  </mat-form-field>
-
-  <!-- You can continue like this for other inputs in your form -->
-
-  <div appearance="fill" class="full-width">
-    <label for="Water-test-certificate">Upload Water Test Certificate</label>
-    <app-file-upload id="Water-test-certificate" (fileUploaded)="handleFileUploaded($event)"></app-file-upload>
+<div class="registration-page-wrapper">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Farm Registration & Location Setup</h1>
+    <p class="page-subtitle">Register your farm and visualize its location with weather analysis</p>
   </div>
 
-  <mat-slide-toggle formControlName="isSinglePhasePower">Single Phase Power</mat-slide-toggle>
-  <mat-slide-toggle formControlName="isThreePhasePower">Three Phase Power</mat-slide-toggle>
+  <div class="main-content-grid">
+    <!-- Left Column: Form -->
+    <div class="form-section-wrapper">
+      <form [formGroup]="farmRegistrationForm" (ngSubmit)="registerFarm()" class="farm-registration-form">
+        <div class="form-header">
+          <h2>Farm Details</h2>
+          <p class="form-subtitle">Complete your farm information</p>
+        </div>
 
-  <!-- <label>Is Single Phase Power?</label>
-  <mat-radio-group formControlName="isSinglePhasePower" class="radio-group">
-    <mat-radio-button value="true">Yes</mat-radio-button>
-    <mat-radio-button value="false">No</mat-radio-button>
-  </mat-radio-group>
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">Basic Information</h3>
+          <div class="form-grid">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Farm Name</mat-label>
+              <input matInput type="text" formControlName="farmName" required />
+              <mat-error *ngIf="farmRegistrationForm.get('farmName')?.hasError('required')">Farm name is required</mat-error>
+            </mat-form-field>
 
-  <label>Is Three Phase Power?</label>
-  <mat-radio-group formControlName="isThreePhasePower" class="radio-group">
-    <mat-radio-button value="true">Yes</mat-radio-button>
-    <mat-radio-button value="false">No</mat-radio-button>
-  </mat-radio-group> -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Survey Number</mat-label>
+              <input matInput type="text" formControlName="surveyNumber" required />
+              <mat-error *ngIf="farmRegistrationForm.get('surveyNumber')?.hasError('required')">Survey number is required</mat-error>
+            </mat-form-field>
 
-  <!-- <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Grid Power Unavailability Time Slots</mat-label>
-    <input matInput type="text" formControlName="gridPowerUnAvailability" placeholder="e.g., 2 PM - 4 PM, 6 PM - 8 PM" />
-  </mat-form-field> -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Address</mat-label>
+              <input matInput type="text" formControlName="address" required />
+              <mat-error *ngIf="farmRegistrationForm.get('address')?.hasError('required')">Address is required</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
 
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Automation Room Size (sq. ft)</mat-label>
-    <input matInput type="number" formControlName="automationRoomSize" required />
-  </mat-form-field>
+        <!-- Infrastructure Section -->
+        <div class="form-section">
+          <h3 class="section-title">Infrastructure & Facilities</h3>
+          <div class="form-grid">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Shade-net Area (sq. mt)</mat-label>
+              <input matInput type="number" formControlName="shadeNetArea" required />
+              <mat-error *ngIf="farmRegistrationForm.get('shadeNetArea')?.hasError('required')">Shade-net area is required</mat-error>
+            </mat-form-field>
 
-  <!-- <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Farmhouse Note</mat-label>
-    <input matInput type="text" formControlName="farmhouseNote" />
-  </mat-form-field> -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Farm Pond Volume (cu. mt)</mat-label>
+              <input matInput type="number" formControlName="farmPondVolume" required />
+              <mat-error *ngIf="farmRegistrationForm.get('farmPondVolume')?.hasError('required')">Farm pond volume is required</mat-error>
+            </mat-form-field>
 
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Storage Area Note</mat-label>
-    <input matInput type="text" formControlName="storageAreaNote" required />
-  </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Automation Room Size (sq. ft)</mat-label>
+              <input matInput type="number" formControlName="automationRoomSize" required />
+              <mat-error *ngIf="farmRegistrationForm.get('automationRoomSize')?.hasError('required')">Automation room size is required</mat-error>
+            </mat-form-field>
 
-  <div style="margin-top: 1rem;">
-    <button mat-raised-button color="primary" type="submit" [disabled]="farmRegistrationForm.invalid">
-      Register
-    </button>
-    <button mat-button type="button" (click)="farmRegistrationForm.reset()">
-      Reset
-    </button>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Storage Area Note</mat-label>
+              <input matInput type="text" formControlName="storageAreaNote" required />
+              <mat-error *ngIf="farmRegistrationForm.get('storageAreaNote')?.hasError('required')">Storage area note is required</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Power & Water Section -->
+        <div class="form-section">
+          <h3 class="section-title">Power & Water Management</h3>
+          <div class="form-grid">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Motor Capacity</mat-label>
+              <mat-select formControlName="motorCapacity" required>
+                <mat-option value="" disabled>Select Motor Capacity</mat-option>
+                <mat-option value="5.5 HP">5.5 HP</mat-option>
+                <mat-option value="7.5 HP">7.5 HP</mat-option>
+                <mat-option value="10 HP">10 HP</mat-option>
+              </mat-select>
+              <mat-error *ngIf="farmRegistrationForm.get('motorCapacity')?.hasError('required')">Motor capacity is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Additional Water Source</mat-label>
+              <input matInput type="text" formControlName="additionalWaterSource" />
+            </mat-form-field>
+
+            <div class="option-group">
+              <p class="option-label">Solar Power Available?</p>
+              <mat-radio-group formControlName="isSolarPowerAvailable" class="radio-group">
+                <mat-radio-button [value]="true" [color]="'primary'">Yes</mat-radio-button>
+                <mat-radio-button [value]="false" [color]="'primary'">No</mat-radio-button>
+              </mat-radio-group>
+            </div>
+          </div>
+
+          <div class="power-toggles">
+            <mat-slide-toggle formControlName="isSinglePhasePower" color="primary">Single Phase Power</mat-slide-toggle>
+            <mat-slide-toggle formControlName="isThreePhasePower" color="primary">Three Phase Power</mat-slide-toggle>
+          </div>
+
+          
+        </div>
+
+        <!-- Upload Section -->
+        <div class="form-section">
+          <h3 class="section-title">Document Upload</h3>
+          <div class="upload-container">
+            <label for="Water-test-certificate" class="upload-label">Water Test Certificate</label>
+            <app-file-upload id="Water-test-certificate" (fileUploaded)="handleFileUploaded($event)"></app-file-upload>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit" [disabled]="farmRegistrationForm.invalid" class="btn-submit">
+            <mat-icon>check_circle</mat-icon>
+            Register Farm
+          </button>
+          <button mat-stroked-button type="button" (click)="farmRegistrationForm.reset()" class="btn-reset">
+            <mat-icon>refresh</mat-icon>
+            Reset Form
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Right Column: Location & Weather -->
+    <div class="location-section-wrapper">
+      <app-location></app-location>
+    </div>
   </div>
-
-</form>
-</div>
-<div class="childcol2">
-  <app-location></app-location>
-</div>
 </div>

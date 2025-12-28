@@ -1,4 +1,30 @@
 <nav class="sidebar" [class.collapsed]="isCollapsed()">
+
+  <!-- User Profile Section -->
+  <div class="user-profile-section">
+    @if (isLoading()) {
+      <div class="user-placeholder">
+        <mat-spinner diameter="24"></mat-spinner>
+      </div>
+    } @else if (userProfile()) {
+      <button mat-button class="user-profile-item" (click)="goToProfile()">
+        <div class="user-avatar">
+          <span class="avatar-initials">{{ (userProfile()!.name | slice:0:2).toUpperCase() }}</span>
+        </div>
+        <div class="user-info" *ngIf="!isCollapsed()">
+          <span class="user-name">{{ userProfile()!.name }}</span>
+          <span class="user-email">{{ userProfile()!.email }}</span>
+        </div>
+        <mat-icon class="profile-arrow" *ngIf="!isCollapsed()">arrow_forward_ios</mat-icon>
+      </button>
+    } @else {
+      <div class="user-placeholder">
+        <mat-icon>person</mat-icon>
+        <span *ngIf="!isCollapsed()">Guest User</span>
+      </div>
+    }
+  </div>
+
   <div class="sidebar-header">
     <h2 class="sidebar-title" *ngIf="!isCollapsed()">Menu</h2>
     <button class="toggle-btn" (click)="toggleSidebar()" 

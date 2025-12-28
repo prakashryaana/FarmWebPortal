@@ -6,10 +6,14 @@ import { Maintainer } from './maintainer';
 import { MaintainerRegistrationService } from './maintainer-registration.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { inject } from '@angular/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-maintainer-registration',
-  imports: [ReactiveFormsModule, FileUploadComponent],
+  imports: [ReactiveFormsModule, FileUploadComponent, MatFormFieldModule, MatIconModule, MatSelectModule, MatInputModule],
   templateUrl: './maintainer-registration.component.html',
   styleUrl: './maintainer-registration.component.css',
 })

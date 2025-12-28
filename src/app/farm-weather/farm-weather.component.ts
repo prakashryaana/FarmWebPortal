@@ -1,14 +1,24 @@
 import { Component, Input, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { GeolocationService, Coordinates } from '../location/geolocation.service';
 import { WeatherService, WeatherData, HistoricalWeather } from './weather.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-farm-weather',
   templateUrl: './farm-weather.component.html',
+  styleUrls: ['./farm-weather.component.css'],
   standalone: true,
-  imports: [MatCardModule, MatTableModule]
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule
+  ]
 })
 export class FarmWeatherComponent {
   @Input() latitude = 0;

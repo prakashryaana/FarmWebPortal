@@ -1,6 +1,16 @@
 import { HistoricalWeatherRange } from "../farm-weather/weather.service";
 import { Coordinates } from "../location/geolocation.service";
 
+export interface TimeRange {
+    fromTime: string;
+    toTime: string;
+}
+
+export interface GridPowerUnavailability {
+    day: string;
+    timeRanges: TimeRange[];
+}
+
 export interface FarmDto {
     farmName: string | null | undefined;
     surveyNumber: string | null | undefined;
@@ -14,9 +24,9 @@ export interface FarmDto {
     waterTestCertificateUrl: string | null | undefined;
     isSinglePhasePower: boolean | null | undefined;
     isThreePhasePower: boolean | null | undefined;
-    //gridPowerUnAvailability: string | null | undefined;
+    //gridPowerUnAvailability?: GridPowerUnavailability[];
     automationRoomSize: number | null | undefined;
-    //farmhouseNote: string | null | undefined;
+    //farmhouseNote?: string | null | undefined;
     storageAreaNote: string | null | undefined;
     historicalWeather: HistoricalWeatherRange | null;
 }

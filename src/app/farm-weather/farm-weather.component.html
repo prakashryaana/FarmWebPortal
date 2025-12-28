@@ -1,64 +1,133 @@
-<div class="farm-weather">
-  <button (click)="getFarmWeather()" [disabled]="isLoading">
-    {{ isLoading ? 'Loading Weather...' : 'Get Farm Weather Data' }}
-  </button>
-  @if (errorMessage) {<div class="error">{{ errorMessage }}</div>}
+<div class="farm-weather-wrapper">
+  <div class="weather-header">
+    <h3>Farm Weather Analysis</h3>
+    <p class="weather-subtitle">Current conditions and historical weather patterns</p>
+  </div>
 
-  @if (location && weatherData) {
-  <div class="weather-results">
-    <h3>Farm at {{ location.latitude.toFixed(4) }}, {{ location.longitude.toFixed(4) }}</h3>
-
-    <div class="current-weather">
-      <h4>Current Conditions</h4>
-      <p>🌡️ Temp: {{ weatherData.current.temperature }}°C</p>
-      <p>💨 Wind: {{ weatherData.current.wind_speed }} km/h</p>
-      <p>🌧️ Precip: {{ weatherData.current.precipitation }} mm</p>
+  <div class="weather-card">
+    <div class="button-container">
+      <button mat-raised-button color="accent" (click)="getFarmWeather()" [disabled]="isLoading" class="weather-btn">
+        <mat-icon>cloud_download</mat-icon>
+        {{ isLoading ? 'Loading Weather Data...' : 'Get Farm Weather Data' }}
+      </button>
     </div>
 
-    @if (weatherData.historical) {
-    <div class="historical-weather">
-      <h4>Historical Summary Range : {{this.formattedStartDate}} - {{this.formattedEndDate}}</h4>
-      <!-- <p>🌡️ Mean Temps (Jan-Dec): {{ weatherData.historical.monthlyMeanTemp.join(', ') }}°C</p> -->
-      <p>🌧️ Rainy Months (>50mm): {{ weatherData.historical.rainyMonths.join(', ') }}</p>
-      <p>❄️ Winter Months: {{ weatherData.historical.winterMonths.join(', ') }}</p>
-      <!-- <p>💨 Avg Wind Speed: {{ weatherData.historical.avgWindSpeed.toFixed(1) }} km/h</p> -->
-
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>Monthly Weather Summary</mat-card-title>
-        </mat-card-header>
+    @if (errorMessage) {
+      <mat-card class="error-alert">
         <mat-card-content>
-          <table mat-table [dataSource]="weatherData.historical.monthly" class="mat-elevation-z8">
-            <ng-container matColumnDef="month">
-              <th mat-header-cell *matHeaderCellDef>Month</th>
-              <td mat-cell *matCellDef="let item">{{ item.month }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="temp">
-              <th mat-header-cell *matHeaderCellDef>🌡️ Mean Temp (°C)</th>
-              <td mat-cell *matCellDef="let item">{{ item.meanTemp }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="rain">
-              <th mat-header-cell *matHeaderCellDef>🌧️ Total Rainfall (mm)</th>
-              <td mat-cell *matCellDef="let item" [class.rainy]="item.totalRain > 50">
-                {{ item.totalRain }}
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="wind">
-              <th mat-header-cell *matHeaderCellDef>💨 Avg. Wind Speed (km/h)</th>
-              <td mat-cell *matCellDef="let item">{{ item.meanWind }}</td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
+          <div class="error-content">
+            <mat-icon class="error-icon">warning</mat-icon>
+            <p class="error-text">{{ errorMessage }}</p>
+          </div>
         </mat-card-content>
       </mat-card>
+    }
 
-    </div>
+    @if (location && weatherData) {
+      <div class="weather-results">
+        <div class="location-header">
+          <mat-icon>location_on</mat-icon>
+          <span class="location-coords">Farm at {{ location.latitude.toFixed(4) }}, {{ location.longitude.toFixed(4) }}</span>
+        </div>
+
+        <!-- Current Weather Section -->
+        <!-- <div class="current-weather-section">
+          <h4 class="section-title">Current Weather Conditions</h4>
+          <div class="weather-grid">
+            <div class="weather-item">
+              <mat-icon class="weather-icon temp-icon">thermostat</mat-icon>
+              <div class="weather-info">
+                <span class="weather-label">Temperature</span>
+                <span class="weather-value">{{ weatherData.current.temperature }}°C</span>
+              </div>
+            </div>
+            <div class="weather-item">
+              <mat-icon class="weather-icon wind-icon">air</mat-icon>
+              <div class="weather-info">
+                <span class="weather-label">Wind Speed</span>
+                <span class="weather-value">{{ weatherData.current.wind_speed }} km/h</span>
+              </div>
+            </div>
+            <div class="weather-item">
+              <mat-icon class="weather-icon rain-icon">water_drop</mat-icon>
+              <div class="weather-info">
+                <span class="weather-label">Precipitation</span>
+                <span class="weather-value">{{ weatherData.current.precipitation }} mm</span>
+              </div>
+            </div>
+          </div>
+        </div> -->
+
+        @if (weatherData.historical) {
+          <!-- Historical Weather Summary -->
+          <div class="historical-summary">
+            <h4 class="section-title">Historical Weather Summary</h4>
+            <p class="date-range">Data Range: {{ formattedStartDate }} to {{ formattedEndDate }}</p>
+
+            <div class="summary-items">
+              <div class="summary-item">
+                <mat-icon>water_drop</mat-icon>
+                <div>
+                  <span class="summary-label">Rainy Months (>50mm)</span>
+                  <span class="summary-value">{{ weatherData.historical.rainyMonths.join(', ') || 'None' }}</span>
+                </div>
+              </div>
+              <div class="summary-item">
+                <mat-icon>ac_unit</mat-icon>
+                <div>
+                  <span class="summary-label">Winter Months</span>
+                  <span class="summary-value">{{ weatherData.historical.winterMonths.join(', ') || 'None' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monthly Weather Table -->
+          <div class="monthly-data-section">
+            <h4 class="section-title">Monthly Weather Data</h4>
+            <mat-card class="table-card">
+              <mat-card-content class="table-content">
+                <table mat-table [dataSource]="weatherData.historical.monthly" class="weather-table">
+                  <!-- Month Column -->
+                  <ng-container matColumnDef="month">
+                    <th mat-header-cell *matHeaderCellDef>Month</th>
+                    <td mat-cell *matCellDef="let item">{{ item.month }}</td>
+                  </ng-container>
+
+                  <!-- Temperature Column -->
+                  <ng-container matColumnDef="temp">
+                    <th mat-header-cell *matHeaderCellDef>Mean Temp (°C)</th>
+                    <td mat-cell *matCellDef="let item" class="temp-cell">
+                      <span class="temp-badge" [class.low-temp]="item.meanTemp < 20">{{ item.meanTemp }}</span>
+                    </td>
+                  </ng-container>
+
+                  <!-- Rainfall Column -->
+                  <ng-container matColumnDef="rain">
+                    <th mat-header-cell *matHeaderCellDef>Total Rainfall (mm)</th>
+                    <td mat-cell *matCellDef="let item" class="rain-cell">
+                      <span class="rain-badge" [class.high-rain]="item.totalRain > 50">
+                        {{ item.totalRain }}
+                      </span>
+                    </td>
+                  </ng-container>
+
+                  <!-- Wind Speed Column -->
+                  <ng-container matColumnDef="wind">
+                    <th mat-header-cell *matHeaderCellDef>Avg. Wind (km/h)</th>
+                    <td mat-cell *matCellDef="let item" class="wind-cell">
+                      {{ item.meanWind.toFixed(1) }}
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        }
+      </div>
     }
   </div>
-  }
 </div>

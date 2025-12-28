@@ -1,21 +1,66 @@
-<div>
-  <button (click)="getLocation()">Get Current Location</button>
-@if (isLoading) {<div>Fetching location...</div>}
-@if (errorMessage) {<div style="color: red;">Error: {{ errorMessage }}</div>}
-@if (location) {
-  <div>
-    Latitude: {{ location.latitude }} <br />
-    Longitude: {{ location.longitude }}
+<div class="location-wrapper">
+  <div class="location-header">
+    <h2>Farm Location & Weather</h2>
+    <p class="subtitle">View your farm's geographic location and weather information</p>
   </div>
-  <!-- Leaflet Map displays automatically when location is available -->
-    <app-leaflet-map 
-      [latitude]="location.latitude" 
-      [longitude]="location.longitude">
-    </app-leaflet-map>
 
-    <app-farm-weather 
-      [latitude]="location.latitude" 
-      [longitude]="location.longitude">
-    </app-farm-weather>
-}
+  <div class="location-card">
+    <div class="button-container">
+      <button mat-raised-button color="primary" (click)="getLocation()" [disabled]="isLoading" class="get-location-btn">
+        <mat-icon>my_location</mat-icon>
+        {{ isLoading ? 'Fetching Location...' : 'Get Current Location' }}
+      </button>
+    </div>
+
+    @if (isLoading) {
+      <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Determining your location...</p>
+      </div>
+    }
+
+    @if (errorMessage) {
+      <mat-card class="error-card">
+        <mat-card-content>
+          <div class="error-content">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <div>
+              <p class="error-title">Unable to Fetch Location</p>
+              <p class="error-message">{{ errorMessage }}</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (location && !isLoading) {
+      <div class="location-info-card">
+        <div class="location-details">
+          <div class="coord-item">
+            <span class="coord-label">Latitude</span>
+            <span class="coord-value">{{ location.latitude.toFixed(6) }}</span>
+          </div>
+          <div class="coord-separator"></div>
+          <div class="coord-item">
+            <span class="coord-label">Longitude</span>
+            <span class="coord-value">{{ location.longitude.toFixed(6) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <app-leaflet-map 
+          [latitude]="location.latitude" 
+          [longitude]="location.longitude">
+        </app-leaflet-map>
+      </div>
+
+      <div class="weather-container">
+        <app-farm-weather 
+          [latitude]="location.latitude" 
+          [longitude]="location.longitude">
+        </app-farm-weather>
+      </div>
+    }
+  </div>
 </div>

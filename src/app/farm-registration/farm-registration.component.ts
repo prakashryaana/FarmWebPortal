@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, FormControl, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CreateFarmDto } from './farm';
+import { CreateFarmDto, GridPowerUnavailability, TimeRange } from './farm';
 import { FarmRegistrationService } from './farm-registration.service';
 import { FileUploadComponent } from '../file-upload/file-upload.component';
 
@@ -16,11 +16,15 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { inject } from '@angular/core';
 import { WeatherService } from '../farm-weather/weather.service';
 import { Coordinates, GeolocationService } from '../location/geolocation.service';
+import { CommonModule } from '@angular/common';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-farm-registration',
   imports: [ReactiveFormsModule, FileUploadComponent, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatRadioModule, MatButtonModule, MatSlideToggle, LocationComponent],
+    MatSelectModule, MatRadioModule, MatButtonModule, MatSlideToggle, LocationComponent, CommonModule, MatCheckboxModule, MatIconModule, MatButtonToggleModule],
   templateUrl: './farm-registration.component.html',
   styleUrl: './farm-registration.component.css',
 })
@@ -31,25 +35,36 @@ export class FarmRegistrationComponent {
   private weatherService = inject(WeatherService);
   private geoLocationService = inject(GeolocationService);
 
+  days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   coords:Coordinates;
+  gridPowerSchedule: GridPowerUnavailability[] = [];
   
   farmRegistrationForm = new FormGroup({
     farmName: new FormControl('', [Validators.required]),
     surveyNumber: new FormControl('', [Validators.required]),
     address: new FormControl('', [Validators.required]),
     shadeNetArea: new FormControl('', [Validators.required]),
-    //geoTag: new FormControl(''),
     farmPondVolume: new FormControl('', [Validators.required]),
     isSolarPowerAvailable: new FormControl('', [Validators.required]),
     motorCapacity: new FormControl('', [Validators.required]),
     additionalWaterSource: new FormControl(''),
     waterTestCertificateUrl: new FormControl(''),
-    isSinglePhasePower: new FormControl('', [Validators.required]),
-    isThreePhasePower: new FormControl('', [Validators.required]),
-    //gridPowerUnAvailability: new FormControl(''),
+    isSinglePhasePower: new FormControl("false", [Validators.required]),
+    isThreePhasePower: new FormControl("True", [Validators.required]),
     automationRoomSize: new FormControl('', [Validators.required]),
-    //farmhouseNote: new FormControl(''),
+    farmhouseNote: new FormControl('', [Validators.maxLength(250)]),
     storageAreaNote: new FormControl('')
+  });
+
+  gridPowerForm = new FormGroup({
+    selectedDay: new FormControl('', [Validators.required]),
+    applyAllDays: new FormControl(false),
+    timeRanges: new FormArray([
+      new FormGroup({
+        fromTime: new FormControl('', [Validators.required]),
+        toTime: new FormControl('', [Validators.required])
+      })
+    ])
   });
 
   farm: CreateFarmDto = {} as CreateFarmDto;
@@ -82,7 +97,7 @@ export class FarmRegistrationComponent {
         waterTestCertificateUrl: this.farmRegistrationForm.get('waterTestCertificateUrl')?.value,
         isSinglePhasePower: Boolean(this.farmRegistrationForm.get('isSinglePhasePower')?.value ?? undefined),
         isThreePhasePower: Boolean(this.farmRegistrationForm.get('isThreePhasePower')?.value ?? undefined),
-        //gridPowerUnAvailability: this.farmRegistrationForm.get('gridPowerUnAvailability')?.value,
+        //gridPowerUnAvailability: this.gridPowerSchedule,
         automationRoomSize: Number(this.farmRegistrationForm.get('automationRoomSize')?.value ?? undefined),
         //farmhouseNote: this.farmRegistrationForm.get('farmhouseNote')?.value,
         storageAreaNote: this.farmRegistrationForm.get('storageAreaNote')?.value,
@@ -101,7 +116,6 @@ export class FarmRegistrationComponent {
         next: (response) => {
           console.log('Farm Registration successful', response);
           this.farmId = response.farmId;
-          // console.log('Farm ID:', this.farmId);
           this.snackBar.open('Farm Registration successful!', 'Close', { duration: 5000 });
           this.router.navigate(['/maintainer-registration', this.farmId]);
         },
@@ -111,6 +125,62 @@ export class FarmRegistrationComponent {
         }}
       );
     }
+  }
+
+  addTimeRange() {
+    const timeRanges = this.gridPowerForm.get('timeRanges') as FormArray;
+    timeRanges.push(new FormGroup({
+      fromTime: new FormControl('', [Validators.required]),
+      toTime: new FormControl('', [Validators.required])
+    }));
+  }
+
+  removeTimeRange(index: number) {
+    const timeRanges = this.gridPowerForm.get('timeRanges') as FormArray;
+    timeRanges.removeAt(index);
+  }
+
+  addGridPowerSchedule() {
+    if (!this.gridPowerForm.valid) {
+      this.snackBar.open('Please fill all time range fields', 'Close', { duration: 3000 });
+      return;
+    }
+    
+    const selectedDay = this.gridPowerForm.get('selectedDay')?.value;
+    const applyAllDays = this.gridPowerForm.get('applyAllDays')?.value;
+    const timeRanges = (this.gridPowerForm.get('timeRanges') as FormArray).value;
+
+    if (applyAllDays) {
+      this.days.forEach(day => {
+        const existing = this.gridPowerSchedule.findIndex(s => s.day === day);
+        if (existing !== -1) {
+          this.gridPowerSchedule[existing].timeRanges = [...timeRanges];
+        } else {
+          this.gridPowerSchedule.push({ day, timeRanges: [...timeRanges] });
+        }
+      });
+      this.snackBar.open('Time ranges applied to all days', 'Close', { duration: 3000 });
+    } else {
+      const existing = this.gridPowerSchedule.findIndex(s => s.day === selectedDay);
+      if (existing !== -1) {
+        this.gridPowerSchedule[existing].timeRanges = [...timeRanges];
+        this.snackBar.open('Time ranges updated for ' + selectedDay, 'Close', { duration: 3000 });
+      } else {
+        this.gridPowerSchedule.push({ day: selectedDay, timeRanges: [...timeRanges] });
+        this.snackBar.open('Time ranges added for ' + selectedDay, 'Close', { duration: 3000 });
+      }
+    }
+    
+    this.resetGridPowerForm();
+  }
+
+  deleteGridPowerSchedule(day: string) {
+    this.gridPowerSchedule = this.gridPowerSchedule.filter(s => s.day !== day);
+    this.snackBar.open('Removed schedule for ' + day, 'Close', { duration: 3000 });
+  }
+
+  resetGridPowerForm() {
+    this.gridPowerForm.reset({ applyAllDays: false, selectedDay: '', timeRanges: [{ fromTime: '', toTime: '' }] });
   }
 
   onFileChange(event: any) {
