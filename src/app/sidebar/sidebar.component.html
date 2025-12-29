@@ -3,74 +3,80 @@
   <!-- User Profile Section -->
   <div class="user-profile-section">
     @if (isLoading()) {
-      <div class="user-placeholder">
-        <mat-spinner diameter="24"></mat-spinner>
-      </div>
+    <div class="user-placeholder">
+      <mat-spinner diameter="24"></mat-spinner>
+    </div>
     } @else if (userProfile()) {
-      <button mat-button class="user-profile-item" (click)="goToProfile()">
-        <div class="user-avatar">
-          <span class="avatar-initials">{{ (userProfile()!.name | slice:0:2).toUpperCase() }}</span>
-        </div>
-        <div class="user-info" *ngIf="!isCollapsed()">
-          <span class="user-name">{{ userProfile()!.name }}</span>
-          <span class="user-email">{{ userProfile()!.email }}</span>
-        </div>
-        <mat-icon class="profile-arrow" *ngIf="!isCollapsed()">arrow_forward_ios</mat-icon>
-      </button>
-    } @else {
-      <div class="user-placeholder">
-        <mat-icon>person</mat-icon>
-        <span *ngIf="!isCollapsed()">Guest User</span>
+    <button mat-button class="user-profile-item" (click)="goToProfile()">
+      <div class="user-avatar">
+        <span class="avatar-initials">{{ (userProfile()!.name | slice:0:2).toUpperCase() }}</span>
       </div>
+      @if (!isCollapsed()) {
+      <div class="user-info">
+        <span class="user-name">{{ userProfile()!.name }}</span>
+        <span class="user-email">{{ userProfile()!.email }}</span>
+      </div>
+
+      <mat-icon class="profile-arrow">arrow_forward_ios</mat-icon>
+      }
+    </button>
+    } @else {
+    <div class="user-placeholder">
+      <mat-icon>person</mat-icon>
+      @if (!isCollapsed()) {
+      <span>Guest User</span>
+      }
+    </div>
     }
   </div>
 
   <div class="sidebar-header">
-    <h2 class="sidebar-title" *ngIf="!isCollapsed()">Menu</h2>
-    <button class="toggle-btn" (click)="toggleSidebar()" 
-            [matTooltip]="isCollapsed() ? 'Expand' : 'Collapse'"
-            matTooltipPosition="right">
+    @if (!isCollapsed()) {
+    <h2 class="sidebar-title">Menu</h2>
+    }
+    <button class="toggle-btn" (click)="toggleSidebar()" [matTooltip]="isCollapsed() ? 'Expand' : 'Collapse'"
+      matTooltipPosition="right">
       <mat-icon>{{ isCollapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
     </button>
   </div>
 
   <div class="sidebar-menu">
-    <ng-container *ngFor="let item of menuItems">
+    @for (item of menuItems; track $index) {
+    <ng-container>
+      @if (!item.submenu) {
       <!-- Regular menu item -->
-      <a *ngIf="!item.submenu" 
-         [routerLink]="item.route"
-         routerLinkActive="active"
-         class="menu-item"
-         [matTooltip]="item.label"
-         [matTooltipDisabled]="!isCollapsed()"
-         matTooltipPosition="right">
+      <a [routerLink]="item.route" routerLinkActive="active" class="menu-item" [matTooltip]="item.label"
+        [matTooltipDisabled]="!isCollapsed()" matTooltipPosition="right">
         <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
-        <span class="menu-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
+        @if (!isCollapsed()) {
+        <span class="menu-label">{{ item.label }}</span>
+        }
       </a>
-
+      } @else {
       <!-- Submenu item -->
-      <div *ngIf="item.submenu" class="submenu-container">
-        <button class="menu-item submenu-toggle" 
-                (click)="toggleSubmenu(item.label)"
-                [matTooltip]="item.label"
-                [matTooltipDisabled]="!isCollapsed()"
-                matTooltipPosition="right">
+      <div class="submenu-container">
+        <button class="menu-item submenu-toggle" (click)="toggleSubmenu(item.label)" [matTooltip]="item.label"
+          [matTooltipDisabled]="!isCollapsed()" matTooltipPosition="right">
           <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
-          <span class="menu-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
-          <mat-icon class="submenu-arrow" *ngIf="!isCollapsed()" 
-                    [class.expanded]="isMenuExpanded(item.label)">expand_more</mat-icon>
+          @if (!isCollapsed()) {
+          <span class="menu-label">{{ item.label }}</span>
+          <mat-icon class="submenu-arrow" [class.expanded]="isMenuExpanded(item.label)">expand_more</mat-icon>
+          }
         </button>
 
-        <div class="submenu" *ngIf="isMenuExpanded(item.label) && !isCollapsed()">
-          <a *ngFor="let subItem of item.submenu"
-             [routerLink]="subItem.route"
-             routerLinkActive="active"
-             class="submenu-item">
+        @if (isMenuExpanded(item.label) && !isCollapsed()) {
+        <div class="submenu">
+          @for (subItem of item.submenu; track $index) {
+          <a [routerLink]="subItem.route" routerLinkActive="active" class="submenu-item">
             <mat-icon class="submenu-icon">{{ subItem.icon }}</mat-icon>
             <span>{{ subItem.label }}</span>
           </a>
+          }
         </div>
+        }
       </div>
+      }
     </ng-container>
+    }
   </div>
 </nav>

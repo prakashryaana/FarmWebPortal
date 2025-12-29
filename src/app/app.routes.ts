@@ -23,6 +23,8 @@ import { UpdateCropMasterComponent } from './master/update-crop-master/update-cr
 import { UpdateFertilizerInventoryComponent } from './inventory/update-fertilizer-inventory/update-fertilizer-inventory.component';
 import { UpdateDiseaseControlInventoryComponent } from './inventory/update-disease-control-inventory/update-disease-control-inventory.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
+import { roleGuard } from './role-guard';
+import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 
 
 export const routes: Routes = [
@@ -43,13 +45,14 @@ export const routes: Routes = [
     // { path: 'auth/magic/callback', component: MagicCallbackComponent, canActivate: [authGuard] },
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
     ,{ path: '', component: HomeDashboardComponent, canActivate: [authGuard] }
-    ,{ path: 'user-management', component: UserManagementComponent, canActivate: [authGuard] }
+    ,{ path: 'user-management', component: UserManagementComponent, canActivate: [authGuard, roleGuard], data: { roles: ['Admin'] }}
     ,{ path: 'add-actions', component: AddActionsComponent, canActivate: [authGuard] }
     ,{ path: 'view-actions', component: ViewActionsComponent, canActivate: [authGuard] }
     ,{ path: 'crop-master', component: UpdateCropMasterComponent, canActivate: [authGuard] }
     ,{ path: 'fertilizer-inventory', component: UpdateFertilizerInventoryComponent, canActivate: [authGuard] }
     ,{ path: 'disease-control-inventory', component: UpdateDiseaseControlInventoryComponent, canActivate: [authGuard] }
     ,{ path: 'user-profile', component: UserProfileComponent, canActivate: [authGuard] }
+    ,{ path: 'unauthorized', component: UnauthorizedComponent }
     // {
     // path: 'admin/users',
     // component: AdminUsersComponent,

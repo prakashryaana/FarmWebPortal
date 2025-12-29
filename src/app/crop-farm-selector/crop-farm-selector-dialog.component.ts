@@ -55,7 +55,7 @@ export class CropFarmSelectorDialogComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       takeUntil(this.destroy$)
     ).subscribe(query => {
-      if (query.trim().length > 1) {
+      if (query.trim().length > 2) {
         this.performSearch(query);
       } else {
         this.searchResults = [];
