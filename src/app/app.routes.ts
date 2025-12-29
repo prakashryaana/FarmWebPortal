@@ -45,7 +45,7 @@ export const routes: Routes = [
     // { path: 'auth/magic/callback', component: MagicCallbackComponent, canActivate: [authGuard] },
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
     ,{ path: '', component: HomeDashboardComponent, canActivate: [authGuard] }
-    ,{ path: 'user-management', component: UserManagementComponent, canActivate: [authGuard, roleGuard], data: { roles: ['Admin'] }}
+    ,{ path: 'user-management', component: UserManagementComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] }}
     ,{ path: 'add-actions', component: AddActionsComponent, canActivate: [authGuard] }
     ,{ path: 'view-actions', component: ViewActionsComponent, canActivate: [authGuard] }
     ,{ path: 'crop-master', component: UpdateCropMasterComponent, canActivate: [authGuard] }
