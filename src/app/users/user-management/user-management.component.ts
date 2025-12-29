@@ -19,6 +19,7 @@ import { MatTooltip } from "@angular/material/tooltip";
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { lastValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 interface UserRow extends User {
   displayRoles: string;
@@ -128,16 +129,30 @@ export class UserManagementComponent {
 
   
   setTempPassword(user: User) {
-    const tempPassword = '12345678';
-    this.userService.setTempPassword(user.userId!, tempPassword)
-      .subscribe({
-        next: updatedUser => {
-          this.snackBar.open('Temporary password updated', 'Close', { duration: 2000 });
-        },
-        error: err => {
-          console.error('Update failed', err);
-          this.snackBar.open('Update failed', 'Close', { duration: 3000 });
-        }});
+    const tempPassword = environment.tempPassword;
+    const dialogRef = this.confirmDialog.open(ConfirmDialogComponent, {
+    width: '400px',
+    data: { 
+      title: 'Confirm Setting Temporary Password',
+      message: `Are you sure you want to set temporary password: "${tempPassword}" for user: "${user.name}"?`,
+      action: 'Yes'
+      }
+    });
+    
+    dialogRef.afterClosed()
+    .subscribe(confirmed => {
+      if (!confirmed) return;  // User cancelled
+
+      this.userService.setTempPassword(user.userId!, tempPassword)
+        .subscribe({
+          next: updatedUser => {
+            this.snackBar.open('Temporary password updated', 'Close', { duration: 2000 });
+          },
+          error: err => {
+            console.error('Update failed', err);
+            this.snackBar.open('Update failed', 'Close', { duration: 3000 });
+          }});
+      });
   }
 
   private showConfirmDialog(title: string, message: string, action: string): Promise<boolean> {
@@ -168,7 +183,7 @@ export class UserManagementComponent {
       .subscribe({
         next: result => {
           this.users.update(users => 
-          users.map(u => u.userId === user.userId ? { ...u, status: newStatus } : u)
+          users.map(u => u.userId === user.userId ? { ...u, systemStatus: newStatus } : u)
           );
           this.snackBar.open(`User is ${newStatus.toLowerCase()}`, 'Close');
         },
@@ -181,16 +196,30 @@ export class UserManagementComponent {
   }
   
   deleteUser(user: User) {
-    this.userService.deleteUser(user.userId!)
-    .subscribe({
-      next : result => {
-        this.users.update(users => users.filter(u => u.userId !== user.userId));
-        this.snackBar.open('User deleted', 'Close', { duration: 2000 });
-      },
-      error : err => {
-        this.snackBar.open('Delete operation failed', 'Close');
-        console.error('Delete operation failed', err);
+    const dialogRef = this.confirmDialog.open(ConfirmDialogComponent, {
+    width: '400px',
+    data: { 
+      title: 'Confirm User deletion',
+      message: `Are you sure you want to delete user: "${user.name}"? A better option is to deactivate the user.`,
+      action: 'Delete'
       }
+    });
+
+    dialogRef.afterClosed()
+    .subscribe(confirmed => {
+      if (!confirmed) return;  // User cancelled
+
+      this.userService.deleteUser(user.userId!)
+      .subscribe({
+        next : result => {
+          this.users.update(users => users.filter(u => u.userId !== user.userId));
+          this.snackBar.open('User deleted', 'Close', { duration: 2000 });
+        },
+        error : err => {
+          this.snackBar.open('Delete operation failed', 'Close');
+          console.error('Delete operation failed', err);
+        }
+      });
     });
   }
 }

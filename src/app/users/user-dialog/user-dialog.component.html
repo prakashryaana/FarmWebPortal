@@ -9,10 +9,10 @@
           <mat-label>Name</mat-label>
           <input matInput formControlName="name" required>
           @if (nameControl()?.hasError('required') && nameControl()?.touched) {
-            <mat-error>Mobile is required</mat-error>
+            <mat-error>Name is required</mat-error>
           }
           @if (nameControl()?.hasError('minlength') && nameControl()?.touched) {
-              <mat-error>Password must be at least 5 characters</mat-error>
+              <mat-error>Name must be at least 5 characters</mat-error>
             }
         </mat-form-field>
 
@@ -42,10 +42,10 @@
             <mat-label>Password</mat-label>
             <input matInput formControlName="password" type="password" required>
             @if (passwordControl()?.hasError('required') && passwordControl()?.touched) {
-              <mat-error>Password is required (min 6 chars)</mat-error>
+              <mat-error>Password is required (min 8 chars)</mat-error>
             }
             @if (passwordControl()?.hasError('minlength') && passwordControl()?.touched) {
-              <mat-error>Password must be at least 6 characters</mat-error>
+              <mat-error>Password must be at least 8 characters</mat-error>
             }
           </mat-form-field>
         }
