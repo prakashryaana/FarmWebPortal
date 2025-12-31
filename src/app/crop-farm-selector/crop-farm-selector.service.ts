@@ -144,6 +144,44 @@ export class CropFarmSelectorService {
     );
   }
 
+  getCropFarmForUser(): Observable<CropOption[]> {
+    // First, search for farms matching the query (by farmId or farmName)
+    return this.http.get<any[]>(`${this.apiUrl}api/Farm/GetAllFarmCropByUser`).pipe(
+      switchMap((farms: any[]) => {
+        // For each farm, get its crops and combine into CropOption objects
+        const options: CropOption[] = [];
+
+        farms
+        .filter(farm => Array.isArray(farm.cropDetail) && farm.cropDetail.length > 0)
+        .forEach(farm => {
+          // Assuming farm has Crops array with cropIds, or we need to fetch them
+          if (farm.cropDetail && Array.isArray(farm.cropDetail)) {
+            // If Crops is an array of IDs, we'd need to fetch full crop data
+            // For now, assuming Crops contains crop objects with cropId and cropName
+            farm.cropDetail.forEach((crop: any) => {
+              options.push({
+                farmId: farm.farmId || farm.Id,
+                farmName: farm.farmName || farm.FarmName,
+                cropId: crop.cropId || crop,
+                cropName: crop.cropName || ''
+              });
+            });
+          }
+        });
+        return of(options);
+      }),
+      tap(options => {
+        console.log('getCropFarmForUser options:', options);
+        this.searchResultsSignal.set(options);
+      }),
+      catchError(error => {
+        console.error('Search error:', error);
+        this.searchResultsSignal.set([]);
+        return of([]);
+      })
+    );
+    }
+
   /**
    * Select a crop-farm combination and persist it
    */

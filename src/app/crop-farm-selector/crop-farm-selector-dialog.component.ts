@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Subject, takeUntil } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CropFarmSelectorService, CropOption } from './crop-farm-selector.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-crop-farm-selector-dialog',
@@ -37,6 +38,7 @@ export class CropFarmSelectorDialogComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['farmName', 'farmId', 'cropName', 'cropId', 'action'];
   private destroy$ = new Subject<void>();
   private searchQuery$ = new Subject<string>();
+  private authService = inject(AuthService)
 
   constructor(
     private fb: FormBuilder,
@@ -46,6 +48,7 @@ export class CropFarmSelectorDialogComponent implements OnInit, OnDestroy {
     this.searchForm = this.fb.group({
       searchQuery: ['', Validators.required]
     });
+    this.loadCropFarmForLoggedInUser();
   }
 
   ngOnInit(): void {
@@ -76,6 +79,39 @@ export class CropFarmSelectorDialogComponent implements OnInit, OnDestroy {
       .subscribe(value => {
         this.searchQuery$.next(value);
       });
+  }
+
+  loadCropFarmForLoggedInUser(): void {
+    let userId;
+    this.authService.currentUser$.subscribe(
+      currentUser => {
+        if (currentUser) {
+          console.log('CurrentUser: ',currentUser.userId, currentUser.mobile, currentUser.roles);
+          userId = currentUser.userId;
+        } else {
+          console.log('No current user loaded.');
+        }
+      }
+    );
+    
+    if (userId) {
+      this.selectorService.getCropFarmForUser()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.isLoading = false;
+          },
+          error: (error) => {
+            console.error('Load farm crops error:', error);
+            this.isLoading = false;
+            this.searchResults = [];
+          },
+          complete: () => {
+            this.isLoading = false;
+          }
+        });
+    }
+    
   }
 
   performSearch(query: string): void {
