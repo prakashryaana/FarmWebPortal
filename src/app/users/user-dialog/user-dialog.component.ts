@@ -10,6 +10,7 @@ import { UserService } from '../user.service';
 import { User, UserRole } from '../user.model';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatRadioButton, MatRadioModule } from "@angular/material/radio";
 
 interface DialogData {
   mode: 'create' | 'edit';
@@ -21,8 +22,9 @@ interface DialogData {
   standalone: true,
   imports: [
     ReactiveFormsModule, MatDialogModule, MatButtonModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule
-  ],
+    MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule,
+    MatRadioButton, MatRadioModule
+],
   templateUrl: './user-dialog.component.html',
   styleUrls: ['./user-dialog.component.css']
 })
@@ -64,10 +66,7 @@ export class UserDialogComponent {
       ...(mode === 'create' && {
         password: ['', [Validators.required, Validators.minLength(8)]]
       }),
-      ...this.availableRoles().reduce((controls, role) => ({
-        ...controls,
-        [`role_${role}`]: [user?.roles?.includes(role) || false]
-      }), {})
+      role: [user?.roles?.[0] || this.availableRoles()[3], Validators.required]  // Single role
     });
 
     this.userForm.set(form);
@@ -89,14 +88,12 @@ export class UserDialogComponent {
     this.isSubmitting.set(true);
 
     const formValue = this.userForm().value;
-    const selectedRoles: UserRole[] = this.availableRoles()
-      .filter((role): role is UserRole => formValue[`role_${role}`] as boolean);
 
     const userData: any = {
       name: formValue.name,
       mobile: formValue.mobile,
       email: formValue.email,
-      roles: selectedRoles  // Now properly typed as UserRole[]
+      roles: [formValue.role as UserRole]  // Single role array
     };
 
     if (this.data.mode === 'create') {

@@ -52,15 +52,14 @@
         
         <div class="roles-section">
           <h3>Roles</h3>
-          <div class="role-checkboxes">
-            @for (role of availableRoles(); track role; let i = $index) {
-              <mat-checkbox 
-                class="role-checkbox"
-                [formControlName]="'role_' + role"
-                [id]="'role_' + role">
-                {{ getRoleDisplayName(role) }}
-              </mat-checkbox>
-            }
+          <div>
+            <mat-radio-group formControlName="role" class="role-radio-group">
+                @for (role of availableRoles(); track role) {
+                  <mat-radio-button [value]="role">
+                    {{ getRoleDisplayName(role) }}
+                  </mat-radio-button>
+                }
+              </mat-radio-group>
           </div>
         </div>
       </form>
