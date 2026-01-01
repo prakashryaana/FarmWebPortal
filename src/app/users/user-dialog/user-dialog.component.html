@@ -16,8 +16,7 @@
             }
         </mat-form-field>
 
-        @if (data.mode === 'create') {
-            <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Mobile</mat-label>
             <input matInput formControlName="mobile" [disabled]="true" required>
             @if (mobileControl()?.hasError('required') && mobileControl()?.touched) {
@@ -26,8 +25,7 @@
             @if (mobileControl()?.hasError('pattern') && mobileControl()?.touched) {
                 <mat-error>Invalid mobile number</mat-error>
             }
-            </mat-form-field>
-        }
+          </mat-form-field>
         
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>

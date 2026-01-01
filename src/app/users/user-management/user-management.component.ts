@@ -81,11 +81,11 @@ export class UserManagementComponent {
 
   dialogRef.afterClosed()
     .subscribe({
-      next: result => {
-        if (!result) return;  // Dialog cancelled
+      next: userData => {
+        if (!userData) return;  // Dialog cancelled
         
         // Call API directly
-        this.userService.createUser(result).subscribe({
+        this.userService.createUser(userData).subscribe({
           next: createdUser => {
             this.users.update(users => [...users, createdUser as UserRow]);
             this.snackBar.open('User created', 'Close', { duration: 2000 });
@@ -107,11 +107,11 @@ export class UserManagementComponent {
 
   dialogRef.afterClosed()
     .subscribe({
-      next: result => {
-        if (!result) return;  // Dialog cancelled
+      next: userData => {
+        if (!userData) return;  // Dialog cancelled
         
         // Call API directly  
-        this.userService.updateUser(user.userId!, result).subscribe({
+        this.userService.updateUser(user.userId!, userData).subscribe({
           next: updatedUser => {
             this.users.update(users =>
               users.map(u => u.userId === user.userId ? { ...(u as any), ...updatedUser } : u)
