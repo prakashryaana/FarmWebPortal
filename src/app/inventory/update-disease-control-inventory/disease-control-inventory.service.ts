@@ -4,8 +4,9 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface DiseaseControlInventory {
-  id?: string;
+  inventoryId?: string;
   diseaseControlName: string;
+  farmId: string;
   quantitySupplied: number;
   suppliedDate?: string;
   quantityUsed: number;
@@ -14,7 +15,7 @@ export interface DiseaseControlInventory {
 
 @Injectable({ providedIn: 'root' })
 export class DiseaseControlInventoryService {
-  private api = `${environment.baseApiUrl}api/disease-control-inventory`;
+  private api = `${environment.baseApiUrl}api/diseasecontrolinventory`;
 
   constructor(private http: HttpClient) {}
 
@@ -27,16 +28,16 @@ export class DiseaseControlInventoryService {
     const payload = { ...item } as any;
     if ((item.suppliedDate as any) instanceof Date) payload.suppliedDate = this.toUtcIso(item.suppliedDate as Date);
     if ((item.usedDate as any) instanceof Date) payload.usedDate = this.toUtcIso(item.usedDate as Date);
-    return this.http.post(this.api, payload);
+    return this.http.post(`${this.api}/AddDiseaseControlInventory`, payload);
   }
 
-  list(): Observable<DiseaseControlInventory[]> { return this.http.get<DiseaseControlInventory[]>(this.api); }
-  get(id: string): Observable<DiseaseControlInventory> { return this.http.get<DiseaseControlInventory>(`${this.api}/${id}`); }
-  update(id: string, item: Partial<DiseaseControlInventory> & { suppliedDate?: Date | string, usedDate?: Date | string }) {
+  list(farmId: string): Observable<DiseaseControlInventory[]> { return this.http.get<DiseaseControlInventory[]>(`${this.api}/GetAllFarmInventory/${farmId}`); }
+  get(inventoryId: string): Observable<DiseaseControlInventory> { return this.http.get<DiseaseControlInventory>(`${this.api}/${inventoryId}`); }
+  update(inventoryId: string, item: Partial<DiseaseControlInventory> & { suppliedDate?: Date | string, usedDate?: Date | string }) {
     const payload = { ...item } as any;
     if ((item.suppliedDate as any) instanceof Date) payload.suppliedDate = this.toUtcIso(item.suppliedDate as Date);
     if ((item.usedDate as any) instanceof Date) payload.usedDate = this.toUtcIso(item.usedDate as Date);
-    return this.http.put(`${this.api}/${id}`, payload);
+    return this.http.put(`${this.api}/${inventoryId}`, payload);
   }
-  delete(id: string) { return this.http.delete(`${this.api}/${id}`); }
+  delete(inventoryId: string) { return this.http.delete(`${this.api}/RemoveInventory/${inventoryId}`); }
 }

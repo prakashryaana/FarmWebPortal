@@ -30,7 +30,7 @@ export class UpdateCropMasterComponent {
     sowingTimeToMonth: new FormControl('', [Validators.required]),
     harvestTimeFromMonth: new FormControl('', [Validators.required]),
     harvestTimeToMonth: new FormControl('', [Validators.required]),
-    sowingMethod: new FormControl('Seedlings', [Validators.required]),
+    sowingMethod: new FormControl('Rizomes/Seedlings', [Validators.required]),
     moleculesToAdd: new FormControl('', [Validators.maxLength(250)]),
     pestsAndDiseases: new FormControl('', [Validators.maxLength(250)])
   });
@@ -52,7 +52,7 @@ export class UpdateCropMasterComponent {
   }
 
   openCreateForm() {
-    this.form.reset({ sowingMethod: 'Seedlings' });
+    this.form.reset({ sowingMethod: 'Rizomes/Seedlings' });
     this.editingId = null;
     this.isFormExpanded = true;
   }
@@ -60,7 +60,7 @@ export class UpdateCropMasterComponent {
   closeForm() {
     this.isFormExpanded = false;
     this.editingId = null;
-    this.form.reset({ sowingMethod: 'Seedlings' });
+    this.form.reset({ sowingMethod: 'Rizomes/Seedlings' });
   }
 
   selectForEdit(item: CropMaster) {
@@ -153,7 +153,7 @@ export class UpdateCropMasterComponent {
       expectedYield: parseFloat(Number(this.form.get('expectedYield')?.value || 0).toFixed(2)),
       sowingTime: `${sowingFrom}-${sowingTo}`,
       harvestTime: `${harvestFrom}-${harvestTo}`,
-      sowingMethod: String(this.form.get('sowingMethod')?.value || 'Seedlings'),
+      sowingMethod: String(this.form.get('sowingMethod')?.value || 'Rizomes/Seedlings'),
       moleculesToAdd: String(this.form.get('moleculesToAdd')?.value || ''),
       pestsAndDiseases: String(this.form.get('pestsAndDiseases')?.value || '')
     };

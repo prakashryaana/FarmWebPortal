@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../users/confirm-dialog/confirm-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { CropFarmSelectorService } from '../../crop-farm-selector/crop-farm-selector.service';
 
 @Component({
   selector: 'app-update-fertilizer-inventory',
@@ -18,14 +19,20 @@ export class UpdateFertilizerInventoryComponent {
   private snackBar = inject(MatSnackBar);
   private svc = inject(FertilizerInventoryService);
   private confirmDialog = inject(MatDialog);
+  private readonly cropFarmSelector = inject(CropFarmSelectorService);
+
+  get selectedFarmName() { return this.cropFarmSelector.selectedFarmName(); }
+  get selectedFarmId() { return this.cropFarmSelector.selectedFarmId(); }
+
+  fertilizerNames = [
+    'A1','A2','A3','A4','A5','B11','BF','C6','Drip Saff','CA','CHA','CSW','Trichoderma',
+    'Pseudomonas','Bio Ferlilizer','VAM','FERT 1','FERT 2','FERT 3','FERT 4','Adjuvent'];
 
   form = new FormGroup({
-    id: new FormControl(''),
+    inventoryId: new FormControl(''),
     fertilizerName: new FormControl('', [Validators.required, Validators.maxLength(100)]),
     quantitySupplied: new FormControl(0.0, [Validators.required]),
-    suppliedDate: new FormControl(null),
-    quantityUsed: new FormControl(0.0, [Validators.required]),
-    usedDate: new FormControl(null)
+    suppliedDate: new FormControl(null)
   });
 
   list: FertilizerInventory[] = [];
@@ -35,10 +42,12 @@ export class UpdateFertilizerInventoryComponent {
   constructor() { this.load(); }
 
   load() { 
-    this.svc.list().subscribe({ 
+    if(this.selectedFarmId){
+      this.svc.list(this.selectedFarmId).subscribe({ 
       next: r => this.list = r, 
       error: e => console.error(e) 
     }); 
+    }
   }
 
   openCreateForm() {
@@ -55,14 +64,12 @@ export class UpdateFertilizerInventoryComponent {
 
   selectForEdit(item: FertilizerInventory) {
     this.form.patchValue({
-      id: item.id,
+      inventoryId: item.inventoryId,
       fertilizerName: item.fertilizerName,
       quantitySupplied: item.quantitySupplied,
-      suppliedDate: item.suppliedDate ? new Date(item.suppliedDate) : null,
-      quantityUsed: item.quantityUsed,
-      usedDate: item.usedDate ? new Date(item.usedDate) : null
+      suppliedDate: item.suppliedDate ? new Date(item.suppliedDate) : null
     });
-    this.editingId = item.id || null;
+    this.editingId = item.inventoryId || null;
     this.isFormExpanded = true;
   }
 
@@ -107,7 +114,7 @@ export class UpdateFertilizerInventoryComponent {
 
     dialogRef.afterClosed().subscribe(confirmed => {
       if (!confirmed) return;
-      this.svc.delete(item.id || '').subscribe({
+      this.svc.delete(item.inventoryId || '').subscribe({
         next: () => {
           this.snackBar.open('Deleted successfully', 'Close', { duration: 3000 });
           this.load();
@@ -120,10 +127,9 @@ export class UpdateFertilizerInventoryComponent {
   private buildPayload() {
     return {
       fertilizerName: this.form.get('fertilizerName')?.value,
+      farmId: this.selectedFarmId,
       quantitySupplied: parseFloat(Number(this.form.get('quantitySupplied')?.value || 0).toFixed(2)),
-      suppliedDate: this.form.get('suppliedDate')?.value,
-      quantityUsed: parseFloat(Number(this.form.get('quantityUsed')?.value || 0).toFixed(2)),
-      usedDate: this.form.get('usedDate')?.value
+      suppliedDate: this.form.get('suppliedDate')?.value
     };
   }
 }

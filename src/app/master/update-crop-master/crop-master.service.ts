@@ -10,7 +10,7 @@ export interface CropMaster {
   expectedYield: number;
   sowingTime: string;
   harvestTime: string;
-  sowingMethod: 'Rizomes' | 'Seedlings' | string;
+  sowingMethod: 'Rizomes/Seedlings' | 'Other' | string;
   moleculesToAdd?: string;
   pestsAndDiseases?: string;
 }
