@@ -18,11 +18,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { inject } from '@angular/core';
 import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selector.service';
 import { effect } from '@angular/core';
+import { CropMasterService } from '../master/update-crop-master/crop-master.service';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-crop-registration',
   imports: [MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule,
-    MatDatepicker, MatDatepickerToggle, MatDatepickerInput, MatNativeDateModule, FarmLookupComponent],
+    MatDatepicker, MatDatepickerToggle, MatDatepickerInput, MatNativeDateModule,
+    FarmLookupComponent, MatSelectModule],
   providers: [
         provideLuxonDateAdapter(DDMMYYYY_DATE_FORMATS),
         //  { provide: MAT_DATE_FORMATS, useValue: DDMMYYYY_DATE_FORMATS },
@@ -38,8 +41,10 @@ export class CropRegistrationComponent {
   cropId: string = '';
   selectedFarm: FarmPartial = {} as FarmPartial;
   isFarmSelected: boolean = false;
+  cropMasterList: any[] = [];
 
-  constructor(private router: Router, private cropRegistrationService: CropRegistrationService, private farmService: FarmService) {
+  constructor(private router: Router, private cropRegistrationService: CropRegistrationService, 
+    private farmService: FarmService, private cropMasterService: CropMasterService) {
     effect(() => {
       const selection = this.cropFarmSelector.selectedCropFarm();
       const farmId = selection?.farmId;
@@ -57,13 +62,36 @@ export class CropRegistrationComponent {
     });
   }
 
+  ngOnInit() {
+    this.cropMasterService.list().subscribe({
+      next: (data) => {
+        this.cropMasterList = data;
+      },
+      error: (error) => {
+        console.error('Failed to fetch crop master list', error);
+      }
+    });
+  }
+
+
   cropRegistrationForm = new FormGroup({
     cropName: new FormControl('', [Validators.required]),
+    cropMasterId: new FormControl<string | null>(null, Validators.required),  // Hidden
     area: new FormControl('', [Validators.required]),
     dateOfSowing: new FormControl(null, [Validators.required])
   });
 
-  
+  onCropMasterChange(event: any) {
+    const selectedId = event.value;
+    const selectedCrop = this.cropMasterList.find(c => c.cropId === selectedId);
+    
+    if (selectedCrop) {
+      this.cropRegistrationForm.patchValue({
+        cropMasterId: selectedId,
+        cropName: selectedCrop.cropName
+      });
+    }
+  }
 
   registerCrop(){
     // this.cropId = Date.now().toString();
@@ -71,7 +99,9 @@ export class CropRegistrationComponent {
     if (this.cropRegistrationForm.valid && this.isFarmSelected) {
       this.crop = {
         cropId: Date.now().toString(),
+        farmId: this.selectedFarm.farmId,
         cropName: this.cropRegistrationForm.get('cropName')?.value,
+        cropMasterId: this.cropRegistrationForm.get('cropMasterId')?.value!,  // Master ID
         cropArea: Number(this.cropRegistrationForm.get('area')?.value),
         dateOfSowing: this.cropRegistrationForm.get('dateOfSowing')?.value
       };
@@ -88,28 +118,28 @@ export class CropRegistrationComponent {
           this.cropId = response.cropId;
 
           //Fetch Farm details
-          this.farmService.getFarmById(this.selectedFarm.farmId).subscribe({
-            next: (res) => {
-              const farm: UpdateFarmDto = res;
-              if (!farm.Crops) {
-                farm.Crops = [];
-              }
-              farm.Crops.push(this.cropId);
-              //Update Farm with new Crop ID
-              this.farmService.updateFarm(this.selectedFarm.farmId, farm).subscribe({
-                next: (res) => {
-                  console.log('Updated Farm with Crop ID successfully', res);
-                  this.snackBar.open('Farm updated with new Crop successfully!', 'Close', { duration: 5000 });
-                },
-                error: (err) => {
-                  console.error('Failed to get Farm details for updating Crop ID', err);
-                  this.snackBar.open('Failed to update Farm with new Crop. Please try again.', 'Close', { duration: 5000 });
-                }
-              });
-            },
-            error: (err) => {
-              console.error('Failed to update Farm with Crop ID', err);
-            }});
+          // this.farmService.getFarmById(this.selectedFarm.farmId).subscribe({
+          //   next: (res) => {
+          //     const farm: UpdateFarmDto = res;
+          //     if (!farm.Crops) {
+          //       farm.Crops = [];
+          //     }
+          //     farm.Crops.push(this.cropId);
+          //     //Update Farm with new Crop ID
+          //     this.farmService.updateFarm(this.selectedFarm.farmId, farm).subscribe({
+          //       next: (res) => {
+          //         console.log('Updated Farm with Crop ID successfully', res);
+          //         this.snackBar.open('Farm updated with new Crop successfully!', 'Close', { duration: 5000 });
+          //       },
+          //       error: (err) => {
+          //         console.error('Failed to get Farm details for updating Crop ID', err);
+          //         this.snackBar.open('Failed to update Farm with new Crop. Please try again.', 'Close', { duration: 5000 });
+          //       }
+          //     });
+          //   },
+          //   error: (err) => {
+          //     console.error('Failed to update Farm with Crop ID', err);
+          //   }});
 
           this.router.navigate(['/home-dashboard']);
         },

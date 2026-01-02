@@ -9,8 +9,17 @@
   }
   <mat-form-field appearance="fill" class="full-width">
     <mat-label>Crop Name</mat-label>
-    <input matInput type="text" formControlName="cropName" required />
+    <!-- <input matInput type="text" formControlName="cropName" required /> -->
+    <mat-select formControlName="cropMasterId" (selectionChange)="onCropMasterChange($event)" required>
+      @for (crop of cropMasterList; track crop.cropId) {
+        <mat-option [value]="crop.cropId">
+          {{ crop.cropName }}
+        </mat-option>
+      }
+    </mat-select>
   </mat-form-field>
+  <!-- Hidden cropName sync -->
+  <input type="hidden" formControlName="cropName">
 
   <mat-form-field appearance="fill" class="full-width">
     <mat-label>Crop Area (in sq. mt)</mat-label>
