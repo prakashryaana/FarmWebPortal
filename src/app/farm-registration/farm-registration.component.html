@@ -23,18 +23,118 @@
               <input matInput type="text" formControlName="farmName" required />
               <mat-error *ngIf="farmRegistrationForm.get('farmName')?.hasError('required')">Farm name is required</mat-error>
             </mat-form-field>
+          </div>
+        </div>
 
+        <!-- Address Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">Address Information</h3>
+          <div class="form-grid">
+            <!-- Pincode -->
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Survey Number</mat-label>
-              <input matInput type="text" formControlName="surveyNumber" required />
-              <mat-error *ngIf="farmRegistrationForm.get('surveyNumber')?.hasError('required')">Survey number is required</mat-error>
+              <mat-label>Pincode</mat-label>
+              <input matInput type="text" formControlName="pincode" placeholder="Enter 6-digit pincode" maxlength="6" />
+              <!-- <mat-hint>Enter pincode to auto-populate state and district</mat-hint> -->
+            </mat-form-field>
+            <!-- <div class="pincode-loading" *ngIf="isPincodeLoading()" style="display:flex;align-items:center;gap:8px;">
+              <mat-progress-spinner diameter="18" mode="indeterminate"></mat-progress-spinner>
+              <span>Looking up pincode...</span>
+            </div> -->
+
+            <!-- State Dropdown -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>State</mat-label>
+              <mat-select formControlName="state">
+                <mat-option value="">Select State</mat-option>
+                <mat-option *ngFor="let state of states()" [value]="state">{{ state.stateName }}</mat-option>
+              </mat-select>
+              <mat-error *ngIf="farmRegistrationForm.get('state')?.hasError('required')">State is required</mat-error>
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Address</mat-label>
-              <input matInput type="text" formControlName="address" required />
-              <mat-error *ngIf="farmRegistrationForm.get('address')?.hasError('required')">Address is required</mat-error>
+            <!-- District Dropdown -->
+            <mat-form-field appearance="outline" class="full-width" *ngIf="farmRegistrationForm.get('state')?.value">
+              <mat-label>District</mat-label>
+              <mat-select formControlName="district">
+                <mat-option value="">Select District</mat-option>
+                <mat-option *ngFor="let district of districts()" [value]="district">{{ district.districtName }}</mat-option>
+              </mat-select>
+              <mat-error *ngIf="farmRegistrationForm.get('district')?.hasError('required')">District is required</mat-error>
             </mat-form-field>
+
+            <!-- Karnataka-Specific Fields -->
+            <ng-container *ngIf="showKarnatakaFields()">
+              <!-- Taluka (for Karnataka) -->
+              <mat-form-field appearance="outline" class="full-width" *ngIf="farmRegistrationForm.get('district')?.value">
+                <mat-label>Taluka</mat-label>
+                <mat-select formControlName="taluka" [required]="showKarnatakaFields()">
+                  <mat-option value="">Select Taluka</mat-option>
+                  <mat-option *ngFor="let taluka of talukas()" [value]="taluka">{{ taluka.talukaName }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="farmRegistrationForm.get('taluka')?.hasError('required')">Taluka is required</mat-error>
+              </mat-form-field>
+
+              <!-- Hobli (for Karnataka) -->
+              <mat-form-field appearance="outline" class="full-width" *ngIf="farmRegistrationForm.get('taluka')?.value">
+                <mat-label>Hobli</mat-label>
+                <mat-select formControlName="hobli" [required]="showKarnatakaFields()">
+                  <mat-option value="">Select Hobli</mat-option>
+                  <mat-option *ngFor="let hobli of hoblis()" [value]="hobli">{{ hobli.hobliName }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="farmRegistrationForm.get('hobli')?.hasError('required')">Hobli is required</mat-error>
+              </mat-form-field>
+
+              <!-- Village (for all states) -->
+              <mat-form-field appearance="outline" class="full-width" *ngIf="farmRegistrationForm.get('hobli')?.value">
+                <mat-label>Village</mat-label>
+                <mat-select formControlName="village">
+                  <mat-option value="">Select Village</mat-option>
+                  <mat-option *ngFor="let village of villages()" [value]="village">{{ village.villageName }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Survey Number (for Karnataka) -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Survey Number</mat-label>
+                <input matInput type="text" formControlName="surveyNumber" [required]="showKarnatakaFields()" />
+                <mat-error *ngIf="farmRegistrationForm.get('surveyNumber')?.hasError('required')">Survey number is required</mat-error>
+              </mat-form-field>
+
+              <!-- Hissa (for Karnataka) -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Hissa</mat-label>
+                <input matInput type="text" formControlName="hissa" [required]="showKarnatakaFields()" />
+                <mat-error *ngIf="farmRegistrationForm.get('hissa')?.hasError('required')">Hissa is required</mat-error>
+              </mat-form-field>
+            </ng-container>
+
+            <!-- Other States Fields -->
+            <ng-container *ngIf="showOtherStateFields()">
+              <!-- Sub-District (for other states) -->
+              <mat-form-field appearance="outline" class="full-width" *ngIf="farmRegistrationForm.get('district')?.value">
+                <mat-label>Sub-District</mat-label>
+                <mat-select formControlName="subDistrict" [required]="showOtherStateFields()">
+                  <mat-option value="">Select Sub-District</mat-option>
+                  <mat-option *ngFor="let subDistrict of subDistricts()" [value]="subDistrict">{{ subDistrict.subDistrictName }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="farmRegistrationForm.get('subDistrict')?.hasError('required')">Sub-District is required</mat-error>
+              </mat-form-field>
+
+              <!-- Village (for other states) -->
+              <mat-form-field appearance="outline" class="full-width" *ngIf="farmRegistrationForm.get('subDistrict')?.value">
+                <mat-label>Village</mat-label>
+                <mat-select formControlName="village">
+                  <mat-option value="">Select Village</mat-option>
+                  <mat-option *ngFor="let village of villages()" [value]="village">{{ village.villageName }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Address Line (for other states) -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Address Line</mat-label>
+                <input matInput type="text" formControlName="addressLine" [required]="showOtherStateFields()" />
+                <mat-error *ngIf="farmRegistrationForm.get('addressLine')?.hasError('required')">Address line is required</mat-error>
+              </mat-form-field>
+            </ng-container>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, computed, effect, signal } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CreateFarmDto, GridPowerUnavailability, TimeRange } from './farm';
@@ -20,29 +20,68 @@ import { CommonModule } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { debounceTime, startWith, switchMap, distinctUntilChanged } from 'rxjs';
+import { AddressService } from './address.service';
+import { District, Hobli, State, SubDistrict, Taluka, Village } from './address.models';
 
 @Component({
   selector: 'app-farm-registration',
   imports: [ReactiveFormsModule, FileUploadComponent, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatRadioModule, MatButtonModule, MatSlideToggle, LocationComponent, CommonModule, MatCheckboxModule, MatIconModule, MatButtonToggleModule],
+    MatSelectModule, MatRadioModule, MatButtonModule, MatSlideToggle, LocationComponent, CommonModule, MatCheckboxModule, MatIconModule, MatButtonToggleModule, MatProgressSpinnerModule],
   templateUrl: './farm-registration.component.html',
   styleUrl: './farm-registration.component.css',
 })
 export class FarmRegistrationComponent {
-  constructor(private router: Router, private farmRegistrationService: FarmRegistrationService) {}
+  
 
   private snackBar = inject(MatSnackBar);
   private weatherService = inject(WeatherService);
   private geoLocationService = inject(GeolocationService);
+  private addressService = inject(AddressService);
 
   days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   coords:Coordinates;
   gridPowerSchedule: GridPowerUnavailability[] = [];
+
+  // Signals
+  pincode = signal('');
+  isPincodeLoading = signal(false);
+  states = signal<{ stateName: string; stateCode: number }[]>([]);
+  districts = signal<any[]>([]);
+  subDistricts = signal<any[]>([]);
+  talukas = signal<any[]>([]);
+  hoblis = signal<any[]>([]);
+  villages = signal<any[]>([]);
+  selectedState = signal<State|null>(null);
+
+  isKarnataka = computed(() => {
+    const selected = this.selectedState();
+    if(selected) {
+      console.log('Selected state :', selected);
+      return selected.stateName.toLowerCase() === 'karnataka';
+    }
+    else
+      return false;
+  });
+
+  showKarnatakaFields = computed(() => this.isKarnataka());
+  showOtherStateFields = computed(() => !this.isKarnataka());
   
   farmRegistrationForm = new FormGroup({
     farmName: new FormControl('', [Validators.required]),
-    surveyNumber: new FormControl('', [Validators.required]),
-    address: new FormControl('', [Validators.required]),
+    
+    pincode: new FormControl(''),
+    state: new FormControl<State|null>(null),
+    district: new FormControl<District|null>(null),
+    subDistrict: new FormControl<SubDistrict|null>(null),
+    taluka: new FormControl<Taluka|null>(null),
+    hobli: new FormControl<Hobli|null>(null),
+    village: new FormControl<Village|null>(null),
+    surveyNumber: new FormControl(''),
+    hissa: new FormControl(''),
+    addressLine: new FormControl(''),
+
     shadeNetArea: new FormControl('', [Validators.required]),
     farmPondVolume: new FormControl('', [Validators.required]),
     isSolarPowerAvailable: new FormControl('', [Validators.required]),
@@ -55,6 +94,64 @@ export class FarmRegistrationComponent {
     farmhouseNote: new FormControl('', [Validators.maxLength(250)]),
     storageAreaNote: new FormControl('')
   });
+
+  constructor(private router: Router, private farmRegistrationService: FarmRegistrationService) {
+    // Load states on init
+    this.addressService.getAllStates().subscribe(states => {
+      this.states.set(states);
+    });
+
+    // State change → cascade and update conditional validators
+    this.farmRegistrationForm.get('state')?.valueChanges.subscribe(state => {
+      this.selectedState.set(state || null);
+      this.clearDependentFields();
+      
+      if (state) {
+        if(this.isKarnataka()) {
+          this.addressService.getKarnatakaDistricts().subscribe(districts => {
+            this.districts.set(districts);
+          });
+        } else {
+          this.addressService.getDistrictsByState(state.stateName).subscribe(districts => {
+            this.districts.set(districts);
+          });
+        }
+        
+        // Update validators based on state
+        this.updateValidators();
+      }
+    });
+
+    // District change → load talukas or subDistricts
+    this.farmRegistrationForm.get('district')?.valueChanges.subscribe(district => {
+      if (district) {
+        this.onDistrictChange(district);
+      }
+    });
+
+    // Subdistrict/Taluka change → load hoblis
+    this.farmRegistrationForm.get('subDistrict')?.valueChanges.subscribe(SubDistrict => {
+      if (SubDistrict && !this.isKarnataka()) {
+        this.onSubDistrictChange(SubDistrict);
+      }
+    });
+
+    this.farmRegistrationForm.get('taluka')?.valueChanges.subscribe(taluka => {
+      if (taluka && this.isKarnataka()) {
+        const district = this.farmRegistrationForm.get('district')?.value;
+        this.onTalukaChange(district, taluka);
+      }
+    });
+
+    // Hobli change → load villages
+    this.farmRegistrationForm.get('hobli')?.valueChanges.subscribe(hobli => {
+      if (hobli && this.isKarnataka()) {
+        const district = this.farmRegistrationForm.get('district')?.value;
+        const taluka = this.farmRegistrationForm.get('taluka')?.value;
+        this.onHobliChange(district, taluka, hobli);
+      }
+    });
+  }
 
   gridPowerForm = new FormGroup({
     selectedDay: new FormControl('', [Validators.required]),
@@ -71,6 +168,142 @@ export class FarmRegistrationComponent {
   farmId: string = '';
   isFileUploaded: boolean = false;
 
+  loadByPincode(pincode: string) {
+    this.isPincodeLoading.set(true);
+    this.addressService.getByPincode(pincode).subscribe({
+      next: (hierarchy) => {
+        this.farmRegistrationForm.patchValue({
+          state: hierarchy.state.stateName,
+          district: hierarchy.districts[0]?.districtNme,
+          subDistrict: hierarchy.subDistricts[0]?.subDistrictName
+        });
+        this.selectedState.set(hierarchy.stateName || '');
+        this.isPincodeLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Pincode lookup failed', err);
+        this.isPincodeLoading.set(false);
+      }
+    });
+  }
+
+  clearDependentFields() {
+    this.farmRegistrationForm.patchValue({
+      district: null,
+      subDistrict: null,
+      taluka: null,
+      hobli: null,
+      village: null
+    }, { emitEvent: false });
+    this.districts.set([]);
+    this.subDistricts.set([]);
+    this.talukas.set([]);
+    this.hoblis.set([]);
+    this.villages.set([]);
+  }
+
+  updateValidators() {
+    const subDistrictControl = this.farmRegistrationForm.get('subDistrict');
+    const addressLineControl = this.farmRegistrationForm.get('addressLine');
+    const talukaControl = this.farmRegistrationForm.get('taluka');
+    const hobliControl = this.farmRegistrationForm.get('hobli');
+    const surveyNumberControl = this.farmRegistrationForm.get('surveyNumber');
+    const hissaControl = this.farmRegistrationForm.get('hissa');
+
+    if (this.isKarnataka()) {
+      // Karnataka: subDistrict and addressLine not required/hidden
+      subDistrictControl?.clearAsyncValidators();
+      subDistrictControl?.clearValidators();
+      subDistrictControl?.updateValueAndValidity({ emitEvent: false });
+      
+      addressLineControl?.clearAsyncValidators();
+      addressLineControl?.clearValidators();
+      addressLineControl?.updateValueAndValidity({ emitEvent: false });
+      
+      talukaControl?.setValidators([Validators.required]);
+      hobliControl?.setValidators([Validators.required]);
+      surveyNumberControl?.setValidators([Validators.required]);
+      hissaControl?.setValidators([Validators.required]);
+    } else {
+      // Other states: taluka, hobli, surveyNumber, hissa hidden/not required
+      talukaControl?.clearAsyncValidators();
+      talukaControl?.clearValidators();
+      talukaControl?.updateValueAndValidity({ emitEvent: false });
+      
+      hobliControl?.clearAsyncValidators();
+      hobliControl?.clearValidators();
+      hobliControl?.updateValueAndValidity({ emitEvent: false });
+      
+      surveyNumberControl?.clearAsyncValidators();
+      surveyNumberControl?.clearValidators();
+      surveyNumberControl?.updateValueAndValidity({ emitEvent: false });
+      
+      hissaControl?.clearAsyncValidators();
+      hissaControl?.clearValidators();
+      hissaControl?.updateValueAndValidity({ emitEvent: false });
+      
+      // Other states: require subDistrict and addressLine
+      subDistrictControl?.setValidators([Validators.required]);
+      addressLineControl?.setValidators([Validators.required]);
+    }
+
+    talukaControl?.updateValueAndValidity({ emitEvent: false });
+    hobliControl?.updateValueAndValidity({ emitEvent: false });
+    surveyNumberControl?.updateValueAndValidity({ emitEvent: false });
+    hissaControl?.updateValueAndValidity({ emitEvent: false });
+    subDistrictControl?.updateValueAndValidity({ emitEvent: false });
+    addressLineControl?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  onPincodeChange(event: any) {
+    const pincode = event.target.value;
+    if (pincode && pincode.length === 6) {
+      this.pincode.set(pincode);
+    }
+  }
+
+  onDistrictChange(district: District) {
+    //console.log('district:', district);
+    if (this.isKarnataka()) {
+      this.addressService.GetKarnatakaTalukasByDistrict(district.districtCode).subscribe({
+        next: talukas => this.talukas.set(talukas),
+        error: err => console.error('Error loading talukas', err)
+      });
+    } else {
+      this.addressService.GetSubdistrictsByDistrict(district.districtCode).subscribe({
+        next: subs => this.subDistricts.set(subs),
+        error: err => console.error('Error loading subDistricts', err)
+      });
+    }
+  }
+
+  onSubDistrictChange(subDistrict: SubDistrict) {
+    //console.log('subDistrict:', subDistrict);
+    if (!this.isKarnataka()) {
+      this.addressService.GetVillagesBySubDistrict(subDistrict.subDistrictName).subscribe(villages => this.villages.set(villages));
+    }
+  }
+
+  onTalukaChange(district: District, taluka: Taluka) {
+    //console.log('taluka:', taluka);
+    if (this.isKarnataka()) {
+      this.addressService.GeKarnatakatHoblisByDistrictAndTaluka(district.districtCode, taluka.talukaCode).subscribe({ 
+        next: hoblis => this.hoblis.set(hoblis),
+        error: err => console.error('Error loading hoblis', err)
+      });
+    }
+  }
+
+  onHobliChange(district: District, taluka: Taluka, hobli: Hobli) {
+    //console.log('hobli:', hobli);
+    if (this.isKarnataka()) {
+      this.addressService.GetKarnatakaVillagesByDistrictAndTalukaAndHobli(district.districtCode, taluka.talukaCode, hobli.hobliCode).subscribe({
+        next: villages => this.villages.set(villages),
+        error: err => console.error('Error loading villages', err)
+      });
+    } 
+  }
+
   registerFarm(){
     console.log(this.weatherService.historicalWeatherData);
     console.log(this.geoLocationService.coordinates);
@@ -84,7 +317,7 @@ export class FarmRegistrationComponent {
         farmId: Date.now().toString(),
         farmName: this.farmRegistrationForm.get('farmName')?.value,
         surveyNumber: this.farmRegistrationForm.get('surveyNumber')?.value,
-        address: this.farmRegistrationForm.get('address')?.value,
+        //address: this.farmRegistrationForm.get('address')?.value,
         shadeNetArea: Number(this.farmRegistrationForm.get('shadeNetArea')?.value ?? undefined),
         geoLocation: {
           latitude: this.geoLocationService.coordinates().latitude,
