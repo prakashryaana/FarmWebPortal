@@ -1,5 +1,6 @@
 import { HistoricalWeatherRange } from "../farm-weather/weather.service";
 import { Coordinates } from "../location/geolocation.service";
+import { RestOfIndiaAddress, KarnatakaAddress, AggregateAddress } from "./address.models";
 
 export interface TimeRange {
     fromTime: string;
@@ -14,10 +15,7 @@ export interface GridPowerUnavailability {
 export interface FarmDto {
     farmName: string | null | undefined;
     surveyNumber: string | null | undefined;
-    //address: string | null | undefined;
-
-    
-
+    address: RestOfIndiaAddress | KarnatakaAddress | AggregateAddress | null | undefined;
     shadeNetArea: number;
     geoLocation: Coordinates | null | undefined;
     farmPondVolume: number | null | undefined;
@@ -42,35 +40,3 @@ export interface CreateFarmDto extends FarmDto {
     farmId: string;
 }
 
-export interface RestOfIndiaAddress {
-    pincode: string;
-    state: string;
-    district: string;
-    subDistrict: string;
-    village: string;
-    addressLine: string;
-}
-
-export interface KarnatakaAddress {
-    pincode: string;
-    state: string;
-    district: string;
-    taluka: string;
-    hobli: string;
-    village: string;
-    surveyNumber: string;
-    hissa: string;
-}
-
-export interface AggregateAddress {
-    pincode: string;
-    state: string;
-    district: string;
-    subDistrict: string;
-    taluka: string;
-    hobli: string;
-    village: string;
-    surveyNumber: string;
-    hissa: string;
-    addressLine: string;
-}

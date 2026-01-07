@@ -28,15 +28,35 @@ export interface Village {
     villageName: string;
 }
 
-export interface FarmAddress {
-    addressLine: string | null | undefined;
-    village: string | null | undefined;
-    subDistrict: string | null | undefined;
-    district: string | null | undefined;
-    state: string | null | undefined;
-    pincode: string | null | undefined;
-    taluka?: string | null | undefined;
-    hobli?: string | null | undefined;
-    surveyNumber?: string | null | undefined;
-    hissa?: string | null | undefined;
+export interface RestOfIndiaAddress {
+    pincode: string;
+    state: string;
+    district: string;
+    subDistrict: string;
+    village: string;
+    addressLine: string;
+}
+
+export interface KarnatakaAddress {
+    pincode: string;
+    state: string;
+    district: string;
+    taluka: string;
+    hobli: string;
+    village: string;
+    surveyNumber: string;
+    hissa: string;
+}
+
+export interface AggregateAddress {
+    pincode: string;
+    state: string;
+    district: string;
+    subDistrict: string;
+    taluka: string;
+    hobli: string;
+    village: string;
+    surveyNumber: string;
+    hissa: string;
+    addressLine: string;
 }

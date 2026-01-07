@@ -317,7 +317,25 @@ export class FarmRegistrationComponent {
         farmId: Date.now().toString(),
         farmName: this.farmRegistrationForm.get('farmName')?.value,
         surveyNumber: this.farmRegistrationForm.get('surveyNumber')?.value,
-        //address: this.farmRegistrationForm.get('address')?.value,
+        
+        address: this.isKarnataka() ? {
+          pincode: this.farmRegistrationForm.get('pincode')?.value,
+          state: this.farmRegistrationForm.get('state')?.value.stateName,
+          district: this.farmRegistrationForm.get('district')?.value.districtName,
+          taluka: this.farmRegistrationForm.get('taluka')?.value.talukaName,
+          hobli: this.farmRegistrationForm.get('hobli')?.value.hobliName,
+          village: this.farmRegistrationForm.get('village')?.value.villageName,
+          surveyNumber: this.farmRegistrationForm.get('surveyNumber')?.value,
+          hissa: this.farmRegistrationForm.get('hissa')?.value
+        } : {
+          pincode: this.farmRegistrationForm.get('pincode')?.value,
+          state: this.farmRegistrationForm.get('state')?.value.stateName,
+          district: this.farmRegistrationForm.get('district')?.value.districtName,
+          subDistrict: this.farmRegistrationForm.get('subDistrict')?.value.subDistrictName,
+          village: this.farmRegistrationForm.get('village')?.value.villageName,
+          addressLine: this.farmRegistrationForm.get('addressLine')?.value,
+        },
+
         shadeNetArea: Number(this.farmRegistrationForm.get('shadeNetArea')?.value ?? undefined),
         geoLocation: {
           latitude: this.geoLocationService.coordinates().latitude,
