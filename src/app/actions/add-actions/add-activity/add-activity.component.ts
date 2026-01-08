@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, AfterViewInit, inject } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewInit, inject, effect } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -15,6 +15,8 @@ import { AddActivityService } from './add-activity.service';
 import { Activity } from './add-activity.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from '../../../../environments/environment';
+import { takeUntil } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-add-activity',
@@ -52,22 +54,34 @@ export class AddActivityComponent implements AfterViewInit {
   scanner!: Html5QrcodeScanner;
   qrResult: string | null = null;
   scanInProgress = false;
+  showAdditionalFields = false;
+
+  productMappings = ['DiseaseControl', 'Fertilizer'];
 
   activityTypes = [
     { value: 'watering', label: 'Watering' },
-    { value: 'spraying', label: 'Spraying (Insecticide/Pesticide/Fertilizer)' },
-    { value: 'deweeding', label: 'De-weeding' }
+    //{ value: 'spraying', label: 'Spraying (Insecticide/Pesticide/Fertilizer)' },
+    { value: 'deweeding', label: 'De-weeding' },
+    { value: 'Fertilizer', label: 'Fertilizer' },
+    { value: 'DiseaseControl', label: 'DiseaseControl' }
   ];
 
   constructor(private fb: FormBuilder, private addActivityService: AddActivityService) {
     this.activityForm = this.fb.group({
-      dateTime: [new Date(), Validators.required],
       type: ['watering', Validators.required],
       message: ['', Validators.required],
       productName: [''],
-      constituents: [''],
-      quantity: [null],
-      isOrganic: [false]
+      quantity: [null]
+    });
+
+    this.activityForm.get('type')?.valueChanges
+    .pipe(takeUntilDestroyed())
+    .subscribe(type => {
+      console.log(type);
+      if(this.productMappings.includes(type))
+        this.showAdditionalFields = true
+      else
+        this.showAdditionalFields = false;
     });
   }
 
@@ -102,11 +116,14 @@ export class AddActivityComponent implements AfterViewInit {
       this.qrResult = decodedText;
       try {
         const scannedData = JSON.parse(decodedText);
+        console.log('Scanned Data:', scannedData);
         this.populateFormFromScan(scannedData);
       } catch {
+        console.log('In the catch block: decoded Text:', decodedText.slice(0, 50));
         this.activityForm.patchValue({ message: `Scanned: ${decodedText.slice(0, 50)}...` });
       }
       setTimeout(() => this.scanInProgress = false, 2000);
+      this.stopScanner()
     }
   }
 
@@ -115,11 +132,8 @@ export class AddActivityComponent implements AfterViewInit {
   }
 
   private populateFormFromScan(scannedData: any) {
-    const { productName, constituents, quantity, isOrganic, type } = scannedData;
+    const { productName, type } = scannedData;
     if (productName) this.activityForm.patchValue({ productName });
-    if (constituents) this.activityForm.patchValue({ constituents });
-    if (quantity) this.activityForm.patchValue({ quantity: parseFloat(quantity) });
-    if (isOrganic !== undefined) this.activityForm.patchValue({ isOrganic });
     if (type) this.activityForm.patchValue({ type });
     this.activityForm.patchValue({ message: `Scanned: ${productName || 'Product'}` });
   }

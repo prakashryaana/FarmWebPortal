@@ -28,6 +28,22 @@
         </mat-select>
       </mat-form-field>
 
+      <!-- Spray Details (conditional) -->
+       @if (showAdditionalFields) {
+        <div>
+        <!-- <h4>Spray Details</h4> -->
+        <mat-form-field appearance="outline">
+          <mat-label>Product Name</mat-label>
+          <input matInput formControlName="productName">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Quantity (liters/kg)</mat-label>
+          <input matInput type="number" formControlName="quantity">
+        </mat-form-field>
+      </div>
+       }
+
       <!-- Message -->
       <mat-form-field appearance="outline">
         <mat-label>Message/Notes</mat-label>
@@ -35,9 +51,9 @@
       </mat-form-field>
 
       <!-- QR Scanner -->
-       @if (scanMode) {
+       <!-- @if (scanMode) { -->
         <div id="scanner-container" class="scanner-container"></div>
-       }
+       <!-- } -->
       
       @if (qrResult) {
         <div class="scan-result">
@@ -46,31 +62,7 @@
       }
       
 
-      <!-- Spray Details (conditional) -->
-       <!-- @if (activityForm.get('type')?.value === 'spraying' || activityForm.get('productName')?.value) {
-        <div>
-        <h4>Spray Details</h4>
-        <mat-form-field appearance="outline">
-          <mat-label>Product Name</mat-label>
-          <input matInput formControlName="productName">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Constituents</mat-label>
-          <textarea matInput formControlName="constituents" rows="2"></textarea>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Quantity (liters/kg)</mat-label>
-          <input matInput type="number" formControlName="quantity">
-        </mat-form-field>
-
-        <mat-radio-group formControlName="isOrganic">
-          <mat-radio-button [value]="true">Organic</mat-radio-button>
-          <mat-radio-button [value]="false">Chemical</mat-radio-button>
-        </mat-radio-group>
-      </div>
-       } -->
+      
       
 
       <!-- Actions -->
@@ -78,9 +70,9 @@
         <button mat-raised-button color="primary" type="submit" [disabled]="!activityForm.valid">
           Add Activity
         </button>
-        <!-- <button mat-stroked-button type="button" (click)="toggleScanMode()">
+        <button mat-stroked-button type="button" (click)="toggleScanMode()">
           {{ scanMode ? 'Switch to Manual' : 'Scan QR Code' }}
-        </button> -->
+        </button>
         <button mat-button type="button" (click)="reset()">
           Reset
         </button>
