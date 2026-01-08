@@ -8,6 +8,7 @@ import { ConfirmDialogComponent } from '../../users/confirm-dialog/confirm-dialo
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CropFarmSelectorService } from '../../crop-farm-selector/crop-farm-selector.service';
+import { effect } from '@angular/core';
 
 @Component({
   selector: 'app-update-fertilizer-inventory',
@@ -39,7 +40,11 @@ export class UpdateFertilizerInventoryComponent {
   isFormExpanded = false;
   editingId: string | null = null;
 
-  constructor() { this.load(); }
+  constructor() { 
+    effect(() => {
+      this.load();
+    });
+  }
 
   load() { 
     if(this.selectedFarmId){
@@ -47,6 +52,8 @@ export class UpdateFertilizerInventoryComponent {
       next: r => this.list = r, 
       error: e => console.error(e) 
     }); 
+    } else {
+      this.list = [];
     }
   }
 
@@ -74,7 +81,7 @@ export class UpdateFertilizerInventoryComponent {
   }
 
   submit() {
-    if (!this.form.valid) {
+    if (!this.form.valid || !this.selectedFarmId) {
       this.snackBar.open('Please fill all required fields', 'Close', { duration: 3000 });
       return;
     }
