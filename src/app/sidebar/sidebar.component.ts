@@ -33,9 +33,9 @@ export class SidebarComponent {
   private userProfileService = inject(UserProfileService);
 
   menuItems: MenuItem[] = [
-    { label: 'On-boarding', route: '/farm-registration', icon: 'business' },
-    { label: 'maintainer-registration', route: '/maintainer-registration/:2222', icon: 'business' },
-    { label: 'Owner-registration', route: '/farm-owner-registration', icon: 'business' },
+    { label: 'On-boarding', route: '/farm-owner-registration', icon: 'business' },
+    // { label: 'maintainer-registration', route: '/maintainer-registration', icon: 'business' },
+    // { label: 'farm-registration', route: '/farm-registration', icon: 'business' },
     { label: 'Setup Crop', route: '/crop-registration', icon: 'agriculture' },
     { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
     { label: 'View Actions', route: '/view-actions', icon: 'list' },

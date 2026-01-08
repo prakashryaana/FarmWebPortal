@@ -22,11 +22,15 @@ export class MaintainerRegistrationComponent {
 
   private snackBar = inject(MatSnackBar);
 
-  farmIdParam: string = '';
+  //farmIdParam: string = '';
+  farmOwnerIdParam: string = '';
 
   ngOnInit() {
-    this.farmIdParam = this.route.snapshot.paramMap.get('farmId');
-    console.log('Farm ID from route:', this.farmIdParam);
+    this.route.queryParams.subscribe(params => {
+      this.farmOwnerIdParam = params['farmOwnerId'];
+    });
+    // this.farmIdParam = this.route.snapshot.paramMap.get('farmId');
+    console.log('farmOwnerId: ', this.farmOwnerIdParam);
   }
 
   farmMaintainerRegistrationForm = new FormGroup({
@@ -45,12 +49,11 @@ export class MaintainerRegistrationComponent {
   maintainerId: string = '';
 
   registerFarmMaintainer() {
-    // this.maintainerId = Date.now().toString();
     // this.router.navigate(
-    //         ['/farm-owner-registration'],
-    //         { queryParams: { farmId: this.farmIdParam, maintainerId: this.maintainerId }}
+    //         ['/farm-registration'],
+    //         { queryParams: { farmOwnerId: this.farmOwnerIdParam, farmMaintainerId: 'dd' }}
     //       );
-    if (this.farmMaintainerRegistrationForm.valid && this.isFileUploaded) {
+    if (this.farmMaintainerRegistrationForm.valid && this.farmOwnerIdParam && this.isFileUploaded) {
       this.maintainer = {
         maintainerId: Date.now().toString(),
         maintainerName: this.farmMaintainerRegistrationForm.get('fullName')?.value,
@@ -61,7 +64,8 @@ export class MaintainerRegistrationComponent {
         education: this.farmMaintainerRegistrationForm.get('education')?.value,
         identityProofDocument: this.farmMaintainerRegistrationForm.get('identityProofDocument')?.value,
         identityProofNumber: this.farmMaintainerRegistrationForm.get('identityProofNumber')?.value,
-        farmsMaintained: [this.farmIdParam]
+        farmOwnerId: this.farmOwnerIdParam,
+        //farmsMaintained: [this.farmIdParam]
       };
       console.log(this.farmMaintainerRegistrationForm.value);
 
@@ -70,8 +74,8 @@ export class MaintainerRegistrationComponent {
           console.log('Maintainer Registration successful', response);
           this.snackBar.open('Maintainer Registration successful!', 'Close', { duration: 5000 });
           this.router.navigate(
-            ['/farm-owner-registration'],
-            { queryParams: { farmId: this.farmIdParam, maintainerId: response.maintainerId }}
+            ['/farm-registration'],
+            { queryParams: { farmOwnerId: this.farmOwnerIdParam, farmMaintainerId: response.maintainerId }}
           );
         },
         error: (error) => {

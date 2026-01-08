@@ -26,16 +26,16 @@ export class FarmOwnerRegistrationComponent implements OnInit {
 
   private snackBar = inject(MatSnackBar);
 
-  farmIdParam: string = '';
-  maintainerIdParam: string = '';
+  // farmIdParam: string = '';
+  // maintainerIdParam: string = '';
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.farmIdParam = params['farmId'];
-      this.maintainerIdParam = params['maintainerId'];
-    });
-    console.log('Farm ID from query params:', this.farmIdParam);
-    console.log('Maintainer ID from query params:', this.maintainerIdParam);
+    // this.route.queryParams.subscribe(params => {
+    //   this.farmIdParam = params['farmId'];
+    //   this.maintainerIdParam = params['maintainerId'];
+    // });
+    // console.log('Farm ID from query params:', this.farmIdParam);
+    // console.log('Maintainer ID from query params:', this.maintainerIdParam);
   }
 
   farmOwnerRegistrationForm = new FormGroup({
@@ -51,11 +51,15 @@ export class FarmOwnerRegistrationComponent implements OnInit {
   farmOwner: FarmOwner = {} as FarmOwner;
 
   registerFarmOwner() {
+    // this.router.navigate(
+    //         ['/maintainer-registration'],
+    //         { queryParams: { farmOwnerId: 'd' }}
+    //       );
     if (this.farmOwnerRegistrationForm.valid) {
       this.farmOwner = {
         ownerId: Date.now().toString(),
-        farmsOwned: [this.farmIdParam],
-        maintainers: [this.maintainerIdParam],
+        // farmsOwned: [this.farmIdParam],
+        // maintainers: [this.maintainerIdParam],
         ownerName: this.farmOwnerRegistrationForm.get('fullName')?.value,
         contactNumber: this.farmOwnerRegistrationForm.get('contactNumber')?.value,
         alternateContactNumber: this.farmOwnerRegistrationForm.get('alternateContactNumber')?.value,
@@ -70,7 +74,10 @@ export class FarmOwnerRegistrationComponent implements OnInit {
         next: (response) => {
           console.log('Farm Owner Registration successful', response);
           this.snackBar.open('Farm Owner Registration successful!', 'Close', { duration: 5000 });
-          this.router.navigate(['home-dashboard']);
+          this.router.navigate(
+            ['/maintainer-registration'],
+            { queryParams: { farmOwnerId: response.ownerId }}
+          );
         },
         error: (error) => {
           console.error('Farm Owner Registration failed', error);

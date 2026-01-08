@@ -14,6 +14,7 @@ import { CropFarmSelectorService } from '../../../crop-farm-selector/crop-farm-s
 import { AddActivityService } from './add-activity.service';
 import { Activity } from './add-activity.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-add-activity',
@@ -132,7 +133,7 @@ export class AddActivityComponent implements AfterViewInit {
   }
 
   onSubmit() {
-    if (this.activityForm.valid && this.selectedCropId) {
+    if (this.activityForm.valid && this.selectedCropId && this.selectedCropId !== environment.tempCropId) {
       
       console.log('Activity Form Data:', this.activityForm.value);
 

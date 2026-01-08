@@ -30,6 +30,8 @@ export interface FarmDto {
     //farmhouseNote?: string | null | undefined;
     storageAreaNote: string | null | undefined;
     historicalWeather: HistoricalWeatherRange | null;
+    farmOwnerId: string;
+    farmMaintainerId: string;
 }
 
 export interface UpdateFarmDto extends FarmDto {

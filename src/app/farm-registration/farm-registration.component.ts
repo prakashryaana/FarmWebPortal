@@ -1,6 +1,6 @@
 import { Component, computed, effect, signal } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CreateFarmDto, GridPowerUnavailability, TimeRange } from './farm';
 import { FarmRegistrationService } from './farm-registration.service';
 import { FileUploadComponent } from '../file-upload/file-upload.component';
@@ -39,6 +39,9 @@ export class FarmRegistrationComponent {
   private weatherService = inject(WeatherService);
   private geoLocationService = inject(GeolocationService);
   private addressService = inject(AddressService);
+
+  farmOwnerIdParam: string = '';
+  farmMaintainerIdParam: string = '';
 
   days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   coords:Coordinates;
@@ -95,7 +98,7 @@ export class FarmRegistrationComponent {
     storageAreaNote: new FormControl('')
   });
 
-  constructor(private router: Router, private farmRegistrationService: FarmRegistrationService) {
+  constructor(private router: Router, private route: ActivatedRoute, private farmRegistrationService: FarmRegistrationService) {
     // Load states on init
     this.addressService.getAllStates().subscribe(states => {
       this.states.set(states);
@@ -151,6 +154,15 @@ export class FarmRegistrationComponent {
         this.onHobliChange(district, taluka, hobli);
       }
     });
+  }
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.farmOwnerIdParam = params['farmOwnerId'];
+      this.farmMaintainerIdParam = params['farmMaintainerId'];
+    });
+    console.log('Farm Owner ID:', this.farmOwnerIdParam);
+    console.log('Farm Maintainer ID:', this.farmMaintainerIdParam);
   }
 
   gridPowerForm = new FormGroup({
@@ -310,6 +322,8 @@ export class FarmRegistrationComponent {
     console.log(this.weatherService.hasWeatherData());
     console.log(this.geoLocationService.hasLocationData());
     if (this.farmRegistrationForm.valid 
+        && this.farmOwnerIdParam 
+        && this.farmMaintainerIdParam
         && this.isFileUploaded 
         && this.weatherService.hasWeatherData() 
         && this.geoLocationService.hasLocationData()){
@@ -317,6 +331,8 @@ export class FarmRegistrationComponent {
         farmId: Date.now().toString(),
         farmName: this.farmRegistrationForm.get('farmName')?.value,
         surveyNumber: this.farmRegistrationForm.get('surveyNumber')?.value,
+        farmOwnerId: this.farmOwnerIdParam,
+        farmMaintainerId: this.farmMaintainerIdParam,
         
         address: this.isKarnataka() ? {
           pincode: this.farmRegistrationForm.get('pincode')?.value,
@@ -368,7 +384,7 @@ export class FarmRegistrationComponent {
           console.log('Farm Registration successful', response);
           this.farmId = response.farmId;
           this.snackBar.open('Farm Registration successful!', 'Close', { duration: 5000 });
-          this.router.navigate(['/maintainer-registration', this.farmId]);
+          this.router.navigate(['home-dashboard']);
         },
         error: (error) => {
           console.error('Farm Registration failed', error);

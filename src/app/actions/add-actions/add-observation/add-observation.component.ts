@@ -21,6 +21,7 @@ import { lastValueFrom } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { ViewChild } from '@angular/core';
 import { ElementRef } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 
 export interface UploadResult {
   photoPath: string | null;
@@ -294,7 +295,7 @@ export class AddObservationComponent implements OnDestroy {
 
   async onSubmit(): Promise<void> {
     const form = this.observationForm;
-    if (!form || form.invalid || !this.selectedCropId) {
+    if (!form || form.invalid || !this.selectedCropId || this.selectedCropId === environment.tempCropId) {
       this.snackBar.open('Please fill required fields', 'Close', { duration: 3000 });
       return;
     }

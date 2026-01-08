@@ -28,10 +28,11 @@ import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 
 
 export const routes: Routes = [
-    { path: 'farm-registration', component: FarmRegistrationComponent, canActivate: [authGuard] }
-    ,{ path: 'farm-owner-registration', component: FarmOwnerRegistrationComponent, canActivate: [authGuard] }
-    ,{ path: 'maintainer-registration/:farmId', component: MaintainerRegistrationComponent, canActivate: [authGuard] }
-    ,{ path: 'crop-registration', component: CropRegistrationComponent, canActivate: [authGuard] }
+    { path: 'farm-registration', component: FarmRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    ,{ path: 'farm-owner-registration', component: FarmOwnerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    //,{ path: 'maintainer-registration/:farmId', component: MaintainerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    ,{ path: 'maintainer-registration', component: MaintainerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    ,{ path: 'crop-registration', component: CropRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
     // { path: 'farm-lookup', component: FarmLookupComponent, canActivate: [authGuard] },
     // { path: 'location', component: LocationComponent, canActivate: [authGuard] },
     // { path: 'farm-weather', component: FarmWeatherComponent, canActivate: [authGuard] },
@@ -48,9 +49,9 @@ export const routes: Routes = [
     ,{ path: 'user-management', component: UserManagementComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] }}
     ,{ path: 'add-actions', component: AddActionsComponent, canActivate: [authGuard] }
     ,{ path: 'view-actions', component: ViewActionsComponent, canActivate: [authGuard] }
-    ,{ path: 'crop-master', component: UpdateCropMasterComponent, canActivate: [authGuard] }
-    ,{ path: 'fertilizer-inventory', component: UpdateFertilizerInventoryComponent, canActivate: [authGuard] }
-    ,{ path: 'disease-control-inventory', component: UpdateDiseaseControlInventoryComponent, canActivate: [authGuard] }
+    ,{ path: 'crop-master', component: UpdateCropMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    ,{ path: 'fertilizer-inventory', component: UpdateFertilizerInventoryComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    ,{ path: 'disease-control-inventory', component: UpdateDiseaseControlInventoryComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
     ,{ path: 'user-profile', component: UserProfileComponent, canActivate: [authGuard] }
     ,{ path: 'unauthorized', component: UnauthorizedComponent }
     // {

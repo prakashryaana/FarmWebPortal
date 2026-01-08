@@ -1,7 +1,8 @@
 export interface Maintainer {
     maintainerId: string;
     maintainerName: string;
-    farmsMaintained: string[];
+    //farmsMaintained: string[];
+    farmOwnerId: string;
     contactNumber: string;
     alternateContactNumber: string;
     address: string;

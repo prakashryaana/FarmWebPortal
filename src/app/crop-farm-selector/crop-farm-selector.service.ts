@@ -107,6 +107,17 @@ export class CropFarmSelectorService {
           }
         });
 
+        farms
+        .filter(farm => !Array.isArray(farm.cropDetail) || farm.cropDetail.length === 0)
+        .forEach(farm => {
+          options.push({
+            farmId: farm.farmId || farm.Id,
+            farmName: farm.farmName || farm.FarmName,
+            cropId: environment.tempCropId,
+            cropName: environment.tempCropName
+          });
+        });
+
         // Also search crops directly by name/id
         return this.http.get<any[]>(`${this.apiUrl}api/Crop/search`, {
           params: new HttpParams().set('searchTerm', searchQuery)
@@ -168,6 +179,20 @@ export class CropFarmSelectorService {
             });
           }
         });
+
+
+        farms
+        .filter(farm => !Array.isArray(farm.cropDetail) || farm.cropDetail.length === 0)
+        .forEach(farm => {
+          options.push({
+            farmId: farm.farmId || farm.Id,
+            farmName: farm.farmName || farm.FarmName,
+            cropId: environment.tempCropId,
+            cropName: environment.tempCropName
+          });
+        });
+
+
         return of(options);
       }),
       tap(options => {
