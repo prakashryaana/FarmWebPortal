@@ -1,12 +1,10 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine
+
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --only=production=false
 COPY . .
-RUN npx ng build FarmWebPortal --configuration production
-
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
+RUN npm run build --configuration production
 
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npx", "serve", "dist", "-s", "-l", "80"]
