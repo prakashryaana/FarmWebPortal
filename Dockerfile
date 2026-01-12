@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production=false
 COPY . .
-RUN npm run build --configuration production
+RUN npm run build FarmWebPortal --configuration production
 
 EXPOSE 80
 CMD ["npx", "serve", "dist", "-s", "-l", "80"]
