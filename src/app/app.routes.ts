@@ -32,7 +32,7 @@ export const routes: Routes = [
     ,{ path: 'farm-owner-registration', component: FarmOwnerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
     //,{ path: 'maintainer-registration/:farmId', component: MaintainerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
     ,{ path: 'maintainer-registration', component: MaintainerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
-    ,{ path: 'crop-registration', component: CropRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    ,{ path: 'crop-registration', component: CropRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN','FARMOWNER'] } }
     // { path: 'farm-lookup', component: FarmLookupComponent, canActivate: [authGuard] },
     // { path: 'location', component: LocationComponent, canActivate: [authGuard] },
     // { path: 'farm-weather', component: FarmWeatherComponent, canActivate: [authGuard] },

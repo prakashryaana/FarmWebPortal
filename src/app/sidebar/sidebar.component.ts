@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { MatProgressSpinnerModule, MatSpinner } from '@angular/material/progress-spinner';
 import { MatProgressBar } from '@angular/material/progress-bar';
+import { AuthService } from '../auth/auth.service';
+import { UserRole } from '../users/user.model';
 
 interface MenuItem {
   label: string;
@@ -31,25 +33,27 @@ export class SidebarComponent {
   isLoading = signal(false);
   userProfile = signal<UserProfile | null>(null);
   private userProfileService = inject(UserProfileService);
+  private authService = inject(AuthService);
 
-  menuItems: MenuItem[] = [
-    { label: 'On-boarding', route: '/farm-owner-registration', icon: 'business' },
-    // { label: 'maintainer-registration', route: '/maintainer-registration', icon: 'business' },
-    // { label: 'farm-registration', route: '/farm-registration', icon: 'business' },
-    { label: 'Setup Crop', route: '/crop-registration', icon: 'agriculture' },
-    { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
-    { label: 'View Actions', route: '/view-actions', icon: 'list' },
-    {
-      label: 'Manage',
-      icon: 'settings',
-      submenu: [
-        { label: 'Manage Users', route: '/user-management', icon: 'group' },
-        { label: 'Manage Crop Master', route: '/crop-master', icon: 'local_florist' },
-        { label: 'Manage Fertilizer Inventory', route: '/fertilizer-inventory', icon: 'grain' },
-        { label: 'Manage Disease Control Inventory', route: '/disease-control-inventory', icon: 'medical_services' }
-      ]
-    }
-  ];
+  menuItems: MenuItem[] = [];
+  // menuItems: MenuItem[] = [
+  //   { label: 'On-boarding', route: '/farm-owner-registration', icon: 'business' },
+  //   // { label: 'maintainer-registration', route: '/maintainer-registration', icon: 'business' },
+  //   // { label: 'farm-registration', route: '/farm-registration', icon: 'business' },
+  //   { label: 'Setup Crop', route: '/crop-registration', icon: 'agriculture' },
+  //   { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
+  //   { label: 'View Actions', route: '/view-actions', icon: 'list' },
+  //   {
+  //     label: 'Manage',
+  //     icon: 'settings',
+  //     submenu: [
+  //       { label: 'Manage Users', route: '/user-management', icon: 'group' },
+  //       { label: 'Manage Crop Master', route: '/crop-master', icon: 'local_florist' },
+  //       { label: 'Manage Fertilizer Inventory', route: '/fertilizer-inventory', icon: 'grain' },
+  //       { label: 'Manage Disease Control Inventory', route: '/disease-control-inventory', icon: 'medical_services' }
+  //     ]
+  //   }
+  // ];
 
   constructor(private router: Router) {
     this.loadUserProfile();
@@ -57,12 +61,54 @@ export class SidebarComponent {
 
   loadUserProfile() {
     this.isLoading.set(true);
-    this.userProfileService.getMyProfile().pipe(
-      tap(profile => this.userProfile.set(profile))
-    ).subscribe({
-      error: () => this.userProfile.set(null),
+    this.userProfileService.getMyProfile().subscribe({
+      next: profile => {
+        this.userProfile.set(profile);
+        this.setMenuByRole();
+      },
+      error: () => {
+        this.userProfile.set(null)
+        this.setMenuByRole();
+      },
       complete: () => this.isLoading.set(false)
     });
+  }
+
+  setMenuByRole() {
+    if(this.authService.hasRole('FARMOWNER')){
+      this.menuItems = [
+        { label: 'Setup Crop', route: '/crop-registration', icon: 'agriculture' },
+        { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
+        { label: 'View Actions', route: '/view-actions', icon: 'list' }
+      ];
+    } else if (this.authService.hasRole('FARMHELP')) {
+      this.menuItems = [
+        { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
+        { label: 'View Actions', route: '/view-actions', icon: 'list' }
+      ];
+    } else if (this.authService.hasRole('EASYGROWADMIN')) {
+      this.menuItems = [
+        { label: 'On-boarding', route: '/farm-owner-registration', icon: 'business' },
+        // { label: 'maintainer-registration', route: '/maintainer-registration', icon: 'business' },
+        // { label: 'farm-registration', route: '/farm-registration', icon: 'business' },
+        { label: 'Setup Crop', route: '/crop-registration', icon: 'agriculture' },
+        { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
+        { label: 'View Actions', route: '/view-actions', icon: 'list' },
+        {
+          label: 'Manage',
+          icon: 'settings',
+          submenu: [
+            { label: 'Manage Users', route: '/user-management', icon: 'group' },
+            { label: 'Manage Crop Master', route: '/crop-master', icon: 'local_florist' },
+            { label: 'Manage Fertilizer Inventory', route: '/fertilizer-inventory', icon: 'grain' },
+            { label: 'Manage Disease Control Inventory', route: '/disease-control-inventory', icon: 'medical_services' }
+          ]
+        }
+      ];
+    } else {
+      //UNKNOWN role don't show anything
+      this.menuItems = [];
+    }
   }
 
   goToProfile() {

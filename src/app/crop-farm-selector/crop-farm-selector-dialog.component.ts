@@ -12,6 +12,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CropFarmSelectorService, CropOption } from './crop-farm-selector.service';
 import { AuthService } from '../auth/auth.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-crop-farm-selector-dialog',
@@ -26,7 +27,8 @@ import { AuthService } from '../auth/auth.service';
     MatButtonModule,
     MatTableModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './crop-farm-selector-dialog.component.html',
   styleUrls: ['./crop-farm-selector-dialog.component.css']
@@ -35,7 +37,7 @@ export class CropFarmSelectorDialogComponent implements OnInit, OnDestroy {
   searchForm!: FormGroup;
   searchResults: CropOption[] = [];
   isLoading = false;
-  displayedColumns: string[] = ['farmName', 'farmId', 'cropName', 'cropId', 'action'];
+  displayedColumns: string[] = ['farmName', 'cropName', 'action'];;//['farmName', 'farmId', 'cropName', 'cropId', 'action'];
   private destroy$ = new Subject<void>();
   private searchQuery$ = new Subject<string>();
   private authService = inject(AuthService)
