@@ -5,14 +5,18 @@
       <h1>
         <a href="/home-dashboard">EasyGrow</a>
       </h1>
-      <app-crop-farm-selector-toolbar class="toolbar-right"></app-crop-farm-selector-toolbar>
       <button (click)="logout()">Logout</button>
     </header>
     <div class="layout">
     <app-sidebar class="sidebar-left"></app-sidebar>
-    <section class="content">
-      <router-outlet></router-outlet>
-    </section>
+    <div class="content-wrapper">
+      <nav class="menu-bar">
+        <app-crop-farm-selector-toolbar class="toolbar-center"></app-crop-farm-selector-toolbar>
+      </nav>
+      <section class="content">
+        <router-outlet></router-outlet>
+      </section>
+    </div>
     </div>
     <footer>
       <!-- <p>© 2025 EasyGrow. All rights reserved.</p> -->
