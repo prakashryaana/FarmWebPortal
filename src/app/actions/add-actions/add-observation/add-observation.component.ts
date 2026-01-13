@@ -46,6 +46,7 @@ export class AddObservationComponent implements OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly snackBar = inject(MatSnackBar);
   private uploadService = inject(UploadService);
+  submitPressed: boolean = false;
 
   
   readonly observationTypes = [
@@ -223,7 +224,7 @@ export class AddObservationComponent implements OnDestroy {
     
     const ctx = canvas.getContext('2d')!;
     ctx.drawImage(video, 0, 0);
-    
+    this.submitPressed = false;
     // ✅ Convert to JPEG (compress to <1MB)
     canvas.toBlob((blob) => {
       if (blob) {
@@ -292,8 +293,11 @@ export class AddObservationComponent implements OnDestroy {
     this.snackBar.open('🗑️ Photo cleared', 'Close', { duration: 2000 });
   }
 
-
-  async onSubmit(): Promise<void> {
+  async onSubmit(event:any): Promise<void> {
+    if (!this.submitPressed) {
+      return;
+    }
+    this.submitPressed = false;
     const form = this.observationForm;
     if (!form || form.invalid || !this.selectedCropId || this.selectedCropId === environment.tempCropId) {
       this.snackBar.open('Please fill required fields', 'Close', { duration: 3000 });

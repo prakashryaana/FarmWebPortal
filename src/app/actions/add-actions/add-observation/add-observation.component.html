@@ -3,7 +3,7 @@
     <mat-card-title>Add Observation for Crop - {{selectedCropName}}</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-  <form [formGroup]="observationForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="observationForm" (ngSubmit)="onSubmit($event)">
     
     <!-- Observation Type -->
     <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 16px;">
@@ -143,7 +143,7 @@
 
     <!-- Submit Button -->
     <div class="submit-section">
-      <button mat-raised-button color="primary" type="submit" [disabled]="!canSubmit()">
+      <button mat-raised-button color="primary" type="submit" (click)="submitPressed = true; $event.stopPropagation()" [disabled]="!canSubmit()">
         @if (serviceLoading()) {
           <mat-spinner diameter="20"></mat-spinner>
           Saving...

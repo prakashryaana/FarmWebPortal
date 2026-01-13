@@ -22,7 +22,7 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
       if (user && auth.hasRole(requiredRoles)) {
         return true;
       }
-      return router.createUrlTree(['/unauthorized']);
+      return router.createUrlTree(['/home-dashboard']);
     })
   );
 };
