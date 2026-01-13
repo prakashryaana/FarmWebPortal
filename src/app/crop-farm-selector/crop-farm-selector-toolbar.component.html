@@ -2,11 +2,11 @@
     <!-- No Selection State -->
     @if (!hasSelection)
     {
-    <div class="toolbar-placeholder">
-        <button mat-icon-button (click)="openSelectorDialog()" matTooltip="Select a crop and farm"
+    <div class="toolbar-placeholder" (click)="openSelectorDialog()" style="cursor: pointer;">
+        <!-- <button mat-icon-button (click)="openSelectorDialog()" matTooltip="Select a crop and farm"
             class="select-button">
             <mat-icon>add_circle_outline</mat-icon>
-        </button>
+        </button> -->
         <span class="placeholder-text">No Farm/Crop selected</span>
     </div>
     }
@@ -24,7 +24,7 @@
 
             <div class="separator">|</div> -->
 
-            <div class="selection-item crop-item">
+            <div class="selection-item crop-item" (click)="openSelectorDialog()">
                 <span class="label">Crop:</span>
                 <span class="value" [matTooltip]="'Crop ID: ' + selectedCropId" matTooltipPosition="below">
                     {{ selectedCropName }}
@@ -33,10 +33,10 @@
         </div>
 
         <div class="toolbar-actions">
-            <button mat-icon-button (click)="openSelectorDialog()" matTooltip="Change crop selection"
+            <!-- <button mat-icon-button (click)="openSelectorDialog()" matTooltip="Change crop selection"
                 class="change-button">
                 <mat-icon>edit</mat-icon>
-            </button>
+            </button> -->
 
             <button mat-icon-button (click)="clearSelection()" matTooltip="Clear selection" class="clear-button">
                 <mat-icon>close</mat-icon>
