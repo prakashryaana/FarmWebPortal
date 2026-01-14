@@ -89,8 +89,8 @@ export class SidebarComponent {
     } else if (this.authService.hasRole('EASYGROWADMIN')) {
       this.menuItems = [
         { label: 'On-boarding', route: '/farm-owner-registration', icon: 'person_add' },
-        { label: 'maintainer-registration', route: '/maintainer-registration', icon: 'person_add' },
-        { label: 'farm-registration', route: '/farm-registration', icon: 'agriculture' },
+        // { label: 'maintainer-registration', route: '/maintainer-registration', icon: 'person_add' },
+        // { label: 'farm-registration', route: '/farm-registration', icon: 'agriculture' },
         { label: 'Setup Crop', route: '/crop-registration', icon: 'grass' },
         { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
         { label: 'View Actions', route: '/view-actions', icon: 'list' },
