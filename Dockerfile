@@ -1,11 +1,33 @@
-FROM node:20-alpine
-
+FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production=false
+RUN npm ci
 COPY . .
+RUN npm run build -- --configuration=production
 
-RUN npm run build
+FROM nginx:alpine
+# Remove ALL default nginx files
+RUN rm -rf /usr/share/nginx/html/* && \
+    rm -f /etc/nginx/conf.d/default.conf
+
+# Copy your Angular files
+COPY --from=builder /app/dist/browser/ /usr/share/nginx/html/
+
+# Custom nginx config (no conflicts)
+COPY <<EOF /etc/nginx/conf.d/default.conf
+server {
+    listen 80;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+    
+    gzip on;
+    gzip_types text/css application/javascript;
+}
+EOF
 
 EXPOSE 80
-CMD ["npx", "serve", "dist", "-s", "-l", "80"]
+CMD ["nginx", "-g", "daemon off;"]
