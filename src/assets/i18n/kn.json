@@ -65,7 +65,17 @@
     "cropDetails": "ಬೆಳೆ ವಿವರಗಳು",
     "noCropsFound": "ಬೆಳೆಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
     "selector" : {
-        "emptyCropSelection" : "ಬೆಳೆ ಆಯ್ಕೆ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ"
+        "emptyCropSelection" : "ಬೆಳೆ ಆಯ್ಕೆ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ",
+        "searchDialog": {
+            "dialogTitle": "ಬೆಳೆ ಹುಡುಕಿ ಮತ್ತು ಆಯ್ಕೆಮಾಡಿ",
+            "searchBoxPlaceholder": "ತೋಟದ ಐಡಿ ಅಥವಾ ತೋಟದ ಹೆಸರಿನ ಮೂಲಕ ಹುಡುಕಿ",
+            "tableTitle": "ಲಭ್ಯವಿರುವ ಬೆಳೆಗಳು",
+            "tableColumnFarmName": "ತೋಟದ ಹೆಸರು",
+            "tableColumnCropName": "ಬೆಳೆಯ ಹೆಸರು",
+            "tableColumnAction": "ಕ್ರಿಯೆ",
+            "selectActionTitle": "ಆಯ್ಕೆ ಮಾಡಿ",
+            "cancelActionTitle": "ರದ್ದುಮಾಡು"
+        }
     }
   },
   "inventory": {
@@ -101,10 +111,26 @@
     "inProgress": "ಪ್ರಗತಿಯಲ್ಲಿ"
   },
   "activity": {
-    "addActivity": "ಚಟುವಟಿಕೆ ಸೇರಿಸಿ"
+    "activityTypeLabel": "ಚಟುವಟಿಕೆಯ ಪ್ರಕಾರ",
+    "addActivity": "ಚಟುವಟಿಕೆ ಸೇರಿಸಿ",
+    "viewActivities": "ಚಟುವಟಿಕೆಗಳು",
+    "watering": "ನೀರುಹಾಕುವುದು",
+    "deWeeding": "ಕಳೆ ತೆಗೆಯುವುದು", 
+    "fertilizer": "ರಸಗೊಬ್ಬರ ಸಿಂಪಡಿಸುವುದು",
+    "diseaseControl": "ರೋಗ ನಿಯಂತ್ರಣ ರಾಸಾಯನಿಕ ಸಿಂಪಡಿಸುವುದು",
+    "productNameLabel": "ವಸ್ತುವಿನ ಹೆಸರು",
+    "quantityLabel": "ಪ್ರಮಾಣ (ಲೀಟರ್/ಕೆಜಿ)"
   },
   "observation": {
-    "addObservation": "ವೀಕ್ಷಣೆ ಸೇರಿಸಿ"
+    "observationTypeLabel": "ವೀಕ್ಷಣೆಯ ಪ್ರಕಾರ",
+    "addObservation": "ವೀಕ್ಷಣೆ ಸೇರಿಸಿ",
+    "viewObservations": "ವೀಕ್ಷಣೆಗಳು",
+    "disease": "ರೋಗ ದಾಳಿ",
+    "insect": "ಕೀಟಗಳ ದಾಳಿ",
+    "waterAvailability": "ನೀರಿನ ಲಭ್ಯತೆ",
+    "nutritionalDeficiency": "ಪೌಷ್ಟಿಕಾಂಶದ ಕೊರತೆ",
+    "cropGrowthStatus": "ಬೆಳೆ ಬೆಳವಣಿಗೆಯ ಸ್ಥಿತಿ",
+    "others": "ಇತರ ಕಾರಣಗಳು"
   },
   "users": {
     "userName": "ಬಳಕೆದಾರ ಹೆಸರು",
@@ -118,7 +144,28 @@
     "farmer": "ರೈತ",
     "maintainer": "ನಿರ್ವಾಹಕೆ"
   },
+  "userProfile": {
+    "profileLoadingMessage": "ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...",
+    "personalInformation": "ವೈಯಕ್ತಿಕ ಮಾಹಿತಿ",
+    "editProfile": "ಪ್ರೊಫೈಲ್ ತಿದ್ದುಪಡೆ",
+    "fullName": "ಪೂರ್ಣ ಹೆಸರು",
+    "nameRequired": "ಹೆಸರು ಕಡ್ಡಾಯವಾಗಿದೆ",
+    "nameConstraints": "ಹೆಸರಿನಲ್ಲಿ ಕನಿಷ್ಠ 2 ಅಕ್ಷರಗಳಿರಬೇಕು",
+    "email": "ಇಮೇಲ್",
+    "emailRequired": "ಇಮೇಲ್ ಕಡ್ಡಾಯವಾಗಿದೆ",
+    "emailConstraints": "ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಇಮೇಲ್ ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ",
+    "mobile": "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+    "mobileNumber": "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+    "mobileConstraints": "ಅಮಾನ್ಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯ ಸ್ವರೂಪ",
+    "roleInformation": "ಪಾತ್ರ ಮಾಹಿತಿ",
+    "role": "ಪಾತ್ರ",
+    "profileUpdateSuccessMessage": "ಪ್ರೊಫೈಲನ್ನು ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ!",
+    "profileUpdateFailedMessage": "ಪ್ರೊಫೈಲ್ ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "saveChanges": "ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಿ",
+    "updating": "ನವೀಕರಿಸಲಾಗುತ್ತಿದೆ..."
+  },
   "common": {
+    "crop": "ಬೆಳೆ",
     "save": "ಉಳಿಸಿ",
     "reset": "ಮರುಹೊಂದಿಸಿ",
     "cancel": "ರದ್ದುಮಾಡಿ",
@@ -126,13 +173,25 @@
     "edit": "ತಿದ್ದುವಿಕೆ",
     "add": "ಸೇರಿಸಿ",
     "scanQRCode": "QR ಕೋಡ್ ಅನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+    "scannedLabel": "QR ಸ್ಕ್ಯಾನ್ ಮಾಡಲಾಗಿದೆ",
     "switchToManual": "ಕೈಪಿಡಿಗೆ ಬದಲಿಸಿ",
+    "photoUpload": "ಫೋಟೋ ಅಪ್ಲೋಡ್",
+    "photoUploadConstraints": "JPEG/PNG ಮಾತ್ರ, ಗರಿಷ್ಠ 1MB",
     "selectFromGallery": "ಗ್ಯಾಲರಿಯಿಂದ ಆಯ್ಕೆಮಾಡಿ",
     "useCamera": "ಕ್ಯಾಮೆರಾ ಬಳಸಿ",
+    "capturePhoto": "ಫೋಟೋ ಸೆರೆಹಿಡಿಯಿರಿ",
     "reTake": "ಮತ್ತೆ ಫೋಟೋ ತೆಗೆದುಕೊಳ್ಳಿ",
+    "voiceNote": "ಧ್ವನಿ ಟಿಪ್ಪಣಿ",
+    "max": "ಗರಿಷ್ಠ",
+    "seconds": "ಸೆಕೆಂಡುಗಳು",
+    "readyToRecord": "ಧ್ವನಿ ಟಿಪ್ಪಣಿಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲು ಸಿದ್ಧವಾಗಿದೆ",
+    "recordingLive": "ಲೈವ್ ರೆಕಾರ್ಡಿಂಗ್",
+    "audioRecorded": "ಆಡಿಯೋ ರೆಕಾರ್ಡ್ ಮಾಡಲಾಗಿದೆ",
     "startRecording": "ರೆಕಾರ್ಡಿಂಗ್ ಪ್ರಾರಂಭಿಸಿ",
     "stopRecording": "ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸಿ",
     "playAudio": "ಆಡಿಯೋ ಪ್ಲೇ ಮಾಡಿ",
+    "messageOrNotes": "ಸಂದೇಶ/ಟಿಪ್ಪಣಿಗಳು",
+    "generateReport": "ವರದಿಯನ್ನು ರಚಿಸಿ",
     "search": "ಹುಡುಕು",
     "filter": "ಅರಣ್ಯ",
     "export": "ರಫ್ತು",

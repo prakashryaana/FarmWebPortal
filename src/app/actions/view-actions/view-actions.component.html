@@ -1,15 +1,15 @@
 <mat-card>
-  <mat-card-title>Actions - {{selectedFarmName}} / {{selectedCropName}}</mat-card-title>
+  <!-- <mat-card-title>Actions - {{selectedFarmName}} / {{selectedCropName}}</mat-card-title> -->
   <mat-card-content>
     <div class="actions-toolbar">
-      <button mat-stroked-button color="primary" (click)="generateReport()"><mat-icon>description</mat-icon> Generate Report</button>
+      <button mat-stroked-button color="primary" (click)="generateReport()"><mat-icon>description</mat-icon>{{'common.generateReport'|translate}}</button>
     </div>
 
     <mat-tab-group>
-      <mat-tab label="Activities">
+      <mat-tab [label]="'activity.viewActivities' | translate">
         <app-list-activity></app-list-activity>
       </mat-tab>
-      <mat-tab label="Observations">
+      <mat-tab [label]="'observation.viewObservations' | translate">
         <app-list-observation></app-list-observation>
       </mat-tab>
     </mat-tab-group>

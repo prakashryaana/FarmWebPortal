@@ -60,11 +60,11 @@ export class AddActivityComponent implements AfterViewInit {
   productMappings = ['DiseaseControl', 'Fertilizer'];
 
   activityTypes = [
-    { value: 'watering', label: 'Watering' },
+    { value: 'watering', label: 'activity.watering' },
     //{ value: 'spraying', label: 'Spraying (Insecticide/Pesticide/Fertilizer)' },
-    { value: 'deweeding', label: 'De-weeding' },
-    { value: 'Fertilizer', label: 'Fertilizer' },
-    { value: 'DiseaseControl', label: 'DiseaseControl' }
+    { value: 'deweeding', label: 'activity.deWeeding' },
+    { value: 'Fertilizer', label: 'activity.fertilizer' },
+    { value: 'DiseaseControl', label: 'activity.diseaseControl' }
   ];
 
   constructor(private fb: FormBuilder, private addActivityService: AddActivityService) {
@@ -176,6 +176,10 @@ export class AddActivityComponent implements AfterViewInit {
       this.qrResult = null;
       if (this.scanMode) this.stopScanner();
     }
+  }
+
+  get buttonLabel(): string {
+    return this.scanMode ? 'common.switchToManual' : 'common.scanQRCode';
   }
 
   reset() {

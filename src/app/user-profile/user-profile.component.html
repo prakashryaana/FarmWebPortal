@@ -2,7 +2,7 @@
   @if (isLoading()) {
     <div class="loading-state">
       <mat-spinner diameter="50"></mat-spinner>
-      <p>Loading your profile...</p>
+      <p>{{'userProfile.profileLoadingMessage' | translate}}</p>
     </div>
   } @else if (userProfile()) {
     <!-- Profile Header -->
@@ -24,22 +24,22 @@
       <mat-card class="info-card">
         <mat-card-header>
           <mat-icon class="card-icon">person</mat-icon>
-          <mat-card-title>Personal Information</mat-card-title>
+          <mat-card-title>{{'userProfile.personalInformation' | translate}}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="info-item">
-            <span class="info-label">Full Name</span>
+            <span class="info-label">{{'userProfile.fullName' | translate}}</span>
             <span class="info-value">{{ userProfile()!.name }}</span>
           </div>
           @if (userProfile()!.email) {
           <div class="info-item">
-            <span class="info-label">Email</span>
+            <span class="info-label">{{'userProfile.email' | translate}}</span>
             <span class="info-value">{{ userProfile()!.email }}</span>
           </div>
           }
           @if (userProfile()!.mobile) {
             <div class="info-item">
-              <span class="info-label">Mobile</span>
+              <span class="info-label">{{'userProfile.mobile' | translate}}</span>
               <span class="info-value">{{ userProfile()!.mobile }}</span>
             </div>
           }
@@ -63,11 +63,11 @@
       <mat-card class="info-card">
         <mat-card-header>
           <mat-icon class="card-icon">badge</mat-icon>
-          <mat-card-title>Role Information</mat-card-title>
+          <mat-card-title>{{'userProfile.roleInformation' | translate}}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="info-item">
-            <span class="info-label">Role</span>
+            <span class="info-label">{{'userProfile.role' | translate}}</span>
             <span class="info-value role-badge">{{ userProfile()!.roles || 'N/A' }}</span>
           </div>
           <!-- @if (userProfile()!.joinDate) {
@@ -84,36 +84,36 @@
     <mat-card class="edit-form-card">
       <mat-card-header>
         <mat-icon class="card-icon">edit</mat-icon>
-        <mat-card-title>Edit Profile</mat-card-title>
+        <mat-card-title>{{'userProfile.editProfile' | translate}}</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <form [formGroup]="profileForm()!" (ngSubmit)="onSubmit()" class="profile-form">
           <div class="form-row">
             <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Full Name</mat-label>
+              <mat-label>{{'userProfile.fullName' | translate}}</mat-label>
               <input matInput formControlName="name" required>
               <mat-icon matPrefix>person</mat-icon>
               @if (profileForm()!.get('name')?.invalid && profileForm()!.get('name')?.touched) {
                 <mat-error>
                   @if (profileForm()!.get('name')?.errors?.['required']) {
-                    Name is required
+                    {{'userProfile.nameRequired' | translate}}
                   } @else if (profileForm()!.get('name')?.errors?.['minlength']) {
-                    Name must be at least 2 characters
+                    {{'userProfile.nameConstraints' | translate}}
                   }
                 </mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Email</mat-label>
+              <mat-label>{{'userProfile.email' | translate}}</mat-label>
               <input matInput formControlName="email" required>
               <mat-icon matPrefix>email</mat-icon>
               @if (profileForm()!.get('email')?.invalid && profileForm()!.get('email')?.touched) {
                 <mat-error>
                   @if (profileForm()!.get('email')?.errors?.['required']) {
-                    Email is required
+                    {{'userProfile.emailRequired' | translate}}
                   } @else if (profileForm()!.get('email')?.errors?.['email']) {
-                    Please enter a valid email address
+                    {{'userProfile.emailConstraints' | translate}}
                   }
                 </mat-error>
               }
@@ -122,11 +122,11 @@
 
           <div class="form-row">
             <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Mobile Number</mat-label>
+              <mat-label>{{'userProfile.mobileNumber' | translate}}</mat-label>
               <input matInput formControlName="mobile">
               <mat-icon matPrefix>phone</mat-icon>
               @if (profileForm()!.get('mobile')?.invalid && profileForm()!.get('mobile')?.touched) {
-                <mat-error>Invalid mobile number format</mat-error>
+                <mat-error>{{'userProfile.mobileConstraints' | translate}}</mat-error>
               }
             </mat-form-field>
           </div>
@@ -138,21 +138,21 @@
               type="submit" 
               [disabled]="profileForm()!.invalid || isUpdating()">
               <mat-icon>{{ isUpdating() ? 'hourglass_empty' : 'save' }}</mat-icon>
-              {{ isUpdating() ? 'Updating...' : 'Save Changes' }}
+              {{ saveButtonLabel | translate }}
             </button>
-            <button 
+            <!-- <button 
               mat-stroked-button 
               class="btn-secondary"
               type="button">
               <mat-icon>close</mat-icon>
-              Cancel
-            </button>
+              {{'common.cancel' | translate}}
+            </button> -->
           </div>
 
           @if (updateSuccess()) {
             <div class="success-alert">
               <mat-icon>check_circle</mat-icon>
-              <span>Profile updated successfully!</span>
+              <span>{{'userProfile.profileUpdateSuccessMessage' | translate}}</span>
             </div>
           }
         </form>
@@ -161,7 +161,7 @@
   } @else {
     <div class="error-state">
       <mat-icon>error_outline</mat-icon>
-      <p>Unable to load profile. Please try again.</p>
+      <p>{{'userProfile.profileUpdateFailedMessage' | translate}}</p>
     </div>
   }
 </div>

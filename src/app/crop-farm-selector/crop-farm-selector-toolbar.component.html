@@ -25,7 +25,7 @@
             <div class="separator">|</div> -->
 
             <div class="selection-item crop-item" (click)="openSelectorDialog()">
-                <span class="label">Crop:</span>
+                <span class="label">{{ 'common.crop' | translate }}:</span>
                 <span class="value" [matTooltip]="'Crop ID: ' + selectedCropId" matTooltipPosition="below">
                     {{ selectedCropName }}
                 </span>

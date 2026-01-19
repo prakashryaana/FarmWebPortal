@@ -65,7 +65,17 @@
     "cropDetails": "Crop Details",
     "noCropsFound": "No crops found",
     "selector" : {
-        "emptyCropSelection" : "Click to select a crop"
+        "emptyCropSelection" : "Click to select a crop",
+        "searchDialog": {
+            "dialogTitle": "Search and Select Crop",
+            "searchBoxPlaceholder": "Search by Farm ID, or Farm Name",
+            "tableTitle": "Available Crops",
+            "tableColumnFarmName": "Farm Name",
+            "tableColumnCropName": "Crop Name",
+            "tableColumnAction": "Action",
+            "selectActionTitle": "Select",
+            "cancelActionTitle": "Cancel"
+        }
     }
   },
   "inventory": {
@@ -101,10 +111,26 @@
     "inProgress": "In Progress"
   },
   "activity": {
-    "addActivity": "Add Activity"
+    "activityTypeLabel": "Activity Type",
+    "addActivity": "Add Activity",
+    "viewActivities": "Activities",
+    "watering": "Watering",
+    "deWeeding": "De-Weeding", 
+    "fertilizer": "Fertilizer",
+    "diseaseControl": "Disease Control",
+    "productNameLabel": "Product Name",
+    "quantityLabel": "Quantity (liters/kg)"
   },
   "observation": {
-    "addObservation": "Add Observation"
+    "observationTypeLabel": "Observation Type",
+    "addObservation": "Add Observation",
+    "viewObservations": "Observations",
+    "disease": "Disease Attack",
+    "insect": "Insect Attack",
+    "waterAvailability": "Water Availability",
+    "nutritionalDeficiency": "Nutritional Deficiency",
+    "cropGrowthStatus": "Crop Growth Status",
+    "others": "Others"
   },
   "users": {
     "userName": "User Name",
@@ -118,7 +144,28 @@
     "farmer": "Farmer",
     "maintainer": "Maintainer"
   },
+  "userProfile": {
+    "profileLoadingMessage": "Loading your profile...",
+    "personalInformation": "Personal Information",
+    "editProfile": "Edit Profile",
+    "fullName": "Full Name",
+    "nameRequired": "Name is required",
+    "nameConstraints": "Name must be at least 2 characters",
+    "email": "Email",
+    "emailRequired": "Email is required",
+    "emailConstraints": "Please enter a valid email address",
+    "mobile": "Mobile",
+    "mobileNumber": "Mobile Number",
+    "mobileConstraints": "Invalid mobile number format",
+    "roleInformation": "Role Information",
+    "role": "Role",
+    "profileUpdateSuccessMessage": "Profile updated successfully!",
+    "profileUpdateFailedMessage": "Unable to load profile. Please try again.",
+    "saveChanges": "Save Changes",
+    "updating": "Updating..."
+  },
   "common": {
+    "crop": "Crop",
     "save": "Save",
     "reset": "Reset",
     "cancel": "Cancel",
@@ -126,13 +173,25 @@
     "edit": "Edit",
     "add": "Add",
     "scanQRCode": "scanQRCode",
+    "scannedLabel": "QR Scanned",
     "switchToManual": "Switch to Manual",
+    "photoUpload": "Photo Upload",
+    "photoUploadConstraints": "JPEG/PNG only, Max 1MB",
     "selectFromGallery": "Select From Gallery",
     "useCamera": "Use Camera",
+    "capturePhoto": "Capture Photo",
     "reTake": "Retake Photo",
+    "voiceNote": "Voice Note",
+    "max": "Max",
+    "seconds": "seconds",
+    "readyToRecord": "Ready to record voice note",
+    "recordingLive": "Recording Live",
+    "audioRecorded": "Audio Recorded",
     "startRecording": "Start Recording",
     "stopRecording": "Stop Recording",
     "playAudio": "Play Audio",
+    "messageOrNotes": "Message/Notes",
+    "generateReport": "Generate Report",
     "search": "Search",
     "filter": "Filter",
     "export": "Export",

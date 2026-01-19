@@ -10,11 +10,12 @@ import { CropFarmSelectorService } from '../../crop-farm-selector/crop-farm-sele
 import { ActivityService } from './list-activity/activity.service';
 import { ObservationService } from '../add-actions/add-observation/observation.service';
 import { firstValueFrom } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-view-actions',
   standalone: true,
-  imports: [CommonModule, MatTabsModule, MatButtonModule, MatIconModule, MatCardModule, ListActivityComponent, ListObservationComponent],
+  imports: [CommonModule, MatTabsModule, MatButtonModule, MatIconModule, MatCardModule, ListActivityComponent, ListObservationComponent, TranslateModule],
   templateUrl: './view-actions.component.html',
   styleUrls: ['./view-actions.component.css']
 })

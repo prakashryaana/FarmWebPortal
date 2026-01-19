@@ -51,12 +51,12 @@ export class AddObservationComponent implements OnDestroy {
 
   
   readonly observationTypes = [
-    { value: 'Disease', label: 'Disease Attack' },
-    { value: 'Insect', label: 'Insect Attack' },
-    { value: 'WaterAvailability', label: 'Water Availability' },
-    { value: 'NutritionalDeficiency', label: 'Nutritional Deficiency' },
-    { value: 'CropGrowthStatus', label: 'Crop Growth Status' },
-    { value: 'Others', label: 'Others' }
+    { value: 'Disease', label: 'observation.disease' },
+    { value: 'Insect', label: 'observation.insect' },
+    { value: 'WaterAvailability', label: 'observation.waterAvailability' },
+    { value: 'NutritionalDeficiency', label: 'observation.nutritionalDeficiency' },
+    { value: 'CropGrowthStatus', label: 'observation.cropGrowthStatus' },
+    { value: 'Others', label: 'observation.others' }
   ] as const;
 
   observationForm!: FormGroup<any>;

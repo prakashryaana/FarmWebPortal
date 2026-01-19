@@ -13,6 +13,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CropFarmSelectorService, CropOption } from './crop-farm-selector.service';
 import { AuthService } from '../auth/auth.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-crop-farm-selector-dialog',
@@ -28,7 +29,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatTableModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslateModule
   ],
   templateUrl: './crop-farm-selector-dialog.component.html',
   styleUrls: ['./crop-farm-selector-dialog.component.css']

@@ -1,16 +1,16 @@
 <mat-card>
-    <mat-card-header>
+    <!-- <mat-card-header>
     <mat-card-title>Add Observation for Crop - {{selectedCropName}}</mat-card-title>
-  </mat-card-header>
+  </mat-card-header> -->
   <mat-card-content>
   <form [formGroup]="observationForm" (ngSubmit)="onSubmit($event)">
     
     <!-- Observation Type -->
     <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 16px;">
-      <mat-label>Observation Type</mat-label>
+      <mat-label>{{ 'observation.observationTypeLabel' | translate }}</mat-label>
       <mat-select formControlName="observationType">
         @for (o of observationTypes; track o.value) {
-          <mat-option [value]="o.value">{{o.label}}</mat-option>
+          <mat-option [value]="o.value">{{o.label | translate}}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -20,8 +20,8 @@
     <!-- Photo Section - NO .click() REFERENCES -->
     <div class="photo-section">
       <label class="section-label">
-        Photo Upload
-        <span class="constraints">JPEG/PNG only, Max 1MB</span>
+        {{'common.photoUpload' | translate}}
+        <span class="constraints">{{'common.photoUploadConstraints' | translate}}</span>
       </label>
       
       <!-- ✅ Gallery (file input - NO click needed) -->
@@ -41,10 +41,10 @@
             <div class="camera-controls">
               <button mat-raised-button color="primary" (click)="capturePhoto()" 
                       [disabled]="!videoStream()">
-                📸 Capture Photo
+                📸 {{'common.capturePhoto' | translate}}
               </button>
               <button mat-stroked-button color="warn" (click)="stopCamera()">
-                <mat-icon>close</mat-icon> Cancel
+                <mat-icon>close</mat-icon> {{'common.cancel' | translate}}
               </button>
             </div>
           } @else {
@@ -77,15 +77,15 @@
 
     <!-- Message -->
     <mat-form-field appearance="fill" style="width: 100%; margin: 16px 0;">
-      <mat-label>Message/Notes</mat-label>
+      <mat-label>{{'common.messageOrNotes' | translate }}</mat-label>
       <textarea matInput rows="3" formControlName="message"></textarea>
     </mat-form-field>
 
     <!-- Voice Recording - PROMINENT PROGRESS BAR -->
     <div class="voice-section">
       <label class="section-label">
-        🎤 Voice Note 
-        <span class="constraints">Max {{maxRecordingTime}} seconds</span>
+        🎤 {{'common.voiceNote' | translate }}
+        <span class="constraints">{{'common.max' | translate }} {{maxRecordingTime}} {{'common.seconds' | translate }}</span>
       </label>
       
       <div class="recording-display">
@@ -94,10 +94,10 @@
           <div class="recording-active">
             <div class="recording-header">
               <mat-icon color="warn" class="pulse-icon">mic</mat-icon>
-              <span class="recording-text">🔴 RECORDING LIVE</span>
+              <span class="recording-text">🔴 {{'common.recordingLive' | translate }}</span>
             </div>
             <div class="timer-display">
-              {{recordingTime()}} / {{maxRecordingTime}} seconds
+              {{recordingTime()}} / {{maxRecordingTime}} {{'common.seconds' | translate }}
             </div>
             <div class="progress-container">
               <div class="progress-bar">
@@ -110,13 +110,13 @@
           <!-- RECORDING COMPLETE -->
           <div class="recording-complete">
             <mat-icon color="primary">check_circle</mat-icon>
-            <span>✅ Audio recorded ({{recordingTime()}}s)</span>
+            <span>✅ {{'common.audioRecorded' | translate }} ({{recordingTime()}}s)</span>
           </div>
         } @else {
           <!-- READY TO RECORD -->
           <div class="recording-ready">
             <mat-icon>mic_none</mat-icon>
-            <span>Ready to record voice note</span>
+            <span>{{'common.readyToRecord' | translate }}</span>
           </div>
         }
       </div>

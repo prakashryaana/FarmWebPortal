@@ -1,7 +1,7 @@
 <mat-card>
-  <mat-card-header>
+  <!-- <mat-card-header>
     <mat-card-title>Add Activity for Crop - {{selectedCropName}}</mat-card-title>
-  </mat-card-header>
+  </mat-card-header> -->
   
   <!-- <div *ngIf="selectedCropFarm as sel">
   <p>Farm: {{ sel.farmName }} ({{ sel.farmId }})</p>
@@ -20,10 +20,10 @@
 
       <!-- Activity Type -->
       <mat-form-field appearance="outline">
-        <mat-label>Activity Type</mat-label>
+        <mat-label>{{ 'activity.activityTypeLabel' | translate }}</mat-label>
         <mat-select formControlName="type">
           <mat-option *ngFor="let type of activityTypes" [value]="type.value">
-            {{ type.label }}
+            {{ type.label | translate}}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -33,12 +33,12 @@
         <div>
         <!-- <h4>Spray Details</h4> -->
         <mat-form-field appearance="outline">
-          <mat-label>Product Name</mat-label>
+          <mat-label>{{'activity.productNameLabel' | translate }}</mat-label>
           <input matInput formControlName="productName">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Quantity (liters/kg)</mat-label>
+          <mat-label>{{'activity.quantityLabel' | translate }}</mat-label>
           <input matInput type="number" formControlName="quantity">
         </mat-form-field>
       </div>
@@ -46,7 +46,7 @@
 
       <!-- Message -->
       <mat-form-field appearance="outline">
-        <mat-label>Message/Notes</mat-label>
+        <mat-label>{{'common.messageOrNotes' | translate }}</mat-label>
         <textarea matInput formControlName="message" rows="3"></textarea>
       </mat-form-field>
 
@@ -57,7 +57,7 @@
       
       @if (qrResult) {
         <div class="scan-result">
-        ✅ QR Scanned: {{ qrResult | slice:0:50 }}...
+        ✅ {{ 'common.scannedLabel' | translate }}: {{ qrResult | slice:0:50 }}...
       </div>
       }
       
@@ -70,8 +70,11 @@
         <button mat-raised-button color="primary" type="submit" [disabled]="!activityForm.valid">
           {{ 'common.add' | translate }}
         </button>
-        <button mat-stroked-button type="button" (click)="toggleScanMode()">
+        <!-- <button mat-stroked-button type="button" (click)="toggleScanMode()">
           {{ scanMode ? 'common.switchToManual' : 'common.scanQRCode' | translate}}
+        </button> -->
+        <button mat-stroked-button type="button" (click)="toggleScanMode()">
+          {{ buttonLabel | translate }}
         </button>
         <button mat-button type="button" (click)="reset()">
           {{ 'common.reset' | translate }}

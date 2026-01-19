@@ -11,6 +11,7 @@ import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { UserProfileService } from './user-profile.service';
 import { UserProfile } from './user-profile.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-user-profile',
@@ -23,7 +24,8 @@ import { UserProfile } from './user-profile.service';
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
+    TranslateModule
   ],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css']
@@ -88,5 +90,9 @@ export class UserProfileComponent implements OnInit {
       }),
       finalize(() => this.isUpdating.set(false))
     ).subscribe();
+  }
+
+  get saveButtonLabel(): string  {
+    return this.isUpdating() ? 'Updating...' : 'userProfile.saveChanges'
   }
 }
