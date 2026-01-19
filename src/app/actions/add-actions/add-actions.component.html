@@ -10,13 +10,13 @@
                   color="primary"
                   [class.active]="currentMode() === 'activity'"
                   (click)="setMode('activity')">
-            Add Activity
+            {{ 'activity.addActivity' | translate }}
           </button>
           <button mat-raised-button 
                   color="accent"
                   [class.active]="currentMode() === 'observation'"
                   (click)="setMode('observation')">
-            Add Observation
+            {{ 'observation.addObservation' | translate }}
           </button>
         </div>
 

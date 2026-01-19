@@ -8,6 +8,7 @@ import { CropFarmSelectorService } from './crop-farm-selector.service';
 import { CropFarmSelectorDialogComponent } from './crop-farm-selector-dialog.component';
 import { AuthService } from '../auth/auth.service';
 import { UserProfileService } from '../user-profile/user-profile.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-crop-farm-selector-toolbar',
@@ -17,7 +18,8 @@ import { UserProfileService } from '../user-profile/user-profile.service';
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    TranslateModule
   ],
   templateUrl: './crop-farm-selector-toolbar.component.html',
   styleUrls: ['./crop-farm-selector-toolbar.component.css']

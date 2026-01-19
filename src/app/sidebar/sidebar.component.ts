@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule, MatSpinner } from '@angular/material/progress
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { AuthService } from '../auth/auth.service';
 import { UserRole } from '../users/user.model';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface MenuItem {
   label: string;
@@ -23,7 +24,7 @@ interface MenuItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, CommonModule, MatIconModule, MatTooltipModule, MatProgressSpinnerModule],
+  imports: [RouterLink, CommonModule, MatIconModule, MatTooltipModule, MatProgressSpinnerModule, TranslateModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
@@ -77,33 +78,33 @@ export class SidebarComponent {
   setMenuByRole() {
     if(this.authService.hasRole('FARMOWNER')){
       this.menuItems = [
-        { label: 'Setup Crop', route: '/crop-registration', icon: 'grass' },
-        { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
-        { label: 'View Actions', route: '/view-actions', icon: 'list' }
+        { label: 'navigation.setupCrop', route: '/crop-registration', icon: 'grass' },
+        { label: 'actions.addAction', route: '/add-actions', icon: 'add_circle' },
+        { label: 'actions.viewActions', route: '/view-actions', icon: 'list' }
       ];
     } else if (this.authService.hasRole('FARMHELP')) {
       this.menuItems = [
-        { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
-        { label: 'View Actions', route: '/view-actions', icon: 'list' }
+        { label: 'actions.addAction', route: '/add-actions', icon: 'add_circle' },
+        { label: 'actions.viewActions', route: '/view-actions', icon: 'list' }
       ];
     } else if (this.authService.hasRole('EASYGROWADMIN')) {
       this.menuItems = [
-        { label: 'On-boarding', route: '/farm-owner-registration', icon: 'person_add' },
-        // { label: 'maintainer-registration', route: '/maintainer-registration', icon: 'person_add' },
-        // { label: 'farm-registration', route: '/farm-registration', icon: 'agriculture' },
-        { label: 'Setup Crop', route: '/crop-registration', icon: 'grass' },
-        { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
-        { label: 'View Actions', route: '/view-actions', icon: 'list' },
-        {
-          label: 'Manage',
-          icon: 'settings',
-          submenu: [
-            { label: 'Manage Users', route: '/user-management', icon: 'group' },
-            { label: 'Manage Crop Master', route: '/crop-master', icon: 'local_florist' },
-            { label: 'Manage Fertilizer Inventory', route: '/fertilizer-inventory', icon: 'grain' },
-            { label: 'Manage Disease Control Inventory', route: '/disease-control-inventory', icon: 'medical_services' }
-          ]
-        }
+        { label: 'navigation.farmOwnerRegistration', route: '/farm-owner-registration', icon: 'person_add' },
+        { label: 'navigation.maintainerRegistration', route: '/maintainer-registration', icon: 'person_add' },
+        { label: 'navigation.farmRegistration', route: '/farm-registration', icon: 'agriculture' },
+        { label: 'navigation.setupCrop', route: '/crop-registration', icon: 'grass' },
+        { label: 'actions.addAction' , route: '/add-actions', icon: 'add_circle' },
+        { label: 'actions.viewActions', route: '/view-actions', icon: 'list' },
+        // {
+        //   label: 'Manage',
+        //   icon: 'settings',
+        //   submenu: [
+            { label: 'navigation.manageUsers', route: '/user-management', icon: 'group' },
+            { label: 'navigation.manageCropMaster', route: '/crop-master', icon: 'local_florist' },
+            { label: 'navigation.manageFertilizerInventory', route: '/fertilizer-inventory', icon: 'grain' },
+            { label: 'navigation.manageDiseaseControlInventory', route: '/disease-control-inventory', icon: 'medical_services' }
+        //   ]
+        // }
       ];
     } else {
       //UNKNOWN role don't show anything

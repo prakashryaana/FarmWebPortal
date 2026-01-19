@@ -32,7 +32,7 @@
 
   <div class="sidebar-header">
     @if (!isCollapsed()) {
-    <h2 class="sidebar-title">Menu</h2>
+    <h2 class="sidebar-title">{{'navigation.menu' | translate}}</h2>
     }
     <button class="toggle-btn" (click)="toggleSidebar()" [matTooltip]="isCollapsed() ? 'Expand' : 'Collapse'"
       matTooltipPosition="right">
@@ -49,7 +49,7 @@
         [matTooltipDisabled]="!isCollapsed()" matTooltipPosition="right">
         <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
         @if (!isCollapsed()) {
-        <span class="menu-label">{{ item.label }}</span>
+        <span class="menu-label">{{ item.label | translate }}</span>
         }
       </a>
       } @else {

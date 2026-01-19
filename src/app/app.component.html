@@ -3,9 +3,12 @@
     <header class="brand-name">
       <!-- <img class="brand-logo" src="./assets/favicon/icons8-vegetables-box-pastel-color-32.png" alt="EasyGrow" aria-hidden="true"> -->
       <h1>
-        <a href="/home-dashboard">EasyGrow</a>
+        <a href="/home-dashboard">EazyGrow</a>
       </h1>
-      <button (click)="logout()">Logout</button>
+      <div class="header-actions">
+        <app-language-switcher></app-language-switcher>
+        <button (click)="logout()">{{'navigation.logout' | translate}}</button>
+      </div>
     </header>
     <div class="layout">
     <app-sidebar class="sidebar-left"></app-sidebar>

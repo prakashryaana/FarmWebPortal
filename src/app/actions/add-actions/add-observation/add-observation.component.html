@@ -27,7 +27,7 @@
       <!-- ✅ Gallery (file input - NO click needed) -->
       <button mat-stroked-button type="button" (click)="openGallery()" 
               [disabled]="imageFile() || isUploading()">
-        📱 Select from Gallery
+        📱 {{ 'common.selectFromGallery' | translate }}
       </button>
       
       <!-- ✅ Live Camera (no input needed) -->
@@ -49,7 +49,7 @@
             </div>
           } @else {
             <button mat-stroked-button type="button" (click)="startCamera()">
-              📷 Use Camera
+              📷 {{ 'common.useCamera' | translate }}
             </button>
           }
         </div>
@@ -58,7 +58,7 @@
       <!-- ✅ Retake -->
       @if (imageFile()) {
         <button mat-outlined-button type="button" color="warn" (click)="clearPhoto()">
-          <mat-icon>close</mat-icon> Retake Photo
+          <mat-icon>close</mat-icon> {{ 'common.reTake' | translate }}
         </button>
       }
       
@@ -126,17 +126,17 @@
         <button mat-stroked-button type="button" (click)="startRecording()" 
                 [disabled]="isRecording()" class="btn-record">
           <mat-icon>mic</mat-icon>
-          <span>Start Recording</span>
+          <span>{{ 'common.startRecording' | translate }}</span>
         </button>
         <button mat-stroked-button type="button" (click)="stopRecording()" 
                 [disabled]="!isRecording()" class="btn-stop">
           <mat-icon>stop</mat-icon>
-          <span>Stop Recording</span>
+          <span>{{ 'common.stopRecording' | translate }}</span>
         </button>
         <button mat-stroked-button type="button" (click)="playRecording()" 
                 [disabled]="!audioUrl() || isRecording()" class="btn-play">
           <mat-icon>play_arrow</mat-icon>
-          <span>Play Audio</span>
+          <span>{{ 'common.playAudio' | translate }}</span>
         </button>
       </div>
     </div>
@@ -148,7 +148,7 @@
           <mat-spinner diameter="20"></mat-spinner>
           Saving...
         } @else {
-          Save Observation
+          {{ 'common.add' | translate }}
         }
       </button>
     </div>

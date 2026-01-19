@@ -22,6 +22,7 @@ import { filter, map } from 'rxjs/operators';
 import { ViewChild } from '@angular/core';
 import { ElementRef } from '@angular/core';
 import { environment } from '../../../../environments/environment';
+import { TranslateModule } from '@ngx-translate/core';
 
 export interface UploadResult {
   photoPath: string | null;
@@ -36,7 +37,7 @@ export interface UploadResult {
     CommonModule, ReactiveFormsModule, MatProgressSpinnerModule,
     MatCardModule, MatFormFieldModule, MatSelectModule,
     MatInputModule, MatButtonModule, MatDatepickerModule,
-    MatNativeDateModule, MatIconModule
+    MatNativeDateModule, MatIconModule, TranslateModule
   ],
   templateUrl: './add-observation.component.html',
   styleUrls: ['./add-observation.component.css']
@@ -50,7 +51,8 @@ export class AddObservationComponent implements OnDestroy {
 
   
   readonly observationTypes = [
-    { value: 'DiseaseInsectAttack', label: 'Disease Insect Attack' },
+    { value: 'Disease', label: 'Disease Attack' },
+    { value: 'Insect', label: 'Insect Attack' },
     { value: 'WaterAvailability', label: 'Water Availability' },
     { value: 'NutritionalDeficiency', label: 'Nutritional Deficiency' },
     { value: 'CropGrowthStatus', label: 'Crop Growth Status' },
