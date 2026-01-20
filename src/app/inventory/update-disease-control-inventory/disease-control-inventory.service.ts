@@ -11,6 +11,8 @@ export interface DiseaseControlInventory {
   suppliedDate?: string;
   quantityUsed: number;
   usedDate?: string;
+  invoiceNumber: string;
+  supplier: string;
 }
 
 @Injectable({ providedIn: 'root' })

@@ -33,7 +33,9 @@ export class UpdateDiseaseControlInventoryComponent {
     inventoryId: new FormControl(''),
     diseaseControlName: new FormControl('', [Validators.required, Validators.maxLength(100)]),
     quantitySupplied: new FormControl(0.0, [Validators.required]),
-    suppliedDate: new FormControl(null)
+    suppliedDate: new FormControl(null),
+    invoiceNumber: new FormControl('',[Validators.required]),
+    supplier: new FormControl('',[Validators.required])
   });
 
   list: DiseaseControlInventory[] = [];
@@ -136,7 +138,9 @@ export class UpdateDiseaseControlInventoryComponent {
       diseaseControlName: this.form.get('diseaseControlName')?.value,
       farmId: this.selectedFarmId,
       quantitySupplied: parseFloat(Number(this.form.get('quantitySupplied')?.value || 0).toFixed(2)),
-      suppliedDate: this.form.get('suppliedDate')?.value
+      suppliedDate: this.form.get('suppliedDate')?.value,
+      invoiceNumber: this.form.get('invoiceNumber')?.value,
+      supplier: this.form.get('supplier')?.value
     };
   }
 }

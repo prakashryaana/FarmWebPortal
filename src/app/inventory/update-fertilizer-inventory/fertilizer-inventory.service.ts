@@ -11,6 +11,8 @@ export interface FertilizerInventory {
   suppliedDate?: string; // UTC ISO
   quantityUsed: number;
   usedDate?: string; // UTC ISO
+  invoiceNumber: string;
+  supplier: string;
 }
 
 @Injectable({ providedIn: 'root' })
