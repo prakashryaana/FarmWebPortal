@@ -4,7 +4,7 @@ import { CropFarmSelectorToolbarComponent } from './crop-farm-selector/crop-farm
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { AuthService } from './auth/auth.service';
 import { AsyncPipe } from '@angular/common';
-import { LanguageSwitcherComponent } from './components/language-switcher/language-switcher.component';
+import { LanguageSwitcherComponent } from './language-switcher/language-switcher.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({

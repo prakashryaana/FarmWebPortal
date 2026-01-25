@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { TranslateModule } from '@ngx-translate/core';
-import { LanguageService } from '../../services/language.service';
+import { LanguageService } from './language.service';
 
 @Component({
   selector: 'app-language-switcher',
