@@ -35,7 +35,7 @@ export class UserDialogComponent {
   public data = inject<DialogData>(MAT_DIALOG_DATA);
 
   readonly availableRoles = signal<UserRole[]>([
-    'FARMOWNER', 'FARMHELP', 'EASYGROWADMIN', 'UNKNOWN'
+    'FARMOWNER', 'FARMHELP', 'EASYGROWADMIN', 'AGRONOMIST', 'TRANSCRIBER', 'UNKNOWN'
   ]);
 
   readonly isSubmitting = signal(false);
@@ -77,6 +77,8 @@ export class UserDialogComponent {
       FARMOWNER: 'Farm Owner',
       FARMHELP: 'Farm Help',
       EASYGROWADMIN: 'EasyGrow Admin',
+      AGRONOMIST: 'AGRONOMIST',
+      TRANSCRIBER: 'TRANSCRIBER',
       UNKNOWN: 'UNKNOWN'
     };
     return displayNames[role] || role;

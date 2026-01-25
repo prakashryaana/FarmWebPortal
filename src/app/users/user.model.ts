@@ -1,4 +1,4 @@
-export type UserRole = 'FARMOWNER' | 'FARMHELP' | 'EASYGROWADMIN' | 'UNKNOWN';
+export type UserRole = 'FARMOWNER' | 'FARMHELP' | 'EASYGROWADMIN' | 'AGRONOMIST' | 'TRANSCRIBER' | 'UNKNOWN';
 export type SystemStatus = 'ACTIVE' | 'DEACTIVATED' | 'UNKNOWN';
 
 export interface User {
