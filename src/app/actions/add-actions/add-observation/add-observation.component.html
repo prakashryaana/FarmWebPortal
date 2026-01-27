@@ -1,157 +1,179 @@
-<mat-card>
-    <!-- <mat-card-header>
-    <mat-card-title>Add Observation for Crop - {{selectedCropName}}</mat-card-title>
-  </mat-card-header> -->
-  <mat-card-content>
-  <form [formGroup]="observationForm" (ngSubmit)="onSubmit($event)">
-    
-    <!-- Observation Type -->
-    <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 16px;">
-      <mat-label>{{ 'observation.observationTypeLabel' | translate }}</mat-label>
-      <mat-select formControlName="observationType">
-        @for (o of observationTypes; track o.value) {
-          <mat-option [value]="o.value">{{o.label | translate}}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <!-- Photo Section - DUAL BUTTONS + RETAKE -->
-    <!-- Photo Section - WEB + MOBILE -->
-    <!-- Photo Section - NO .click() REFERENCES -->
-    <div class="photo-section">
-      <label class="section-label">
-        {{'common.photoUpload' | translate}}
-        <span class="constraints">{{'common.photoUploadConstraints' | translate}}</span>
-      </label>
+<!-- <mat-card>
+  <mat-card-content> -->
+    <form [formGroup]="observationForm" (ngSubmit)="onSubmit($event)">
       
-      <!-- ✅ Gallery (file input - NO click needed) -->
-      <button mat-stroked-button type="button" (click)="openGallery()" 
-              [disabled]="imageFile() || isUploading()">
-        📱 {{ 'common.selectFromGallery' | translate }}
-      </button>
-      
-      <!-- ✅ Live Camera (no input needed) -->
-      @if (!imageFile()) {
-        <div class="camera-preview">
-          <video #videoElement autoplay playsinline muted 
-                [hidden]="!showCameraPreview()"
-                style="width: 100%; max-width: 320px; height: auto; border-radius: 8px;"></video>
-          
-          @if (showCameraPreview()) {
-            <div class="camera-controls">
-              <button mat-raised-button color="primary" (click)="capturePhoto()" 
-                      [disabled]="!videoStream()">
-                📸 {{'common.capturePhoto' | translate}}
-              </button>
-              <button mat-stroked-button color="warn" (click)="stopCamera()">
-                <mat-icon>close</mat-icon> {{'common.cancel' | translate}}
-              </button>
-            </div>
-          } @else {
-            <button mat-stroked-button type="button" (click)="startCamera()">
-              📷 {{ 'common.useCamera' | translate }}
-            </button>
+      <!-- Observation Type -->
+      <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 16px;">
+        <mat-label>{{ 'observation.observationTypeLabel' | translate }}</mat-label>
+        <mat-select formControlName="observationType">
+          @for (o of observationTypes; track o.value) {
+            <mat-option [value]="o.value">{{o.label | translate}}</mat-option>
           }
-        </div>
-      }
-      
-      <!-- ✅ Retake -->
-      @if (imageFile()) {
-        <button mat-outlined-button type="button" color="warn" (click)="clearPhoto()">
-          <mat-icon>close</mat-icon> {{ 'common.reTake' | translate }}
-        </button>
-      }
-      
-      <!-- ✅ Hidden file input (gallery only - NO #fileInput reference needed) -->
-      <input type="file" #galleryInput accept="image/jpeg,image/png" 
-            (change)="handleImage($event)" class="file-input" hidden>
-      
-      <!-- ✅ Preview -->
-      @if (imagePreview()) {
-        <div class="preview">
-          <img [src]="imagePreview()!" alt="Photo preview">
-        </div>
-      }
-    </div>
+        </mat-select>
+      </mat-form-field>
 
+      <!-- Tabbed Content -->
+      <mat-tab-group class="observation-tabs" animationDuration="300">
+        
+        <!-- Photo Upload Tab -->
+        <mat-tab class="photo-tab">
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">photo_camera</mat-icon>
+            <span class="tab-label">{{'common.photoUpload' | translate}}</span>
+          </ng-template>
 
-    <!-- Message -->
-    <mat-form-field appearance="fill" style="width: 100%; margin: 16px 0;">
-      <mat-label>{{'common.messageOrNotes' | translate }}</mat-label>
-      <textarea matInput rows="3" formControlName="message"></textarea>
-    </mat-form-field>
-
-    <!-- Voice Recording - PROMINENT PROGRESS BAR -->
-    <div class="voice-section">
-      <label class="section-label">
-        🎤 {{'common.voiceNote' | translate }}
-        <span class="constraints">{{'common.max' | translate }} {{maxRecordingTime}} {{'common.seconds' | translate }}</span>
-      </label>
-      
-      <div class="recording-display">
-        @if (isRecording()) {
-          <!-- ACTIVE RECORDING - RED ALERT STYLE -->
-          <div class="recording-active">
-            <div class="recording-header">
-              <mat-icon color="warn" class="pulse-icon">mic</mat-icon>
-              <span class="recording-text">🔴 {{'common.recordingLive' | translate }}</span>
-            </div>
-            <div class="timer-display">
-              {{recordingTime()}} / {{maxRecordingTime}} {{'common.seconds' | translate }}
-            </div>
-            <div class="progress-container">
-              <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="progressPercent()"></div>
+          <div class="tab-content photo-section">
+            <label class="section-label">
+              {{'common.photoUpload' | translate}}
+              <span class="constraints">{{'common.photoUploadConstraints' | translate}}</span>
+            </label>
+            
+            <!-- Gallery (file input - NO click needed) -->
+            <button mat-stroked-button type="button" (click)="openGallery()" 
+                    [disabled]="imageFile() || isUploading()">
+                    <mat-icon>photo_gallery</mat-icon>
+                    <span class="btn-text">{{ 'common.selectFromGallery' | translate }}</span>
+            </button>
+            
+            <!-- Live Camera (no input needed) -->
+            @if (!imageFile()) {
+              <div class="camera-preview">
+                <video #videoElement autoplay playsinline muted 
+                      [hidden]="!showCameraPreview()"
+                      style="width: 100%; max-width: 320px; height: auto; border-radius: 8px;"></video>
+                
+                @if (showCameraPreview()) {
+                  <div class="camera-controls">
+                    <button mat-raised-button color="primary" (click)="capturePhoto()" 
+                            [disabled]="!videoStream()">
+                            <mat-icon>add_a_photo</mat-icon>
+                            <span class="btn-text">{{ 'common.capturePhoto' | translate }}</span>
+                    </button>
+                    <button mat-stroked-button color="warn" (click)="stopCamera()">
+                      <mat-icon>close</mat-icon> {{'common.cancel' | translate}}
+                    </button>
+                  </div>
+                } @else {
+                  <button mat-stroked-button type="button" (click)="startCamera()">
+                    <mat-icon>photo_camera</mat-icon>
+                    <span class="btn-text">{{ 'common.useCamera' | translate }}</span>
+                  </button>
+                }
               </div>
-              <span class="progress-text">{{progressPercent().toFixed(0)}}%</span>
+            }
+            
+            <!-- Retake -->
+            @if (imageFile()) {
+              <button mat-outlined-button type="button" color="warn" (click)="clearPhoto()">
+                <mat-icon>close</mat-icon> {{ 'common.reTake' | translate }}
+              </button>
+            }
+            
+            <!-- Hidden file input (gallery only) -->
+            <input type="file" #galleryInput accept="image/jpeg,image/png" 
+                  (change)="handleImage($event)" class="file-input" hidden>
+            
+            <!-- Preview -->
+            @if (imagePreview()) {
+              <div class="preview">
+                <img [src]="imagePreview()!" alt="Photo preview">
+              </div>
+            }
+          </div>
+        </mat-tab>
+
+        <!-- Message Tab -->
+        <mat-tab class="message-tab">
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">message</mat-icon>
+            <span class="tab-label">{{'common.messageOrNotes' | translate}}</span>
+          </ng-template>
+          
+          <div class="tab-content message-section">
+            <mat-form-field appearance="fill" style="width: 100%; margin: 16px 0;">
+              <mat-label>{{'common.messageOrNotes' | translate }}</mat-label>
+              <textarea matInput rows="6" formControlName="message"></textarea>
+            </mat-form-field>
+          </div>
+        </mat-tab>
+
+        <!-- Voice Recording Tab -->
+        <mat-tab class="voice-tab">
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">mic</mat-icon>
+            <span class="tab-label">{{'common.voiceNote' | translate}}</span>
+          </ng-template>
+
+          <div class="tab-content voice-section">
+            <label class="section-label">
+              🎤 {{'common.voiceNote' | translate }}
+              <span class="constraints">{{'common.max' | translate }} {{maxRecordingTime}} {{'common.seconds' | translate }}</span>
+            </label>
+            
+            <div class="recording-display">
+              @if (isRecording()) {
+                <div class="recording-active">
+                  <div class="recording-header">
+                    <mat-icon color="warn" class="pulse-icon">mic</mat-icon>
+                    <span class="recording-text">🔴 {{'common.recordingLive' | translate }}</span>
+                  </div>
+                  <div class="timer-display">
+                    {{recordingTime()}} / {{maxRecordingTime}} {{'common.seconds' | translate }}
+                  </div>
+                  <div class="progress-container">
+                    <div class="progress-bar">
+                      <div class="progress-fill" [style.width.%]="progressPercent()"></div>
+                    </div>
+                    <span class="progress-text">{{progressPercent().toFixed(0)}}%</span>
+                  </div>
+                </div>
+              } @else if (audioUrl()) {
+                <div class="recording-complete">
+                  <mat-icon color="primary">check_circle</mat-icon>
+                  <span>{{'common.audioRecorded' | translate }} ({{recordingTime()}}s)</span>
+                </div>
+              } @else {
+                <div class="recording-ready">
+                  <mat-icon>mic_none</mat-icon>
+                  <span>{{'common.readyToRecord' | translate }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- Recording Controls -->
+            <div class="recording-buttons">
+              <button mat-stroked-button type="button" (click)="startRecording()" 
+                      [disabled]="isRecording()" class="btn-record">
+                <mat-icon class="btn-icon">mic</mat-icon>
+                <span class="btn-text">{{ 'common.startRecording' | translate }}</span>
+              </button>
+              <button mat-stroked-button type="button" (click)="stopRecording()" 
+                      [disabled]="!isRecording()" class="btn-stop">
+                <mat-icon class="btn-icon">stop</mat-icon>
+                <span class="btn-text">{{ 'common.stopRecording' | translate }}</span>
+              </button>
+              <button mat-stroked-button type="button" (click)="playRecording()" 
+                      [disabled]="!audioUrl() || isRecording()" class="btn-play">
+                <mat-icon class="btn-icon">play_arrow</mat-icon>
+                <span class="btn-text">{{ 'common.playAudio' | translate }}</span>
+              </button>
             </div>
           </div>
-        } @else if (audioUrl()) {
-          <!-- RECORDING COMPLETE -->
-          <div class="recording-complete">
-            <mat-icon color="primary">check_circle</mat-icon>
-            <span>✅ {{'common.audioRecorded' | translate }} ({{recordingTime()}}s)</span>
-          </div>
-        } @else {
-          <!-- READY TO RECORD -->
-          <div class="recording-ready">
-            <mat-icon>mic_none</mat-icon>
-            <span>{{'common.readyToRecord' | translate }}</span>
-          </div>
-        }
-      </div>
+        </mat-tab>
 
-      <!-- Recording Controls -->
-      <div class="recording-buttons">
-        <button mat-stroked-button type="button" (click)="startRecording()" 
-                [disabled]="isRecording()" class="btn-record">
-          <mat-icon>mic</mat-icon>
-          <span>{{ 'common.startRecording' | translate }}</span>
-        </button>
-        <button mat-stroked-button type="button" (click)="stopRecording()" 
-                [disabled]="!isRecording()" class="btn-stop">
-          <mat-icon>stop</mat-icon>
-          <span>{{ 'common.stopRecording' | translate }}</span>
-        </button>
-        <button mat-stroked-button type="button" (click)="playRecording()" 
-                [disabled]="!audioUrl() || isRecording()" class="btn-play">
-          <mat-icon>play_arrow</mat-icon>
-          <span>{{ 'common.playAudio' | translate }}</span>
+      </mat-tab-group>
+
+      <!-- Submit Button -->
+      <div class="submit-section">
+        <button mat-raised-button color="primary" type="submit" (click)="submitPressed = true; $event.stopPropagation()" [disabled]="!canSubmit()">
+          @if (serviceLoading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+            Saving...
+          } @else {
+            {{ 'common.add' | translate }}
+          }
         </button>
       </div>
-    </div>
-
-    <!-- Submit Button -->
-    <div class="submit-section">
-      <button mat-raised-button color="primary" type="submit" (click)="submitPressed = true; $event.stopPropagation()" [disabled]="!canSubmit()">
-        @if (serviceLoading()) {
-          <mat-spinner diameter="20"></mat-spinner>
-          Saving...
-        } @else {
-          {{ 'common.add' | translate }}
-        }
-      </button>
-    </div>
-  </form>
-  </mat-card-content>
-</mat-card>
+    </form>
+  <!-- </mat-card-content>
+</mat-card> -->

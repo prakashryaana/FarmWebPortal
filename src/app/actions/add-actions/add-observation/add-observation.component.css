@@ -231,7 +231,8 @@
 
 /* Responsive */
 @media (max-width: 600px) {
-  .recording-buttons { flex-direction: column; }
+  /* .recording-buttons { flex-direction: row; }
+  .recording-buttons .btn-text { display: none;} */
   .progress-container { flex-direction: column; gap: 12px; }
   .section-label { flex-direction: column; align-items: flex-start; gap: 4px; }
   .photo-buttons {
@@ -247,8 +248,90 @@
     flex-direction: column;
     align-items: center;
   }
-}
 
+  .tab-label {
+    display: none;
+  }
+
+  .tab-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .recording-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .recording-buttons button {
+    /* Remove all button styling - make invisible */
+    background: none !important;
+    border: none !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    position: relative;
+    cursor: pointer;
+  }
+
+  /* Hide button backgrounds completely */
+  .recording-buttons button.mat-mdc-button,
+  .recording-buttons button.mat-mdc-stroked-button {
+    background: transparent !important;
+    border: none !important;
+  }
+
+  /* Only show icons, hide all text */
+  .recording-buttons .btn-icon {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 32px !important;
+    line-height: 32px !important;
+    color: #666 !important;
+  }
+
+  .recording-buttons .btn-text {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Color states for icons only */
+  .recording-buttons .btn-record:not(:disabled) .btn-icon {
+    color: #f44336 !important; /* Red */
+  }
+
+  .recording-buttons .btn-stop:not(:disabled) .btn-icon {
+    color: #ff9800 !important; /* Orange */
+  }
+
+  .recording-buttons .btn-play:not(:disabled) .btn-icon {
+    color: #4caf50 !important; /* Green */
+  }
+
+  /* Disabled state */
+  .recording-buttons button:disabled .btn-icon {
+    opacity: 0.3 !important;
+    color: #ccc !important;
+  }
+
+  .recording-display .timer-display
+  ,.recording-display .recording-text {
+    display: none;
+  }
+
+  .recording-display {
+    /* display: flex;
+    width: 56px; */
+  }
+}
 
 .photo-section {
   display: flex;

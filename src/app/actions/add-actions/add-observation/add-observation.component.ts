@@ -23,6 +23,7 @@ import { ViewChild } from '@angular/core';
 import { ElementRef } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { TranslateModule } from '@ngx-translate/core';
+import { MatTabsModule } from '@angular/material/tabs';
 
 export interface UploadResult {
   photoPath: string | null;
@@ -37,7 +38,7 @@ export interface UploadResult {
     CommonModule, ReactiveFormsModule, MatProgressSpinnerModule,
     MatCardModule, MatFormFieldModule, MatSelectModule,
     MatInputModule, MatButtonModule, MatDatepickerModule,
-    MatNativeDateModule, MatIconModule, TranslateModule
+    MatNativeDateModule, MatIconModule, TranslateModule, MatTabsModule
   ],
   templateUrl: './add-observation.component.html',
   styleUrls: ['./add-observation.component.css']
