@@ -36,7 +36,7 @@ header.brand-name {
 header.brand-name h1 {
   margin: 0;
   padding: 0;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
   color: #1f2933;
   flex: 1;
@@ -202,7 +202,7 @@ header button:hover {
   }
 
   header.brand-name h1 {
-    font-size: 15px;
+    font-size: 18px;
   }
 
   header button {
