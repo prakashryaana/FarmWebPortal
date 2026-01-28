@@ -6,10 +6,11 @@ import { AuthService } from './auth/auth.service';
 import { AsyncPipe } from '@angular/common';
 import { LanguageSwitcherComponent } from './language-switcher/language-switcher.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CropFarmSelectorToolbarComponent, SidebarComponent, AsyncPipe, LanguageSwitcherComponent, TranslateModule],
+  imports: [RouterOutlet, CropFarmSelectorToolbarComponent, SidebarComponent, AsyncPipe, LanguageSwitcherComponent, TranslateModule, MatIcon],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

@@ -9,25 +9,8 @@ import { LanguageService } from './language.service';
   selector: 'app-language-switcher',
   standalone: true,
   imports: [CommonModule, MatSelectModule, MatFormFieldModule, TranslateModule],
-  template: `
-    <mat-form-field appearance="outline" class="language-selector">
-      <mat-label>{{ 'common.selectLanguage' | translate }}</mat-label>
-      <mat-select 
-        [value]="languageService.getCurrentLanguage()"
-        (selectionChange)="onLanguageChange($event.value)"
-      >
-        <mat-option *ngFor="let lang of languageService.getSupportedLanguages()" [value]="lang.code">
-          {{ lang.nativeName }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  `,
-  styles: [`
-    .language-selector {
-      min-width: 150px;
-      max-width: 200px;
-    }
-  `]
+  templateUrl: './language-switcher.component.html',
+  styleUrls: ['./language-switcher.component.css']
 })
 export class LanguageSwitcherComponent implements OnInit {
   constructor(public languageService: LanguageService) {}

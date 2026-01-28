@@ -7,7 +7,10 @@
       </h1>
       <div class="header-actions">
         <app-language-switcher></app-language-switcher>
-        <button (click)="logout()">{{'navigation.logout' | translate}}</button>
+        <button (click)="logout()" class="btn-logout">
+          <mat-icon class="mt-logout">logout</mat-icon>
+          <span class="lbl-logout">{{'navigation.logout' | translate}}</span>
+        </button>
       </div>
     </header>
     <div class="layout">

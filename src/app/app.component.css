@@ -98,7 +98,7 @@ header.brand-name h1 a:hover {
   flex-shrink: 0;
 }
 
-header button {
+/* header button {
   padding: 0.4rem 0.8rem;
   background: #22c55e;
   color: white;
@@ -113,6 +113,30 @@ header button {
 header button:hover {
   background: #16a34a;
   box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+} */
+
+.btn-logout {
+  /* border: 2px solid #e74c3c !important; */
+  /* color: #e74c3c !important;
+  background: white !important; */
+  padding: 0.4rem 0.8rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-logout:hover {
+  background: #e74c3c;
+  box-shadow: 0 4px 12px rgba(226, 77, 19, 0.3);
+  transform: translateY(-2px);
 }
 
 .layout {
@@ -197,21 +221,25 @@ header button:hover {
 }
 
 @media (max-width: 480px) {
-  header.brand-name {
+  /* header.brand-name {
     padding: 0 0.5rem;
     height: 48px;
   }
 
   header.brand-name h1 {
     font-size: 13px;
-  }
+  } */
 
-  header button {
+  /* header button {
     padding: 0.3rem 0.6rem;
     font-size: 0.7rem;
+  } */
+
+  .btn-logout .lbl-logout {
+    display: none;
   }
 
-  .menu-bar {
+  /* .menu-bar {
     padding: 0.4rem 0.5rem;
     min-height: 40px;
     gap: 0.5rem;
@@ -219,5 +247,5 @@ header button:hover {
 
   .content {
     padding: 0.7rem;
-  }
+  } */
 }
