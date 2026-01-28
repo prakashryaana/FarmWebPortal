@@ -1,46 +1,77 @@
-<!-- <app-farm-lookup (selectedFarm)="onSelectedFarmEvent($event)"></app-farm-lookup> -->
-<form class="container" [formGroup]="cropRegistrationForm" (ngSubmit)="registerCrop()" class="crop-registration-form">
+<div class="registration-container">
+  <form [formGroup]="cropRegistrationForm" (submit)="registerCrop()" class="registration-form">
+    <div class="form-header">
+      <h1>Crop Registration</h1>
+      <p class="subtitle">Register your crops and manage cultivation details</p>
+    </div>
 
-  <h2>Crop Registration</h2>
-  @if (selectedFarm.farmId) {
-  <p>Registering crop for Farm : <strong>{{ selectedFarm.farmName }} (farmId : {{ selectedFarm.farmId }})</strong></p>
-  } @else {
-    <p class="warning-text">Please select a farm to register a crop.</p>
-  }
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Crop Name</mat-label>
-    <!-- <input matInput type="text" formControlName="cropName" required /> -->
-    <mat-select formControlName="cropMasterId" (selectionChange)="onCropMasterChange($event)" required>
-      @for (crop of cropMasterList; track crop.cropId) {
-        <mat-option [value]="crop.cropId">
-          {{ crop.cropName }}
-        </mat-option>
+    <!-- Farm Selection Info Section -->
+    <div class="form-section">
+      <h3 class="section-title">Farm Information</h3>
+      @if (selectedFarm.farmId) {
+        <div class="farm-info-display">
+          <p class="farm-info-text">
+            <strong>Selected Farm:</strong> {{ selectedFarm.farmName }} 
+            <!-- <span class="farm-id">(ID: {{ selectedFarm.farmId }})</span> -->
+          </p>
+        </div>
+      } @else {
+        <div class="warning-alert">
+          <mat-icon class="warning-icon">warning</mat-icon>
+          <p>Please select a farm to register a crop.</p>
+        </div>
       }
-    </mat-select>
-  </mat-form-field>
-  <!-- Hidden cropName sync -->
-  <input type="hidden" formControlName="cropName">
+    </div>
 
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Crop Area (in sq. mt)</mat-label>
-    <input matInput type="number" formControlName="area" required />
-  </mat-form-field>
+    <!-- Crop Details Section -->
+    <div class="form-section">
+      <h3 class="section-title">Crop Details</h3>
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Crop Name</mat-label>
+          <mat-select id="crop-name" formControlName="cropMasterId" (selectionChange)="onCropMasterChange($event)" required>
+            <mat-option value="" disabled>Select a crop</mat-option>
+            @for (crop of cropMasterList; track crop.cropId) {
+              <mat-option [value]="crop.cropId">
+                {{ crop.cropName }}
+              </mat-option>
+            }
+          </mat-select>
+          @if (cropRegistrationForm.get('cropMasterId')?.hasError('required')) {
+            <mat-error>Crop name is required</mat-error>
+          }
+        </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>Date of Sowing</mat-label>
-    <input matInput [matDatepicker]="picker" formControlName="dateOfSowing">
-    <mat-hint></mat-hint>
-    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field>
-    
-  <div style="margin-top: 1rem;">
-    <button mat-raised-button color="primary" type="submit" [disabled]="cropRegistrationForm.invalid">
-      Register
-    </button>
-    <button mat-button type="button" (click)="cropRegistrationForm.reset()">
-      Reset
-    </button>
-  </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Crop Area (sq. mt)</mat-label>
+          <input matInput id="crop-area" type="number" formControlName="area" required placeholder="Enter area in square meters" />
+          @if (cropRegistrationForm.get('area')?.hasError('required')) {
+            <mat-error>Crop area is required</mat-error>
+          }
+        </mat-form-field>
 
-</form>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Date of Sowing</mat-label>
+          <input matInput id="date-of-sowing" [matDatepicker]="picker" formControlName="dateOfSowing" required />
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          @if (cropRegistrationForm.get('dateOfSowing')?.hasError('required')) {
+            <mat-error>Date of sowing is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="cropRegistrationForm.invalid || !selectedFarm.farmId" class="btn-submit">
+        <mat-icon>check_circle</mat-icon>
+        Register Crop
+      </button>
+      <button mat-stroked-button type="button" (click)="cropRegistrationForm.reset()" class="btn-reset">
+        <mat-icon>refresh</mat-icon>
+        Reset Form
+      </button>
+    </div>
+  </form>
+</div>

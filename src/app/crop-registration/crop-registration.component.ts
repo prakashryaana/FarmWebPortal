@@ -20,12 +20,13 @@ import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selecto
 import { effect } from '@angular/core';
 import { CropMasterService } from '../master/update-crop-master/crop-master.service';
 import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-crop-registration',
   imports: [MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule,
     MatDatepicker, MatDatepickerToggle, MatDatepickerInput, MatNativeDateModule,
-    FarmLookupComponent, MatSelectModule],
+    FarmLookupComponent, MatSelectModule, MatIconModule],
   providers: [
         provideLuxonDateAdapter(DDMMYYYY_DATE_FORMATS),
         //  { provide: MAT_DATE_FORMATS, useValue: DDMMYYYY_DATE_FORMATS },
