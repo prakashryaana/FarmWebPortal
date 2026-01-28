@@ -1,85 +1,79 @@
-<!-- <mat-card> -->
-  <!-- <mat-card-header>
-    <mat-card-title>Add Activity for Crop - {{selectedCropName}}</mat-card-title>
-  </mat-card-header> -->
-  
-  <!-- <div *ngIf="selectedCropFarm as sel">
-  <p>Farm: {{ sel.farmName }} ({{ sel.farmId }})</p>
-  <p>Crop: {{ sel.cropName }} ({{ sel.cropId }})</p>
-</div> -->
-  
-  <!-- <mat-card-content> -->
-    <form [formGroup]="activityForm" (ngSubmit)="onSubmit()">
-      <!-- DateTime Field -->
-      <!-- <mat-form-field appearance="outline">
-        <mat-label>Date & Time</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="dateTime">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field> -->
+<!-- <div class="registration-container"> -->
+  <!-- <div class="registration-form"> -->
+    <!-- <div class="form-header">
+      <h1>Add Activity</h1>
+      <p class="subtitle">Record farming activities for your crops</p>
+    </div> -->
 
-      <!-- Activity Type -->
-      <mat-form-field appearance="outline">
-        <mat-label>{{ 'activity.activityTypeLabel' | translate }}</mat-label>
-        <mat-select formControlName="type">
-          <mat-option *ngFor="let type of activityTypes" [value]="type.value">
-            {{ type.label | translate}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <!-- Spray Details (conditional) -->
-       @if (showAdditionalFields) {
-        <div>
-        <!-- <h4>Spray Details</h4> -->
-        <mat-form-field appearance="outline">
-          <mat-label>{{'activity.productNameLabel' | translate }}</mat-label>
-          <input matInput formControlName="productName">
+    <!-- Activity Form Section -->
+    <form [formGroup]="activityForm" (ngSubmit)="onSubmit()" class="form-section">
+      <h3 class="section-title">Activity Details</h3>
+      <div class="form-grid">
+        <!-- Activity Type -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'activity.activityTypeLabel' | translate }}</mat-label>
+          <mat-select id="activity-type" formControlName="type" required>
+            <mat-option value="" disabled>Select activity type</mat-option>
+            @for (type of activityTypes; track type.value) {
+              <mat-option [value]="type.value">
+                {{ type.label | translate}}
+              </mat-option>
+            }
+          </mat-select>
+          @if (activityForm.get('type')?.hasError('required')) {
+            <mat-error>Activity type is required</mat-error>
+          }
         </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>{{'activity.quantityLabel' | translate }}</mat-label>
-          <input matInput type="number" formControlName="quantity">
+        <!-- Spray Details (conditional) -->
+        @if (showAdditionalFields) {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{'activity.productNameLabel' | translate }}</mat-label>
+            <input matInput id="product-name" formControlName="productName" placeholder="Enter product name" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{'activity.quantityLabel' | translate }}</mat-label>
+            <input matInput id="quantity" type="number" formControlName="quantity" placeholder="Enter quantity" />
+          </mat-form-field>
+        }
+
+        <!-- Message -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{'common.messageOrNotes' | translate }}</mat-label>
+          <textarea matInput id="message" formControlName="message" rows="4" placeholder="Add notes or observations"></textarea>
         </mat-form-field>
       </div>
-       }
 
-      <!-- Message -->
-      <mat-form-field appearance="outline">
-        <mat-label>{{'common.messageOrNotes' | translate }}</mat-label>
-        <textarea matInput formControlName="message" rows="3"></textarea>
-      </mat-form-field>
-
-      <!-- QR Scanner -->
-       <!-- @if (scanMode) { -->
-        <div id="scanner-container" class="scanner-container"></div>
-       <!-- } -->
-      
+      <!-- QR Scanner Section -->
       @if (qrResult) {
-        <div class="scan-result">
-        ✅ {{ 'common.scannedLabel' | translate }}: {{ qrResult | slice:0:50 }}...
-      </div>
+        <!-- <div class="form-section"> -->
+          <div class="scan-result">
+            <mat-icon class="scan-icon">check_circle</mat-icon>
+            {{ 'common.scannedLabel' | translate }}: {{ qrResult | slice:0:50 }}...
+          </div>
+        <!-- </div> -->
       }
-      
 
-      
-      
+      <div class="qr-scanner-section">
+        <div id="scanner-container" class="scanner-container"></div>
+      </div>
 
-      <!-- Actions -->
-      <div class="actions">
-        <button mat-raised-button color="primary" type="submit" [disabled]="!activityForm.valid">
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="!activityForm.valid" class="btn-submit">
+          <!-- <mat-icon>add_circle</mat-icon> -->
           {{ 'common.add' | translate }}
         </button>
-        <!-- <button mat-stroked-button type="button" (click)="toggleScanMode()">
-          {{ scanMode ? 'common.switchToManual' : 'common.scanQRCode' | translate}}
-        </button> -->
-        <button mat-stroked-button type="button" (click)="toggleScanMode()">
+        <button mat-stroked-button type="button" (click)="toggleScanMode()" class="btn-action">
+          <mat-icon>qr_code_scanner</mat-icon>
           {{ buttonLabel | translate }}
         </button>
-        <button mat-button type="button" (click)="reset()">
+        <button mat-button type="button" (click)="reset()" class="btn-reset">
+          <mat-icon>refresh</mat-icon>
           {{ 'common.reset' | translate }}
         </button>
       </div>
     </form>
-  <!-- </mat-card-content>
-</mat-card> -->
+  <!-- </div> -->
+<!-- </div> -->

@@ -18,6 +18,7 @@ import { environment } from '../../../../environments/environment';
 import { takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateModule } from '@ngx-translate/core';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-add-activity',
@@ -25,7 +26,8 @@ import { TranslateModule } from '@ngx-translate/core';
   imports: [
     CommonModule, ReactiveFormsModule,
     MatCardModule, MatButtonModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatRadioModule, TranslateModule
+    MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatRadioModule, 
+    TranslateModule, MatIconModule
   ],
   templateUrl: './add-activity.component.html',
   styleUrl: './add-activity.component.css'

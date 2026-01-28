@@ -8,6 +8,7 @@ import { CropFarmSelectorService } from '../../crop-farm-selector/crop-farm-sele
 import { inject } from '@angular/core';
 import { AddObservationComponent } from './add-observation/add-observation.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { MatIconModule } from '@angular/material/icon';
 
 export type ActionMode = 'activity' | 'observation';
 
@@ -15,7 +16,7 @@ export type ActionMode = 'activity' | 'observation';
   selector: 'app-add-actions',
   standalone: true,
   imports: [CommonModule, MatTabsModule, MatButtonModule, MatCardModule,
-    AddActivityComponent, AddObservationComponent, TranslateModule],
+    AddActivityComponent, AddObservationComponent, TranslateModule, MatIconModule],
   templateUrl: './add-actions.component.html',
   styleUrls: ['./add-actions.component.css']
 })

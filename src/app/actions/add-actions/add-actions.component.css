@@ -1,24 +1,152 @@
+.registration-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.registration-form {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.03);
+  padding: 3rem;
+  border: 1px solid #e8eef5;
+}
+
+.form-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+  border-bottom: 3px solid #e8eef5;
+  padding-bottom: 1.5rem;
+}
+
+.form-header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  color: #7f8c8d;
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 400;
+}
+
+.form-section {
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+  transition: all 0.3s ease;
+}
+
+.form-section:hover {
+  box-shadow: 0 2px 12px rgba(52, 152, 219, 0.12);
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Tab Selection */
 .tab-selection {
-      display: flex;
-      gap: 12px;
-      margin: 24px 0;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    
-    .tab-selection button {
-      min-height: 48px;
-      padding: 0 24px;
-      border-radius: 24px;
-      transition: all 0.3s ease;
-    }
-    
-    .tab-selection button.active {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      transform: translateY(-2px);
-    }
-    
-    .content-area {
-      padding: 24px 0;
-      min-height: 400px;
-    }
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.tab-button {
+  min-height: 48px;
+  padding: 0 1.5rem !important;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.tab-button.active {
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+  transform: translateY(-2px);
+}
+
+.tab-button mat-icon {
+  margin-right: 0.25rem;
+}
+
+.content-area {
+  padding: 2rem 0;
+  min-height: 400px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .registration-container {
+    padding: 1rem;
+  }
+
+  .registration-form {
+    padding: 1.5rem;
+  }
+
+  .form-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .tab-selection {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .tab-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .registration-form {
+    padding: 1rem;
+  }
+
+  .form-section {
+    padding: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+  }
+
+  .content-area {
+    padding: 1rem 0;
+  }
+}

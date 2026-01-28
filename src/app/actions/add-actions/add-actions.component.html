@@ -1,34 +1,42 @@
-<mat-card>
-      <mat-card-header>
-        <mat-card-title></mat-card-title>
-      </mat-card-header>
-      
-      <mat-card-content>
-        <!-- Tab Selection -->
-        <div class="tab-selection">
-          <button mat-raised-button 
-                  color="primary"
-                  [class.active]="currentMode() === 'activity'"
-                  (click)="setMode('activity')">
-            {{ 'activity.addActivity' | translate }}
-          </button>
-          <button mat-raised-button 
-                  color="accent"
-                  [class.active]="currentMode() === 'observation'"
-                  (click)="setMode('observation')">
-            {{ 'observation.addObservation' | translate }}
-          </button>
-        </div>
+<div class="registration-container">
+  <div class="registration-form">
+    <div class="form-header">
+      <h1>Add Activities & Observations</h1>
+      <p class="subtitle">Record farm activities and observations for your crops</p>
+    </div>
 
-        <!-- Active Content -->
-        @if (currentMode() === 'activity') {
-          <div class="content-area">
-            <app-add-activity />
-          </div>
-        } @if (currentMode() === 'observation') {
-          <div class="content-area">
-            <app-add-observation />
-          </div>
-        }
-      </mat-card-content>
-    </mat-card>
+    <!-- Tab Selection Section -->
+    <!-- <div class="form-section"> -->
+      <!-- <h3 class="section-title">Select Category</h3> -->
+      <div class="tab-selection">
+        <button mat-raised-button 
+                color="primary"
+                [class.active]="currentMode() === 'activity'"
+                (click)="setMode('activity')"
+                class="tab-button">
+          <mat-icon>assignment</mat-icon>
+          {{ 'activity.addActivity' | translate }}
+        </button>
+        <button mat-raised-button 
+                color="accent"
+                [class.active]="currentMode() === 'observation'"
+                (click)="setMode('observation')"
+                class="tab-button">
+          <mat-icon>visibility</mat-icon>
+          {{ 'observation.addObservation' | translate }}
+        </button>
+      </div>
+    <!-- </div> -->
+
+    <!-- Active Content -->
+    @if (currentMode() === 'activity') {
+      <div class="content-area">
+        <app-add-activity />
+      </div>
+    } @if (currentMode() === 'observation') {
+      <div class="content-area">
+        <app-add-observation />
+      </div>
+    }
+  </div>
+</div>
