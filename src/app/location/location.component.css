@@ -160,13 +160,13 @@
   overflow: hidden;
 }
 
-::ng-deep .mat-mdc-button-base mat-icon {
+/* ::ng-deep .mat-mdc-button-base mat-icon {
   margin-right: 0.25rem;
 }
 
 ::ng-deep mat-spinner {
   margin: 0 auto;
-}
+} */
 
 /* Responsive Design */
 @media (max-width: 768px) {

@@ -415,10 +415,10 @@
 }
 
 /* Material Table Override */
-::ng-deep .mat-mdc-table-sticky {
+/* ::ng-deep .mat-mdc-table-sticky {
   background-color: #ffffff;
 }
 
 ::ng-deep .mat-mdc-button-base mat-icon {
   margin-right: 0.25rem;
-}
+} */
