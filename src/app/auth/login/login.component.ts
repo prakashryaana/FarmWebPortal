@@ -10,13 +10,16 @@ import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-login',
   imports:[MatCard,MatCardHeader,MatCardTitle,MatCardContent,MatIcon,MatCardSubtitle,MatFormField,MatLabel,MatCardActions
     ,CommonModule,ReactiveFormsModule,RouterLink,MatCardModule,MatFormFieldModule,MatInputModule,MatButtonModule,MatIconModule,MatProgressSpinnerModule
   ],
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class LoginComponent {
   mobile = '';

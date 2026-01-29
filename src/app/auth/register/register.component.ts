@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -22,7 +22,9 @@ import { ValidationErrors } from '@angular/forms';
     ,MatButton,MatButtonToggleModule,MatFormFieldModule,MatInputModule
   ,MatButtonModule,RouterLink,CommonModule,MatCardModule,MatFormFieldModule
   ,MatInputModule,MatButtonModule,MatIconModule,MatSelectModule,MatProgressSpinnerModule,MatSnackBarModule],
-  templateUrl: './register.component.html'
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class RegisterComponent implements OnInit {
   asOwner = true;
