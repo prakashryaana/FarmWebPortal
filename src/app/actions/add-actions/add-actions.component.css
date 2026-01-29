@@ -68,6 +68,11 @@
 }
 
 .tab-button {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25) !important;
+  font-size: 1rem !important;
+  font-weight: 600;
   min-height: 48px;
   padding: 0 1.5rem !important;
   border-radius: 8px;
@@ -75,11 +80,11 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 500;
+  width: 45%;
 }
 
 .tab-button.active {
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+  box-shadow: 0 10px 10px rgba(6, 139, 228, 0.35) !important;
   transform: translateY(-2px);
 }
 
