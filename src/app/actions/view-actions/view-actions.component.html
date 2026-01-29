@@ -1,17 +1,47 @@
-<mat-card>
-  <!-- <mat-card-title>Actions - {{selectedFarmName}} / {{selectedCropName}}</mat-card-title> -->
-  <mat-card-content>
-    <div class="actions-toolbar">
-      <button mat-stroked-button color="primary" (click)="generateReport()"><mat-icon>description</mat-icon>{{'common.generateReport'|translate}}</button>
+<div class="registration-container">
+  <div class="registration-form">
+    <div class="form-header">
+      <h1>View Activities & Observations</h1>
+      <p class="subtitle">Review and manage your crop records</p>
+      <button mat-raised-button color="accent" (click)="generateReport()" class="btn-report">
+        <mat-icon>description</mat-icon>
+        {{ 'common.generateReport' | translate }}
+      </button>
     </div>
 
-    <mat-tab-group>
-      <mat-tab [label]="'activity.viewActivities' | translate">
-        <app-list-activity></app-list-activity>
-      </mat-tab>
-      <mat-tab [label]="'observation.viewObservations' | translate">
-        <app-list-observation></app-list-observation>
-      </mat-tab>
-    </mat-tab-group>
-  </mat-card-content>
-</mat-card>
+    <!-- Toolbar Section -->
+    <!-- <div class="toolbar-section">
+      <button mat-raised-button color="accent" (click)="generateReport()" class="btn-report">
+        <mat-icon>description</mat-icon>
+        {{ 'common.generateReport' | translate }}
+      </button>
+    </div> -->
+
+    <!-- Tabs Section -->
+    <div class="tabs-container">
+      <mat-tab-group class="data-tabs">
+        <!-- Activities Tab -->
+        <mat-tab [label]="'activity.viewActivities' | translate">
+          <ng-template mat-tab-label>
+            <!-- <mat-icon class="tab-icon">assignment</mat-icon> -->
+            <span class="tab-label">{{ 'activity.viewActivities' | translate }}</span>
+          </ng-template>
+          <div class="tab-content">
+            <app-list-activity></app-list-activity>
+          </div>
+        </mat-tab>
+
+        <!-- Observations Tab -->
+        <mat-tab [label]="'observation.viewObservations' | translate">
+          <ng-template mat-tab-label>
+            <!-- <mat-icon class="tab-icon">visibility</mat-icon> -->
+            <span class="tab-label">{{ 'observation.viewObservations' | translate }}</span>
+          </ng-template>
+          <div class="tab-content">
+            <app-list-observation></app-list-observation>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+</div>
