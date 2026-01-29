@@ -3,6 +3,7 @@
   "navigation": {
     "menu": "Menu",
     "dashboard": "Dashboard",
+    "onboarding": "Onboarding",
     "farmLookup": "Farm Lookup",
     "cropRegistration": "Crop Registration",
     "setupCrop": "Setup Crop",
