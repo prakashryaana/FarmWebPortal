@@ -42,8 +42,12 @@
   padding: 0.75rem 1.5rem !important;
   font-size: 0.95rem !important;
   min-height: 44px;
+  /* background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25); */
   background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25);
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25) !important;
+  transition: all 0.3s ease;
 }
 
 .get-location-btn:hover:not(:disabled) {
