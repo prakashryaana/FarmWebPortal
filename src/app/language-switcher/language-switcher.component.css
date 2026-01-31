@@ -1,20 +1,9 @@
-.language-selector {
-  max-height: 100px;
-}
-
 .selector {
-  min-width: 100px;
-  max-width: 150px;
   color: #ddd;
-  background-color: #fff;
 }
 
 @media (max-width: 480px) {
   .language-selector {
-    max-height: 60px;
-  }
-  .selector {
-    max-width: 40px;
-    max-height: 40px;
+    max-width: 100px;
   }
 }
