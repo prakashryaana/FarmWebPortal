@@ -1,4 +1,9 @@
-.language-selector {
-      min-width: 100px;
-      max-width: 150px;
-    }
+.selector {
+  color: #ddd;
+}
+
+@media (max-width: 480px) {
+  .language-selector {
+    max-width: 100px;
+  }
+}

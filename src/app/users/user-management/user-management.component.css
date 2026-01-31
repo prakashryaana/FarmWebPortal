@@ -59,7 +59,10 @@ mat-card {
 
 .search { width: 320px; }
 
-.table-wrapper { min-height: 160px; }
+.table-wrapper { 
+    min-height: 160px;
+    overflow: auto;
+}
 
 .loading-row { display:flex; align-items:center; gap:12px; padding:24px; }
 .loading-text { color: rgba(0,0,0,0.6); }

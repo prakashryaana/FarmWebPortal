@@ -148,6 +148,11 @@ header button:hover {
   display: flex;
   flex: 1;
   overflow: hidden;
+  flex-direction: row;
+}
+
+.sidebar-left {
+  flex-shrink: 0;
 }
 
 .content-wrapper {
@@ -196,10 +201,12 @@ header button:hover {
 
   .content {
     padding: 0.9rem;
+    font-size: 1rem;
   }
 }
 
 @media (max-width: 768px) {
+  /* Mobile layout: stack sidebar horizontally below header */
   header.brand-name {
     padding: 0 0.75rem;
     height: 52px;
@@ -215,42 +222,93 @@ header button:hover {
     font-size: 0.75rem;
   }
 
+  main {
+    flex-direction: column;
+  }
+
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar-left {
+    /* Sidebar now appears as horizontal bar */
+    width: 100%;
+    max-height: 60px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .content-wrapper {
+    flex: 1;
+    overflow: hidden;
+  }
+
   .menu-bar {
-    padding: 0.5rem 0.75rem;
-    min-height: 42px;
+    padding: 0.6rem 0.75rem;
+    min-height: 44px;
+    gap: 0.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .toolbar-center {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+    max-width: 100%;
   }
 
   .content {
-    padding: 0.8rem;
+    padding: 1rem;
+    font-size: 1.1rem;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+    line-height: 1.6;
+  }
+
+  /* Increase button sizes for mobile touchability */
+  .btn-logout {
+    padding: 0.5rem 0.9rem;
+    font-size: 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  /* header.brand-name {
+  header.brand-name {
     padding: 0 0.5rem;
     height: 48px;
   }
 
   header.brand-name h1 {
-    font-size: 13px;
-  } */
-
-  /* header button {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.7rem;
-  } */
+    font-size: 15px;
+  }
 
   .btn-logout .lbl-logout {
     display: none;
   }
 
-  /* .menu-bar {
-    padding: 0.4rem 0.5rem;
+  .btn-logout {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+
+  .sidebar-left {
+    max-height: 55px;
+  }
+
+  .menu-bar {
+    padding: 0.5rem 0.5rem;
     min-height: 40px;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
   .content {
-    padding: 0.7rem;
-  } */
+    padding: 1rem;
+    font-size: 1.05rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    line-height: 1.5;
+  }
 }

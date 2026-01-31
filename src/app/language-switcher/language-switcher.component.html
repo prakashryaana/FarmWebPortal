@@ -1,6 +1,6 @@
 <mat-form-field appearance="outline" class="language-selector">
     <!-- <mat-label>{{ 'common.selectLanguage' | translate }}</mat-label> -->
-    <mat-select class="language-selector" [value]="languageService.getCurrentLanguage()" (selectionChange)="onLanguageChange($event.value)">
+    <mat-select class="selector" [value]="languageService.getCurrentLanguage()" (selectionChange)="onLanguageChange($event.value)">
         <mat-option *ngFor="let lang of languageService.getSupportedLanguages()" [value]="lang.code">
             {{ lang.nativeName }}
         </mat-option>
