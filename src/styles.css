@@ -121,7 +121,7 @@ input, textarea, select {
 
 @media (max-width: 480px) {
   html {
-    font-size: 11px;
+    font-size: 12px;
   }
   
   h1 {
