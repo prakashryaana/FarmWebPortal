@@ -78,5 +78,14 @@
       }
     </ng-container>
     }
+    <ng-container>
+      <div class="header-actions">
+        <app-language-switcher></app-language-switcher>
+        <button (click)="logout()" class="btn-logout">
+          <mat-icon class="mt-logout">logout</mat-icon>
+          <span class="lbl-logout">{{'navigation.logout' | translate}}</span>
+        </button>
+      </div>
+    </ng-container>
   </div>
 </nav>

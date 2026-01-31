@@ -13,6 +13,7 @@ import { MatProgressBar } from '@angular/material/progress-bar';
 import { AuthService } from '../auth/auth.service';
 import { UserRole } from '../users/user.model';
 import { TranslateModule } from '@ngx-translate/core';
+import { LanguageSwitcherComponent } from '../language-switcher/language-switcher.component';
 
 interface MenuItem {
   label: string;
@@ -24,7 +25,8 @@ interface MenuItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, CommonModule, MatIconModule, MatTooltipModule, MatProgressSpinnerModule, TranslateModule],
+  imports: [RouterLink, CommonModule, MatIconModule, MatTooltipModule, MatProgressSpinnerModule,
+     TranslateModule, LanguageSwitcherComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
@@ -37,26 +39,8 @@ export class SidebarComponent {
   private authService = inject(AuthService);
 
   menuItems: MenuItem[] = [];
-  // menuItems: MenuItem[] = [
-  //   { label: 'On-boarding', route: '/farm-owner-registration', icon: 'business' },
-  //   // { label: 'maintainer-registration', route: '/maintainer-registration', icon: 'business' },
-  //   // { label: 'farm-registration', route: '/farm-registration', icon: 'business' },
-  //   { label: 'Setup Crop', route: '/crop-registration', icon: 'agriculture' },
-  //   { label: 'Add Actions', route: '/add-actions', icon: 'add_circle' },
-  //   { label: 'View Actions', route: '/view-actions', icon: 'list' },
-  //   {
-  //     label: 'Manage',
-  //     icon: 'settings',
-  //     submenu: [
-  //       { label: 'Manage Users', route: '/user-management', icon: 'group' },
-  //       { label: 'Manage Crop Master', route: '/crop-master', icon: 'local_florist' },
-  //       { label: 'Manage Fertilizer Inventory', route: '/fertilizer-inventory', icon: 'grain' },
-  //       { label: 'Manage Disease Control Inventory', route: '/disease-control-inventory', icon: 'medical_services' }
-  //     ]
-  //   }
-  // ];
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private auth:AuthService) {
     this.loadUserProfile();
   }
 
@@ -132,5 +116,9 @@ export class SidebarComponent {
 
   isMenuExpanded(menuLabel: string): boolean {
     return this.expandedMenus().includes(menuLabel);
+  }
+
+  logout(){
+    this.auth.logout();
   }
 }
