@@ -198,7 +198,6 @@
 
   .selection-item .value {
     font-size: 11px;
-    max-width: 100px;
     padding: 3px 6px;
   }
 
@@ -229,7 +228,7 @@
   }
 
   .placeholder-text {
-    font-size: 11px;
+    font-size: 0.9rem !important;
     min-width: 0;
   }
 
@@ -249,14 +248,14 @@
   }
 
   .selection-item .label {
-    font-size: 10px;
+    font-size: 0.9rem;
     display: inline;
   }
 
   .selection-item .value {
-    font-size: 10px;
-    max-width: 70px;
-    padding: 2px 4px;
+    font-size: 0.9rem;
+    /* max-width: 70px; */
+    /* padding: 2px 4px; */
   }
 
   .toolbar-actions {

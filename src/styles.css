@@ -121,7 +121,7 @@ input, textarea, select {
 
 @media (max-width: 480px) {
   html {
-    font-size: 12px;
+    font-size: 0.9rem;
   }
   
   h1 {
@@ -134,5 +134,11 @@ input, textarea, select {
   
   h3 {
     font-size: 0.9rem;
+  }
+
+  mat-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
   }
 }

@@ -1,47 +1,13 @@
 <div class="crop-farm-toolbar">
-    <!-- No Selection State -->
-    @if (!hasSelection)
-    {
-    <div class="toolbar-placeholder" (click)="openSelectorDialog()" style="cursor: pointer;">
-        <!-- <button mat-icon-button (click)="openSelectorDialog()" matTooltip="Select a crop and farm"
-            class="select-button">
-            <mat-icon>add_circle_outline</mat-icon>
-        </button> -->
+    <div class="selection-item crop-item" (click)="openSelectorDialog()">
+        @if (!hasSelection){
         <span class="placeholder-text">{{ 'crop.selector.emptyCropSelection' | translate }}</span>
+        }
+        @else {
+        <span class="label">{{ 'common.crop' | translate }}:</span>
+        <span class="value" [matTooltip]="'Crop ID: ' + selectedCropId" matTooltipPosition="below">
+            {{ selectedCropName }}
+        </span>
+        }
     </div>
-    }
-    @else
-    {
-    <!-- Selection Display State -->
-    <div class="toolbar-selection">
-        <!-- <div class="selection-items"> -->
-            <!-- <div class="selection-item farm-item">
-                <span class="label">Farm:</span>
-                <span class="value" [matTooltip]="'Farm ID: ' + selectedFarmId" matTooltipPosition="below">
-                    {{ selectedFarmName }}
-                </span>
-            </div>
-
-            <div class="separator">|</div> -->
-
-            <div class="selection-item crop-item" (click)="openSelectorDialog()">
-                <span class="label">{{ 'common.crop' | translate }}:</span>
-                <span class="value" [matTooltip]="'Crop ID: ' + selectedCropId" matTooltipPosition="below">
-                    {{ selectedCropName }}
-                </span>
-            </div>
-        <!-- </div> -->
-
-        <!-- <div class="toolbar-actions"> -->
-            <!-- <button mat-icon-button (click)="openSelectorDialog()" matTooltip="Change crop selection"
-                class="change-button">
-                <mat-icon>edit</mat-icon>
-            </button> -->
-
-            <!-- <button mat-icon-button (click)="clearSelection()" matTooltip="Clear selection" class="clear-button">
-                <mat-icon>close</mat-icon>
-            </button> -->
-        <!-- </div> -->
-    </div>
-    }
 </div>

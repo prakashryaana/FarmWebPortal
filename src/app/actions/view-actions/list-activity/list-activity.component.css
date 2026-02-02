@@ -211,7 +211,7 @@
   color: #1976d2;
   border-radius: 4px;
   font-weight: 500;
-  font-size: 0.85rem;
+  /* font-size: 0.85rem; */
 }
 
 .message-text {
@@ -266,7 +266,7 @@
 
   .column-header {
     padding: 0.75rem;
-    font-size: 0.85rem;
+    /* font-size: 0.85rem; */
   }
 
   .header-icon {
@@ -275,7 +275,7 @@
 
   .column-cell {
     padding: 0.75rem;
-    font-size: 0.85rem;
+    /* font-size: 0.85rem; */
   }
 
   .detail-cell {
@@ -306,12 +306,12 @@
 
   .column-header {
     padding: 0.5rem;
-    font-size: 0.75rem;
+    /* font-size: 0.75rem; */
   }
 
   .column-cell {
     padding: 0.5rem;
-    font-size: 0.75rem;
+    /* font-size: 0.75rem; */
   }
 
   .detail-cell {
@@ -321,7 +321,7 @@
 
   .activity-type-badge {
     padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
+    /* font-size: 0.75rem; */
   }
 
   .message-text {

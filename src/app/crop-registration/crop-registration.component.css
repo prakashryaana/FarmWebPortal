@@ -258,6 +258,6 @@
   }
 
   .farm-info-text {
-    flex-direction: column;
+    flex-direction: row;
   }
 }
