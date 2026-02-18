@@ -16,7 +16,7 @@ COPY --from=builder /app/dist/browser/ /usr/share/nginx/html/
 # Custom nginx config (no conflicts)
 COPY <<EOF /etc/nginx/conf.d/default.conf
 server {
-    listen 4200;
+    listen 80;
     root /usr/share/nginx/html;
     index index.html;
 
@@ -29,5 +29,5 @@ server {
 }
 EOF
 
-EXPOSE 4200
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
