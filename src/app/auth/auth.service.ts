@@ -89,13 +89,7 @@ export class AuthService {
   }
 
    loginWithPassword(credentials: { mobile: string; password: string }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/login-with-password`, credentials, {withCredentials:true}).pipe(
-      map(() => void 0),
-      catchError(err => {
-        console.error('Login failed', err);
-        return of(null);
-      })
-    );
+    return this.http.post(`${this.baseUrl}/login-with-password`, credentials, {withCredentials:true});
   }
 
   // Called by guard or app init: sync cookie → Angular state
