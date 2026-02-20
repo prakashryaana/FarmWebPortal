@@ -317,6 +317,8 @@
 
   .main-content-grid {
     gap: 1rem;
+    display: flex;
+    flex-direction: column-reverse;
   }
 }
 
