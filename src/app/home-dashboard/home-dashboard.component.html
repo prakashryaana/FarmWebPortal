@@ -1,5 +1,5 @@
 <!-- home-dashboard.component.html -->
-<div class="dashboard-container" *ngIf="summary$ | async as summary; else loading">
+<div class="dashboard-container" *ngIf="auth.hasRole('EASYGROWADMIN') && summary$ | async as summary; else loading">
   <div class="cards">
     <mat-card class="card">
       <mat-card-header>

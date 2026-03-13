@@ -31,6 +31,6 @@ export class HomeDashboardComponent {
   liveActivitiesToday$: Observable<number> =
     this.dashboardService.pollTodayLiveActivitiesCount(15); // every 15s
 
-  constructor(private auth: AuthService) {}
+  constructor(public auth: AuthService) {}
 
 }
