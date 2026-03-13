@@ -45,4 +45,9 @@ export class GeolocationService {
       })
     );
   }
+
+  setManualCoordinates(coords: Coordinates): void {
+    this.farmCoordinates.set(coords);
+    console.log('Manual coordinates set:', this.farmCoordinates());
+  }
 }

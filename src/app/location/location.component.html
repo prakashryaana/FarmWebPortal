@@ -12,6 +12,37 @@
       </button>
     </div>
 
+    <div class="manual-entry-section">
+      <h3>Or Enter Coordinates Manually</h3>
+      <div class="manual-input-container">
+        <mat-form-field appearance="outline" class="coord-input">
+          <mat-label>Latitude</mat-label>
+          <input matInput [(ngModel)]="manualLatitude" type="number" placeholder="e.g., 40.7128" />
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="coord-input">
+          <mat-label>Longitude</mat-label>
+          <input matInput [(ngModel)]="manualLongitude" type="number" placeholder="e.g., -74.0060" />
+        </mat-form-field>
+
+        <button mat-raised-button color="accent" (click)="setManualLocation()" class="set-location-btn">
+          <mat-icon>location_on</mat-icon>
+          Set Location
+        </button>
+      </div>
+
+      @if (manualEntryError) {
+        <mat-card class="error-card manual-error">
+          <mat-card-content>
+            <div class="error-content">
+              <mat-icon class="error-icon">error_outline</mat-icon>
+              <p class="error-message">{{ manualEntryError }}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
     @if (isLoading) {
       <div class="loading-state">
         <mat-spinner diameter="40"></mat-spinner>

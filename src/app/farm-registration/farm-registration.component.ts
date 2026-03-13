@@ -321,6 +321,7 @@ export class FarmRegistrationComponent {
     console.log(this.geoLocationService.coordinates);
     console.log(this.weatherService.hasWeatherData());
     console.log(this.geoLocationService.hasLocationData());
+    console.log(this.geoLocationService.coordinates());
     if (this.farmRegistrationForm.valid 
         && this.farmOwnerIdParam 
         && this.farmMaintainerIdParam
