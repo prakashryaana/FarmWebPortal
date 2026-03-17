@@ -120,7 +120,12 @@
     "fertilizer": "Fertilizer",
     "diseaseControl": "Disease Control",
     "productNameLabel": "Product Name",
-    "quantityLabel": "Quantity (liters/kg)"
+    "quantityLabel": "Quantity (liters/kg)",
+    "reSeeding": "Re-Seeding",
+    "growMediaAddition": "Growing Media Addition",
+    "reWatering": "Re-Watering",
+    "fertilizerRefill": "Fertilizer Refill",
+    "drenching": "Drenching"
   },
   "observation": {
     "observationTypeLabel": "Observation Type",
@@ -131,7 +136,13 @@
     "waterAvailability": "Water Availability",
     "nutritionalDeficiency": "Nutritional Deficiency",
     "cropGrowthStatus": "Crop Growth Status",
-    "others": "Others"
+    "others": "Others",
+    "dripLineCheck": "Drip Line Check",
+    "waterTDSPH": "Water TDS/pH",
+    "growingMediaTDSPH": "Growing Media TDS/pH",
+    "rootCheck": "Root Check",
+    "shadeNetCheck": "Shade-Net Check",
+    "stickyTrap": "Sticky Trap"
   },
   "users": {
     "userName": "User Name",

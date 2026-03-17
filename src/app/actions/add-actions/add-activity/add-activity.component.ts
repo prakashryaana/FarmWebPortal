@@ -64,9 +64,14 @@ export class AddActivityComponent implements AfterViewInit {
   activityTypes = [
     { value: 'watering', label: 'activity.watering' },
     //{ value: 'spraying', label: 'Spraying (Insecticide/Pesticide/Fertilizer)' },
-    { value: 'deweeding', label: 'activity.deWeeding' },
-    { value: 'Fertilizer', label: 'activity.fertilizer' },
-    { value: 'DiseaseControl', label: 'activity.diseaseControl' }
+    { value: 'deWeeding', label: 'activity.deWeeding' },
+    { value: 'fertilizer', label: 'activity.fertilizer' },
+    { value: 'spray', label: 'activity.diseaseControl' },
+    { value: 'reSeeding', label: 'activity.reSeeding' },
+    { value: 'growMediaAddition', label: 'activity.growMediaAddition' },
+    { value: 'reWatering', label: 'activity.reWatering' },
+    { value: 'fertilizerRefill', label: 'activity.fertilizerRefill' },
+    { value: 'drenching', label: 'activity.drenching' }
   ];
 
   constructor(private fb: FormBuilder, private addActivityService: AddActivityService) {

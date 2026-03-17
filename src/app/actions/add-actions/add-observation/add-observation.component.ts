@@ -57,6 +57,12 @@ export class AddObservationComponent implements OnDestroy {
     { value: 'WaterAvailability', label: 'observation.waterAvailability' },
     { value: 'NutritionalDeficiency', label: 'observation.nutritionalDeficiency' },
     { value: 'CropGrowthStatus', label: 'observation.cropGrowthStatus' },
+    { value: 'DripLineCheck', label: 'observation.dripLineCheck' },
+    { value: 'WaterTDSPH', label: 'observation.waterTDSPH' },
+    { value: 'GrowingMediaTDSPH', label: 'observation.growingMediaTDSPH' },
+    { value: 'RootCheck', label: 'observation.rootCheck' },
+    { value: 'ShadeNetCheck', label: 'observation.shadeNetCheck' },
+    { value: 'StickyTrap', label: 'observation.stickyTrap' },
     { value: 'Others', label: 'observation.others' }
   ] as const;
 
