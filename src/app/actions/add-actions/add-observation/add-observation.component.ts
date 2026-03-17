@@ -64,7 +64,7 @@ export class AddObservationComponent implements OnDestroy {
     { value: 'ShadeNetCheck', label: 'observation.shadeNetCheck' },
     { value: 'StickyTrap', label: 'observation.stickyTrap' },
     { value: 'Others', label: 'observation.others' }
-  ] as const;
+  ];
 
   observationForm!: FormGroup<any>;
   readonly recorder = signal<any>(null);
@@ -134,6 +134,10 @@ export class AddObservationComponent implements OnDestroy {
     this.wasLoading.set(this.serviceLoading());
   });
 }
+
+  ngOnInit() {
+    this.observationTypes.sort((a, b) => a.label.localeCompare(b.label));
+  }
 
   async startRecording(): Promise<void> {
     if (this.isRecording()) return;  // ADD GUARD

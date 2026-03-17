@@ -59,14 +59,14 @@ export class AddActivityComponent implements AfterViewInit {
   scanInProgress = false;
   showAdditionalFields = false;
 
-  productMappings = ['DiseaseControl', 'Fertilizer'];
+  productMappings = ['fertilizer', 'spray'];
 
   activityTypes = [
     { value: 'watering', label: 'activity.watering' },
     //{ value: 'spraying', label: 'Spraying (Insecticide/Pesticide/Fertilizer)' },
     { value: 'deWeeding', label: 'activity.deWeeding' },
     { value: 'fertilizer', label: 'activity.fertilizer' },
-    { value: 'spray', label: 'activity.diseaseControl' },
+    { value: 'spray', label: 'activity.spray' },
     { value: 'reSeeding', label: 'activity.reSeeding' },
     { value: 'growMediaAddition', label: 'activity.growMediaAddition' },
     { value: 'reWatering', label: 'activity.reWatering' },
@@ -91,6 +91,10 @@ export class AddActivityComponent implements AfterViewInit {
       else
         this.showAdditionalFields = false;
     });
+  }
+
+  ngOnInit() {
+    this.activityTypes.sort((a, b) => a.label.localeCompare(b.label));
   }
 
   ngAfterViewInit() {
@@ -179,9 +183,9 @@ export class AddActivityComponent implements AfterViewInit {
         }
       });
 
-      //this.activityForm.reset({ dateTime: new Date() });
-      this.qrResult = null;
-      if (this.scanMode) this.stopScanner();
+      this.activityForm.reset();
+      // this.qrResult = null;
+      // if (this.scanMode) this.stopScanner();
     }
   }
 
