@@ -83,11 +83,11 @@
     <div class="camera-controls">
       <button mat-raised-button (click)="openCamera()" class="camera-btn">
         <mat-icon>photo_camera</mat-icon>
-        <span class="btn-text">Open Camera</span>
+        <span class="btn-text">{{ 'common.useCamera' | translate }}</span>
       </button>
       <button mat-stroked-button (click)="pickFromGallery()" class="gallery-btn">
         <mat-icon>image</mat-icon>
-        <span class="btn-text">Gallery</span>
+        <span class="btn-text">{{ 'common.selectFromGallery' | translate }}</span>
       </button>
     </div>
   }
