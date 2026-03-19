@@ -20,4 +20,5 @@ export interface Activity {
   message?: string;
   activityId: string;
   cropId: string;
+  photo?: string;
 }

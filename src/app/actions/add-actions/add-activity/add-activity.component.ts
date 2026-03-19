@@ -19,6 +19,11 @@ import { takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatIconModule } from '@angular/material/icon';
+import { CameraControlComponent, CameraControlOutput } from '../../../camera-control/camera-control.component';
+import { UploadService } from '../../../file-upload/upload.service';
+import { lastValueFrom } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+import { HttpEvent, HttpEventType } from '@angular/common/http';
 
 @Component({
   selector: 'app-add-activity',
@@ -27,13 +32,14 @@ import { MatIconModule } from '@angular/material/icon';
     CommonModule, ReactiveFormsModule,
     MatCardModule, MatButtonModule, MatFormFieldModule, MatInputModule,
     MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatRadioModule, 
-    TranslateModule, MatIconModule
+    TranslateModule, MatIconModule, CameraControlComponent
   ],
   templateUrl: './add-activity.component.html',
   styleUrl: './add-activity.component.css'
 })
 export class AddActivityComponent implements AfterViewInit {
   @ViewChild('scannerContainer', { static: false }) scannerContainer!: ElementRef;
+  @ViewChild(CameraControlComponent, { static: false }) cameraControl!: CameraControlComponent;
 
   private snackBar = inject(MatSnackBar);
   //#region gets the global selected crop farm
@@ -58,6 +64,8 @@ export class AddActivityComponent implements AfterViewInit {
   qrResult: string | null = null;
   scanInProgress = false;
   showAdditionalFields = false;
+  photoFileName: string = '';
+  photoFile: File | null = null;
 
   productMappings = ['fertilizer', 'spray'];
 
@@ -74,7 +82,7 @@ export class AddActivityComponent implements AfterViewInit {
     { value: 'drenching', label: 'activity.drenching' }
   ];
 
-  constructor(private fb: FormBuilder, private addActivityService: AddActivityService) {
+  constructor(private fb: FormBuilder, private addActivityService: AddActivityService, private uploadService: UploadService) {
     this.activityForm = this.fb.group({
       type: ['watering', Validators.required],
       message: ['', Validators.required],
@@ -99,6 +107,17 @@ export class AddActivityComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     // Initialize scanner only when needed
+  }
+
+  onPhotoCapture(output: CameraControlOutput) {
+    if (output.success && output.fileBlob) {
+      this.photoFile = new File([output.fileBlob], `capture-${Date.now()}.jpg`, { type: 'image/jpeg' });;
+      this.photoFileName = output.filename;
+      console.log('Photo captured:', this.photoFileName);
+      this.snackBar.open('Photo ready to submit', 'Close', { duration: 3000 });
+    } else {
+      this.snackBar.open('Failed to capture photo', 'Close', { duration: 5000 });
+    }
   }
 
   startScanner() {
@@ -158,16 +177,22 @@ export class AddActivityComponent implements AfterViewInit {
     }
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.activityForm.valid && this.selectedCropId && this.selectedCropId !== environment.tempCropId) {
-      
-      console.log('Activity Form Data:', this.activityForm.value);
+      //add logic to handle photo upload if photoFile is not null
+      let photoPath = '';
+      if (this.photoFile) {
+        photoPath = await this.uploadFile(this.photoFile);
+      }
+
+      //console.log('Activity Form Data:', this.activityForm.value);
 
       let activity: Activity = {
         activityType: this.activityForm.value.type,
         message: this.activityForm.value.message,
         activityId: Date.now().toString(),
-        cropId: this.selectedCropId
+        cropId: this.selectedCropId,
+        photo: photoPath
       };
 
       console.log('Activity Object:', activity);
@@ -176,16 +201,31 @@ export class AddActivityComponent implements AfterViewInit {
         next: (response) => {
           console.log('Activity successfully saved:', response);
           this.snackBar.open('Activity successfully saved!', 'Close', { duration: 5000 });
+          // Reset form and camera after successful submission
+          this.reset();
         },
         error: (error) => {
           console.error('Error saving activity:', error);
           this.snackBar.open('Error saving activity. Please try again.', 'Close', { duration: 5000 });
         }
       });
-
-      this.activityForm.reset();
       // this.qrResult = null;
       // if (this.scanMode) this.stopScanner();
+    }
+  }
+
+  async uploadFile(file: File): Promise<string> {
+    try {
+      const body = await lastValueFrom(
+        this.uploadService.upload(file).pipe(
+          filter((e: HttpEvent<any>) => e.type === HttpEventType.Response),
+          map((e: any) => e.body)
+        )
+      );
+      return body?.fullPath || '';
+    } catch (err) {
+      console.error('Upload failed', err);
+      throw err;
     }
   }
 
@@ -195,7 +235,12 @@ export class AddActivityComponent implements AfterViewInit {
 
   reset() {
     this.activityForm.reset();
+    this.photoFile = null;
+    this.photoFileName = '';
     this.qrResult = null;
     if (this.scanMode) this.stopScanner();
+    if (this.cameraControl) {
+      this.cameraControl.reset();
+    }
   }
 }

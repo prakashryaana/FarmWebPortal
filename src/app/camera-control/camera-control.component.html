@@ -1,0 +1,102 @@
+<div class="camera-control-container">
+  <!-- Loading Spinner -->
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  }
+
+  <!-- Photo Preview State -->
+  @if (capturedPhoto) {
+    <div class="photo-preview-container">
+      <img [src]="capturedPhoto" alt="Captured photo" class="photo-preview">
+      <div class="photo-info">
+        <span class="photo-name">{{ photoFileName }}</span>
+        <button mat-icon-button (click)="retakePhoto()" class="retake-btn" title="Retake photo">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+
+      <!-- Upload/Submit Controls -->
+      <!-- <div class="photo-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="uploadPhoto()" 
+          [disabled]="uploading"
+          class="btn-upload">
+          <ng-container>
+            @if (uploading) {
+              <mat-icon>hourglass_empty</mat-icon>
+              <span>{{ allowUpload ? 'Uploading...' : 'Processing...' }}</span>
+            } @else {
+              <mat-icon>{{ allowUpload ? 'cloud_upload' : 'check' }}</mat-icon>
+              <span>{{ allowUpload ? 'Upload' : 'Confirm' }}</span>
+            }
+          </ng-container>
+        </button>
+        <button mat-stroked-button (click)="retakePhoto()" class="btn-retake">
+          <mat-icon>refresh</mat-icon>
+          <span>Retake</span>
+        </button>
+      </div> -->
+    </div>
+  } @else if (cameraMode) {
+    <!-- Live Camera Stream State -->
+    <div class="camera-stream-container">
+      <video 
+        #videoElement 
+        class="video-stream" 
+        autoplay 
+        playsinline
+        webkit-playsinline
+        muted
+        disablepictureinpicture>
+      </video>
+      <canvas #canvasElement style="display: none;"></canvas>
+
+      <!-- Camera Controls Overlay -->
+      <div class="camera-controls-overlay">
+        <button mat-fab (click)="capturePhoto()" class="capture-btn" [matTooltip]="'Capture Photo'">
+          <mat-icon>camera</mat-icon>
+        </button>
+        @if (hasManyCamera) {
+          <button 
+            mat-icon-button 
+            (click)="switchCamera()" 
+            class="switch-camera-btn" 
+            [matTooltip]="'Switch Camera'">
+            <mat-icon>flip_camera_android</mat-icon>
+          </button>
+        }
+        <button 
+          mat-icon-button 
+          (click)="stopCamera()" 
+          class="close-camera-btn" 
+          [matTooltip]="'Close Camera'">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+  } @else {
+    <!-- Initial Controls State -->
+    <div class="camera-controls">
+      <button mat-raised-button (click)="openCamera()" class="camera-btn">
+        <mat-icon>photo_camera</mat-icon>
+        <span class="btn-text">Open Camera</span>
+      </button>
+      <button mat-stroked-button (click)="pickFromGallery()" class="gallery-btn">
+        <mat-icon>image</mat-icon>
+        <span class="btn-text">Gallery</span>
+      </button>
+    </div>
+  }
+
+  <!-- Hidden Gallery Input -->
+  <input 
+    #galleryInput 
+    type="file" 
+    accept="image/*" 
+    (change)="onPhotoCapture($event)" 
+    style="display: none;">
+</div>

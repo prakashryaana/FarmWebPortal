@@ -45,6 +45,11 @@
         </mat-form-field>
       </div>
 
+      <app-camera-control 
+        [allowUpload]="false"
+        (photoCapture)="onPhotoCapture($event)">
+      </app-camera-control>
+
       <!-- QR Scanner Section -->
       @if (qrResult) {
         <!-- <div class="form-section"> -->
