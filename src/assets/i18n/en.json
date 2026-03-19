@@ -138,11 +138,11 @@
     "cropGrowthStatus": "Crop Growth Status",
     "others": "Others",
     "dripLineCheck": "Drip Line Check",
-    "waterTDSPH": "Water TDS/pH",
-    "growingMediaTDSPH": "Growing Media TDS/pH",
-    "rootCheck": "Root Check",
+    "waterTDSPHCheck": "Water TDS/pH Check",
+    "growingMediaTDSPHCheck": "Growing Media TDS/pH Check",
+    "rootsCheck": "Roots Check",
     "shadeNetCheck": "Shade-Net Check",
-    "stickyTrap": "Sticky Trap"
+    "stickyTrapCheck": "Sticky Trap Check"
   },
   "users": {
     "userName": "User Name",

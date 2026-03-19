@@ -115,7 +115,7 @@
     "activityTypeLabel": "ಚಟುವಟಿಕೆಯ ಪ್ರಕಾರ",
     "addActivity": "ಚಟುವಟಿಕೆ ಸೇರಿಸಿ",
     "viewActivities": "ಚಟುವಟಿಕೆಗಳು",
-    "watering": "ನೀರುಹಾಕುವುದು",
+    "watering": "ನೀರು ಹಾಕುವುದು",
     "deWeeding": "ಕಳೆ ತೆಗೆಯುವುದು", 
     "fertilizer": "ರಸಗೊಬ್ಬರ ಸಿಂಪಡಿಸುವುದು",
     "spray": "ಸಿಂಪಡಿಸಿ",
@@ -137,12 +137,12 @@
     "nutritionalDeficiency": "ಪೌಷ್ಟಿಕಾಂಶದ ಕೊರತೆ",
     "cropGrowthStatus": "ಬೆಳೆ ಬೆಳವಣಿಗೆಯ ಸ್ಥಿತಿ",
     "others": "ಇತರ ಕಾರಣಗಳು",
-    "dripLineCheck": "ಡ್ರಿಪ್ ಲೈನ್ ಚೆಕ್",
-    "waterTDSPH": "ನೀರಿನ ಟಿಡಿಎಸ್/ಪಿಹೆಚ್",
-    "growingMediaTDSPH": "ಬೆಳೆಯುತ್ತಿರುವ ಮಾಧ್ಯಮದ ಟಿಡಿಎಸ್/ಪಿಹೆಚ್",
-    "rootCheck": "ಬೇರು ಚೆಕ್",
-    "shadeNetCheck": "ಶೇಡ್-ನೆಟ್ ಚೆಕ್",
-    "stickyTrap": "ಜಿಗುಟಾದ ಬಲೆ"
+    "dripLineCheck": "ಡ್ರಿಪ್ ಲೈನ್ ಪರಿಶೀಲನೆ",
+    "waterTDSPHCheck": "ನೀರಿನ ಟಿಡಿಎಸ್/ಪಿಹೆಚ್ ಪರಿಶೀಲನೆ",
+    "growingMediaTDSPHCheck": "ಬೆಳೆಯುತ್ತಿರುವ ಮಾಧ್ಯಮದ ಟಿಡಿಎಸ್/ಪಿಹೆಚ್ ಪರಿಶೀಲನೆ",
+    "rootsCheck": "ಬೇರುಗಳ ಪರಿಶೀಲನೆ",
+    "shadeNetCheck": "ಶೇಡ್-ನೆಟ್ ಪರಿಶೀಲನೆ",
+    "stickyTrapCheck": "ಜಿಗುಟಾದ ಬಲೆ ಪರಿಶೀಲನೆ"
   },
   "users": {
     "userName": "ಬಳಕೆದಾರ ಹೆಸರು",

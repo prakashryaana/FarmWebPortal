@@ -58,11 +58,11 @@ export class AddObservationComponent implements OnDestroy {
     { value: 'NutritionalDeficiency', label: 'observation.nutritionalDeficiency' },
     { value: 'CropGrowthStatus', label: 'observation.cropGrowthStatus' },
     { value: 'DripLineCheck', label: 'observation.dripLineCheck' },
-    { value: 'WaterTDSPH', label: 'observation.waterTDSPH' },
-    { value: 'GrowingMediaTDSPH', label: 'observation.growingMediaTDSPH' },
-    { value: 'RootCheck', label: 'observation.rootCheck' },
+    { value: 'WaterTDSPHCheck', label: 'observation.waterTDSPHCheck' },
+    { value: 'GrowingMediaTDSPHCheck', label: 'observation.growingMediaTDSPHCheck' },
+    { value: 'RootsCheck', label: 'observation.rootsCheck' },
     { value: 'ShadeNetCheck', label: 'observation.shadeNetCheck' },
-    { value: 'StickyTrap', label: 'observation.stickyTrap' },
+    { value: 'StickyTrapCheck', label: 'observation.stickyTrapCheck' },
     { value: 'Others', label: 'observation.others' }
   ];
 
@@ -112,7 +112,7 @@ export class AddObservationComponent implements OnDestroy {
   constructor() {
   // Initialize IMMEDIATELY (no queueMicrotask)
   this.observationForm = this.fb.group({
-    observationType: ['DiseaseInsectAttack', Validators.required],
+    observationType: ['Disease', Validators.required],
     message: ['']
   });
 
