@@ -122,10 +122,11 @@
     "productNameLabel": "ವಸ್ತುವಿನ ಹೆಸರು",
     "quantityLabel": "ಪ್ರಮಾಣ (ಲೀಟರ್/ಕೆಜಿ)",
     "reSeeding": "ಮರು-ಬಿತ್ತನೆ",
-    "growMediaAddition": "ಬೆಳೆಯುತ್ತಿರುವ ಮಾಧ್ಯಮ ಸೇರ್ಪಡೆ",
+    "growingMediaAddition": "ಬೆಳೆಯುತ್ತಿರುವ ಮಾಧ್ಯಮ ಸೇರ್ಪಡೆ",
     "reWatering": "ಮರು ನೀರುಹಾಕುವುದು",
     "fertilizerRefill": "ರಸಗೊಬ್ಬರ ಮರುಪೂರಣ",
-    "drenching": "ಡ್ರೆಂಚಿಂಗ್"
+    "drenching": "ಡ್ರೆಂಚಿಂಗ್",
+    "photoCapture": "ಫೋಟೋ ಸೆರೆಹಿಡಿಯಿರಿ"
   },
   "observation": {
     "observationTypeLabel": "ವೀಕ್ಷಣೆಯ ಪ್ರಕಾರ",

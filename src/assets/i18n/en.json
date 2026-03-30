@@ -122,10 +122,11 @@
     "productNameLabel": "Product Name",
     "quantityLabel": "Quantity (liters/kg)",
     "reSeeding": "Re-Seeding",
-    "growMediaAddition": "Growing Media Addition",
+    "growingMediaAddition": "Growing Media Addition",
     "reWatering": "Re-Watering",
     "fertilizerRefill": "Fertilizer Refill",
-    "drenching": "Drenching"
+    "drenching": "Drenching",
+    "photoCapture": "Photo Capture"
   },
   "observation": {
     "observationTypeLabel": "Observation Type",

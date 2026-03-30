@@ -73,13 +73,14 @@ export class AddActivityComponent implements AfterViewInit {
     { value: 'watering', label: 'activity.watering' },
     //{ value: 'spraying', label: 'Spraying (Insecticide/Pesticide/Fertilizer)' },
     { value: 'deWeeding', label: 'activity.deWeeding' },
-    { value: 'fertilizer', label: 'activity.fertilizer' },
+    //{ value: 'fertilizer', label: 'activity.fertilizer' },
     { value: 'spray', label: 'activity.spray' },
     { value: 'reSeeding', label: 'activity.reSeeding' },
-    { value: 'growMediaAddition', label: 'activity.growMediaAddition' },
+    { value: 'growingMediaAddition', label: 'activity.growingMediaAddition' },
     { value: 'reWatering', label: 'activity.reWatering' },
     { value: 'fertilizerRefill', label: 'activity.fertilizerRefill' },
-    { value: 'drenching', label: 'activity.drenching' }
+    { value: 'drenching', label: 'activity.drenching' },
+    { value: 'photoCapture', label: 'activity.photoCapture' }
   ];
 
   constructor(private fb: FormBuilder, private addActivityService: AddActivityService, private uploadService: UploadService) {
@@ -150,8 +151,8 @@ export class AddActivityComponent implements AfterViewInit {
         console.log('Scanned Data:', scannedData);
         this.populateFormFromScan(scannedData);
       } catch {
-        console.log('In the catch block: decoded Text:', decodedText.slice(0, 50));
-        this.activityForm.patchValue({ message: `Scanned: ${decodedText.slice(0, 50)}...` });
+        console.log('In the catch block: decoded Text:', decodedText);
+        this.activityForm.patchValue({ message: `Scanned: ${decodedText}` });
       }
       setTimeout(() => this.scanInProgress = false, 2000);
       this.stopScanner()
@@ -166,7 +167,7 @@ export class AddActivityComponent implements AfterViewInit {
     const { productName, type } = scannedData;
     if (productName) this.activityForm.patchValue({ productName });
     if (type) this.activityForm.patchValue({ type });
-    this.activityForm.patchValue({ message: `Scanned: ${productName || 'Product'}` });
+    this.activityForm.patchValue({ message: `Scanned: Product - ${productName}, type - ${type}` });
   }
 
   toggleScanMode() {
