@@ -298,8 +298,8 @@
   }
 
   .camera-stream-container {
-    aspect-ratio: 16 / 9;
-    max-height: 60vh;
+    /* aspect-ratio: 3 / 4; */
+    /* min-height: 60vh; */
   }
 
   .video-stream {
