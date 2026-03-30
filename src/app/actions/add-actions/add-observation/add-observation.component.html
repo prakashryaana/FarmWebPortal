@@ -32,70 +32,10 @@
             <mat-icon class="tab-icon">photo_camera</mat-icon>
             <span class="tab-label">{{'common.photoUpload' | translate}}</span>
           </ng-template>
-
-          <div class="tab-content photo-section">
-            <h4 class="tab-section-title">{{'common.photoUpload' | translate}}</h4>
-            <p class="tab-hint">{{'common.photoUploadConstraints' | translate}}</p>
-            
-            <!-- Gallery Button -->
-            <div class="button-group">
-              <button mat-raised-button type="button" (click)="openGallery()" 
-                      [disabled]="imageFile() || isUploading()"
-                      class="btn-action">
-                <mat-icon>photo_gallery</mat-icon>
-                <span class="btn-text">{{ 'common.selectFromGallery' | translate }}</span>
-              </button>
-            </div>
-            
-            <!-- Live Camera Section -->
-            @if (!imageFile()) {
-              <div class="camera-section">
-                <div class="camera-preview">
-                  <video #videoElement autoplay playsinline muted 
-                        [hidden]="!showCameraPreview()"
-                        class="video-element"></video>
-                  
-                  @if (showCameraPreview()) {
-                    <div class="camera-controls">
-                      <button mat-raised-button color="primary" (click)="capturePhoto()" 
-                              [disabled]="!videoStream()"
-                              class="btn-capture">
-                        <mat-icon>add_a_photo</mat-icon>
-                        <span class="btn-text">{{ 'common.capturePhoto' | translate }}</span>
-                      </button>
-                      <button mat-stroked-button color="warn" (click)="stopCamera()" class="btn-cancel">
-                        <mat-icon>close</mat-icon>
-                        <span class="btn-text">{{ 'common.cancel' | translate }}</span>
-                      </button>
-                    </div>
-                  } @else {
-                    <button mat-stroked-button type="button" (click)="startCamera()" class="btn-camera">
-                      <mat-icon>photo_camera</mat-icon>
-                      <span class="btn-text">{{ 'common.useCamera' | translate }}</span>
-                    </button>
-                  }
-                </div>
-              </div>
-            }
-            
-            <!-- Retake Button -->
-            @if (imageFile()) {
-              <button mat-outlined-button type="button" color="warn" (click)="clearPhoto()" class="btn-retake">
-                <mat-icon>close</mat-icon> {{ 'common.reTake' | translate }}
-              </button>
-            }
-            
-            <!-- Hidden file input -->
-            <input type="file" #galleryInput accept="image/jpeg,image/png" 
-                  (change)="handleImage($event)" class="file-input" hidden>
-            
-            <!-- Image Preview -->
-            @if (imagePreview()) {
-              <div class="preview">
-                <img [src]="imagePreview()!" alt="Photo preview" class="preview-img">
-              </div>
-            }
-          </div>
+          <app-camera-control 
+            [allowUpload]="false"
+            (photoCapture)="onPhotoCapture($event)">
+          </app-camera-control>
         </mat-tab>
 
         <!-- Message Tab -->
@@ -180,16 +120,20 @@
 
       <!-- Submit Section -->
       <div class="form-actions">
-        <button mat-raised-button color="primary" type="submit" (click)="submitPressed = true; $event.stopPropagation()" [disabled]="!canSubmit()" class="btn-submit">
+        <!-- <button mat-raised-button color="primary" type="submit" (click)="submitPressed = true; $event.stopPropagation()" [disabled]="!canSubmit()" class="btn-submit">
           @if (serviceLoading()) {
             <mat-spinner diameter="20" class="spinner"></mat-spinner>
             <span>{{ 'common.saving' | translate }}</span>
           } @else {
-            <!-- <mat-icon>add_circle</mat-icon> -->
             <span>{{ 'common.add' | translate }}</span>
           }
+        </button> -->
+        <button mat-raised-button color="primary" (click)="submitPressed=true; $event.stopPropagation()"
+         type="submit" [disabled]="!observationForm.valid" class="btn-submit">
+          <!-- <mat-icon>add_circle</mat-icon> -->
+          {{ 'common.add' | translate }}
         </button>
-        <button mat-button type="button" (click)="observationForm.reset()" class="btn-reset">
+        <button mat-button type="button" (click)="reset()" class="btn-reset">
           <mat-icon>refresh</mat-icon>
           {{ 'common.reset' | translate }}
         </button>

@@ -24,6 +24,7 @@ import { ElementRef } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatTabsModule } from '@angular/material/tabs';
+import { CameraControlComponent, CameraControlOutput } from '../../../camera-control/camera-control.component';
 
 export interface UploadResult {
   photoPath: string | null;
@@ -33,22 +34,26 @@ export interface UploadResult {
 @Component({
   selector: 'app-add-observation',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  //changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule, ReactiveFormsModule, MatProgressSpinnerModule,
     MatCardModule, MatFormFieldModule, MatSelectModule,
     MatInputModule, MatButtonModule, MatDatepickerModule,
-    MatNativeDateModule, MatIconModule, TranslateModule, MatTabsModule
+    MatNativeDateModule, MatIconModule, TranslateModule, MatTabsModule,
+    CameraControlComponent
   ],
   templateUrl: './add-observation.component.html',
   styleUrls: ['./add-observation.component.css']
 })
 export class AddObservationComponent implements OnDestroy {
+  @ViewChild(CameraControlComponent, { static: false }) cameraControl!: CameraControlComponent;
   private readonly observationService = inject(ObservationService);
   private readonly fb = inject(FormBuilder);
   private readonly snackBar = inject(MatSnackBar);
   private uploadService = inject(UploadService);
   submitPressed: boolean = false;
+  photoFileName: string = '';
+  photoFile: File | null = null;
 
   
   readonly observationTypes = [
@@ -71,8 +76,6 @@ export class AddObservationComponent implements OnDestroy {
   readonly audioChunks = signal<Blob[]>([]);
   readonly audioUrl = signal<string | null>(null);
   readonly mediaStream = signal<MediaStream | null>(null);
-  readonly imagePreview = signal<string | null>(null);
-  readonly imageFile = signal<File | null>(null);
   
   readonly isRecording = signal(false);
   readonly recordingTime = signal(0);
@@ -85,11 +88,8 @@ export class AddObservationComponent implements OnDestroy {
   readonly wasLoading = signal(false);
 
   readonly canSubmit = computed(() => {
-  return this.observationForm.valid && 
-         !this.isRecording() && 
-         !this.serviceLoading() &&
-         (!this.imageFile() || this.imageFile()!.size <= 1024 * 1024);
-});
+    return this.observationForm.valid;
+  });
 
   readonly progressPercent = computed(() => 
     Math.min((this.recordingTime() / this.maxRecordingTime) * 100, 100)
@@ -104,15 +104,10 @@ export class AddObservationComponent implements OnDestroy {
 
   readonly isUploading = computed(() => this.serviceLoading() || this.recordingTime() > 0);
 
-  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
-
-  readonly showCameraPreview = signal(false);
-  readonly videoStream = signal<MediaStream | null>(null);
-
   constructor() {
   // Initialize IMMEDIATELY (no queueMicrotask)
   this.observationForm = this.fb.group({
-    observationType: ['Disease', Validators.required],
+    observationType: ['', Validators.required],
     message: ['']
   });
 
@@ -128,7 +123,7 @@ export class AddObservationComponent implements OnDestroy {
   effect(() => {
     if (!this.serviceLoading() && this.wasLoading()) {
       this.snackBar.open('Observation saved successfully!', 'Close', { duration: 3000 });
-      this.resetForm();
+      this.reset();
       this.wasLoading.set(false);
     }
     this.wasLoading.set(this.serviceLoading());
@@ -205,107 +200,6 @@ export class AddObservationComponent implements OnDestroy {
     }
   }
 
-
-  async startCamera(): Promise<void> {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { width: 640, height: 480, facingMode: 'user' } 
-      });
-      this.videoStream.set(stream);
-      this.videoElement.nativeElement.srcObject = stream;
-      this.showCameraPreview.set(true);
-    } catch (err) {
-      this.snackBar.open('❌ Camera access denied', 'Close');
-      console.error('Camera error:', err);
-    }
-  }
-
-  stopCamera(): void {
-    const stream = this.videoStream();
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      this.videoStream.set(null);
-    }
-    this.showCameraPreview.set(false);
-  }
-
-  async capturePhoto(): Promise<void> {
-    const video = this.videoElement.nativeElement;
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext('2d')!;
-    ctx.drawImage(video, 0, 0);
-    this.submitPressed = false;
-    // ✅ Convert to JPEG (compress to <1MB)
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const file = new File([blob], `capture-${Date.now()}.jpg`, { type: 'image/jpeg' });
-        
-        // ✅ Your existing validation
-        if (file.size > 1024 * 1024) {
-          this.snackBar.open('❌ Photo too large (compressing...)', 'Close');
-          return;
-        }
-        
-        this.imageFile.set(file);
-        const reader = new FileReader();
-        reader.onload = () => this.imagePreview.set(reader.result as string);
-        reader.readAsDataURL(file);
-        
-        this.stopCamera();
-      }
-    }, 'image/jpeg', 0.8); // 80% quality
-  }
-
-  openGallery(): void {
-    // ✅ Programmatically trigger file input
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-    if (input) input.click();
-  }
-
-  handleImage(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    
-    if (!file) return;
-
-    if (!['image/jpeg', 'image/png'].includes(file.type)) {
-      this.snackBar.open('Only JPEG/PNG allowed', 'Close', { duration: 3000 });
-      return;
-    }
-
-    if (file.size > 1024 * 1024) {
-      this.snackBar.open('Photo must be under 1MB', 'Close', { duration: 3000 });
-      return;
-    }
-
-    this.imageFile.set(file);
-    
-    const reader = new FileReader();
-    reader.onload = () => this.imagePreview.set(reader.result as string);
-    reader.readAsDataURL(file);
-
-    //Clear BOTH inputs for re-selection
-    // this.fileInput.nativeElement.value = '';
-    // this.cameraInput.nativeElement.value = '';
-  }
-
-  clearPhoto(): void {
-    //Clear signals
-    this.imageFile.set(null);
-    this.imagePreview.set(null);
-    
-    //Cleanup URL if exists
-    if (this.imagePreview()) {
-      URL.revokeObjectURL(this.imagePreview()!);
-    }
-    
-    //Show snackbar feedback
-    this.snackBar.open('🗑️ Photo cleared', 'Close', { duration: 2000 });
-  }
-
   async onSubmit(event:any): Promise<void> {
     if (!this.submitPressed) {
       return;
@@ -319,10 +213,9 @@ export class AddObservationComponent implements OnDestroy {
     let photoPath = '';
     let voiceNotePath = '';
 
-    const imageFile = this.imageFile();
     try {
-      if (imageFile) {
-        photoPath = await this.uploadFile(imageFile);
+      if (this.photoFile) {
+        photoPath = await this.uploadFile(this.photoFile);
       }
 
       const audioUrl = this.audioUrl();
@@ -343,6 +236,7 @@ export class AddObservationComponent implements OnDestroy {
 
       // Create observation after uploads complete
       this.observationService.createObservation(request);
+      this.reset();
 
     } catch (err: any) {
       console.error('Submission failed', err);
@@ -365,20 +259,24 @@ export class AddObservationComponent implements OnDestroy {
     }
   }
 
-  resetForm(): void {
+  reset(): void {
     // SAFE: Check if form exists before reset
-    const form = this.observationForm;
-    if (form) {
-      form.reset({
-        observationType: 'DiseaseInsectAttack'
-      });
-    }
-    
-    this.imagePreview.set(null);
-    this.imageFile.set(null);
+    // const form = this.observationForm;
+    // if (form) {
+    //   form.reset({
+    //     observationType: 'DiseaseInsectAttack'
+    //   });
+    // }
+    this.observationForm.reset();
     this.audioUrl.set(null);
     this.recordingTime.set(0);
+    this.photoFile = null;
+    this.photoFileName = '';
     
+    if (this.cameraControl) {
+      this.cameraControl.reset();
+    }
+
     const stream = this.mediaStream();
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
@@ -398,11 +296,21 @@ export class AddObservationComponent implements OnDestroy {
     lastModified: Date.now()
   });
 
+  onPhotoCapture(output: CameraControlOutput) {
+    if (output.success && output.fileBlob) {
+      this.photoFile = new File([output.fileBlob], `capture-${Date.now()}.jpg`, { type: 'image/jpeg' });;
+      this.photoFileName = output.filename;
+      console.log('Photo captured:', this.photoFileName);
+      this.snackBar.open('Photo ready to submit', 'Close', { duration: 3000 });
+    } else {
+      this.snackBar.open('Failed to capture photo', 'Close', { duration: 5000 });
+    }
+  }
+
   ngOnDestroy(): void {
     const interval = this.recordingInterval();
     if (interval) clearInterval(interval);
     
     this.stopRecording();
-    this.stopCamera();
   }
 }
