@@ -42,6 +42,7 @@ export class CameraControlComponent implements OnInit, OnDestroy {
 
   @Input() allowUpload: boolean = true;
   @Output() photoCapture = new EventEmitter<CameraControlOutput>();
+  @Output() photoCancel = new EventEmitter<void>();
 
   // State variables
   cameraMode = false;
@@ -227,13 +228,14 @@ export class CameraControlComponent implements OnInit, OnDestroy {
     this.galleryInput.nativeElement.click();
   }
 
-  onPhotoCapture(event: any) {
+  async onPhotoCapture(event: any) {
     const file = event.target.files?.[0];
     if (file) {
       this.photoFileName = file.name;
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         this.capturedPhoto = e.target?.result as string;
+        await this.uploadPhoto();
       };
       reader.readAsDataURL(file);
     }
@@ -243,6 +245,7 @@ export class CameraControlComponent implements OnInit, OnDestroy {
     this.capturedPhoto = null;
     this.photoFileName = null;
     if (this.galleryInput) this.galleryInput.nativeElement.value = '';
+    this.photoCancel.emit();
   }
 
   async uploadPhoto() {

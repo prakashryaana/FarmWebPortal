@@ -45,9 +45,7 @@
         </mat-form-field>
       </div>
 
-      <app-camera-control 
-        [allowUpload]="false"
-        (photoCapture)="onPhotoCapture($event)">
+      <app-camera-control [allowUpload]="false" (photoCapture)="onPhotoCapture($event)" (photoCancel)="onPhotoCancel()">
       </app-camera-control>
 
       <!-- QR Scanner Section -->
@@ -66,7 +64,7 @@
 
       <!-- Form Actions -->
       <div class="form-actions">
-        <button mat-raised-button color="primary" type="submit" [disabled]="!activityForm.valid" class="btn-submit">
+        <button mat-raised-button color="primary" type="submit" [disabled]="!activityForm.valid" (click)="submitPressed=true; $event.stopPropagation()" class="btn-submit">
           <!-- <mat-icon>add_circle</mat-icon> -->
           {{ 'common.add' | translate }}
         </button>

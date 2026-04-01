@@ -32,9 +32,7 @@
             <mat-icon class="tab-icon">photo_camera</mat-icon>
             <span class="tab-label">{{'common.photoUpload' | translate}}</span>
           </ng-template>
-          <app-camera-control 
-            [allowUpload]="false"
-            (photoCapture)="onPhotoCapture($event)">
+          <app-camera-control [allowUpload]="false" (photoCapture)="onPhotoCapture($event)" (photoCancel)="onPhotoCancel()">
           </app-camera-control>
         </mat-tab>
 

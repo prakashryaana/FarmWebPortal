@@ -66,6 +66,7 @@ export class AddActivityComponent implements AfterViewInit {
   showAdditionalFields = false;
   photoFileName: string = '';
   photoFile: File | null = null;
+  submitPressed: boolean = false;
 
   productMappings = ['fertilizer', 'spray'];
 
@@ -119,6 +120,12 @@ export class AddActivityComponent implements AfterViewInit {
     } else {
       this.snackBar.open('Failed to capture photo', 'Close', { duration: 5000 });
     }
+  }
+
+  onPhotoCancel() {
+    this.photoFile = null;
+    this.photoFileName = '';
+    console.log('Photo capture cancelled');
   }
 
   startScanner() {
@@ -179,6 +186,10 @@ export class AddActivityComponent implements AfterViewInit {
   }
 
   async onSubmit() {
+    if (!this.submitPressed) {
+      return;
+    }
+    this.submitPressed = false;
     if (this.activityForm.valid && this.selectedCropId && this.selectedCropId !== environment.tempCropId) {
       //add logic to handle photo upload if photoFile is not null
       let photoPath = '';

@@ -307,6 +307,12 @@ export class AddObservationComponent implements OnDestroy {
     }
   }
 
+  onPhotoCancel() {
+    this.photoFile = null;
+    this.photoFileName = '';
+    console.log('Photo capture cancelled');
+  }
+
   ngOnDestroy(): void {
     const interval = this.recordingInterval();
     if (interval) clearInterval(interval);
