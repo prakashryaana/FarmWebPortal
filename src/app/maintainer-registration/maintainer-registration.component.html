@@ -4,6 +4,16 @@
       <h1>Farm Maintainer Registration</h1>
       <p class="subtitle">Register as a farm maintainer and manage farm operations</p>
     </div>
+    <div class="relationship-selections">
+      <div class="owner-selection">
+        <label>Select Farm Owner (Required):</label>
+        <app-entity-search 
+          [entityType]="'FarmOwner'"
+          (selectedEntity)="onOwnerSelected($event)"
+          (clearSelectedEntity)="selectedOwner = null">
+        </app-entity-search>
+      </div>
+    </div>
 
     <!-- Personal Information Section -->
     <div class="form-section">
@@ -103,7 +113,8 @@
 
     <!-- Action Buttons -->
     <div class="form-actions">
-      <button mat-raised-button color="primary" type="submit" [disabled]="farmMaintainerRegistrationForm.invalid" class="btn-submit">
+      <button mat-raised-button color="primary" type="submit" [disabled]="farmMaintainerRegistrationForm.invalid"
+        (click)="submitPressed=true; $event.stopPropagation()" class="btn-submit">
         <mat-icon>check_circle</mat-icon>
         Register as Maintainer
       </button>

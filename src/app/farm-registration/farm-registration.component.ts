@@ -24,24 +24,22 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { debounceTime, startWith, switchMap, distinctUntilChanged } from 'rxjs';
 import { AddressService } from './address.service';
 import { District, Hobli, State, SubDistrict, Taluka, Village } from './address.models';
+import { EntitySearchComponent } from '../entity-search/entity-search.component';
+import { SearchResult, FarmOwnerSearchResult, FarmHelpSearchResult } from '../entity-search/entity-search.service';
 
 @Component({
   selector: 'app-farm-registration',
   imports: [ReactiveFormsModule, FileUploadComponent, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatRadioModule, MatButtonModule, MatSlideToggle, LocationComponent, CommonModule, MatCheckboxModule, MatIconModule, MatButtonToggleModule, MatProgressSpinnerModule],
+    MatSelectModule, MatRadioModule, MatButtonModule, MatSlideToggle, LocationComponent, CommonModule, MatCheckboxModule, MatIconModule, MatButtonToggleModule, MatProgressSpinnerModule, EntitySearchComponent],
   templateUrl: './farm-registration.component.html',
   styleUrl: './farm-registration.component.css',
 })
 export class FarmRegistrationComponent {
-  
 
   private snackBar = inject(MatSnackBar);
   private weatherService = inject(WeatherService);
   private geoLocationService = inject(GeolocationService);
   private addressService = inject(AddressService);
-
-  farmOwnerIdParam: string = '';
-  farmMaintainerIdParam: string = '';
 
   days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   coords:Coordinates;
@@ -57,6 +55,23 @@ export class FarmRegistrationComponent {
   hoblis = signal<any[]>([]);
   villages = signal<any[]>([]);
   selectedState = signal<State|null>(null);
+  selectedOwner: FarmOwnerSearchResult | null = null;
+  selectedMaintainer: FarmHelpSearchResult | null = null;
+  submitPressed: boolean = false;
+
+  onOwnerSelected(owner: SearchResult) {
+    // Type guard: ensure it's a FarmOwner or FarmHelp (has contactNumber)
+    console.log('Selected owner from search dialog:', owner);
+    this.selectedOwner = owner as FarmOwnerSearchResult;
+    // Proceed with registration using this owner's data
+  }
+
+  onMaintainerSelected(maintainer: SearchResult) {
+    // Type guard: ensure it's a FarmOwner or FarmHelp (has contactNumber)
+    console.log('Selected maintainer from search dialog:', maintainer);
+    this.selectedMaintainer = maintainer as FarmHelpSearchResult;
+    // Proceed with registration using this maintainer's data
+  }
 
   isKarnataka = computed(() => {
     const selected = this.selectedState();
@@ -157,12 +172,6 @@ export class FarmRegistrationComponent {
   }
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.farmOwnerIdParam = params['farmOwnerId'];
-      this.farmMaintainerIdParam = params['farmMaintainerId'];
-    });
-    console.log('Farm Owner ID:', this.farmOwnerIdParam);
-    console.log('Farm Maintainer ID:', this.farmMaintainerIdParam);
   }
 
   gridPowerForm = new FormGroup({
@@ -322,18 +331,22 @@ export class FarmRegistrationComponent {
     console.log(this.weatherService.hasWeatherData());
     console.log(this.geoLocationService.hasLocationData());
     console.log(this.geoLocationService.coordinates());
+    console.log('selectedOwner: ' + this.selectedOwner);
+    console.log('selectedMaintainer: ' + this.selectedMaintainer);
+    if (!this.submitPressed) {
+      return;
+    }
+    this.submitPressed = false;
     if (this.farmRegistrationForm.valid 
-        && this.farmOwnerIdParam 
-        && this.farmMaintainerIdParam
-        && this.isFileUploaded 
+        && this.selectedOwner
         && this.weatherService.hasWeatherData() 
         && this.geoLocationService.hasLocationData()){
       this.farm = {
         farmId: Date.now().toString(),
         farmName: this.farmRegistrationForm.get('farmName')?.value,
         surveyNumber: this.farmRegistrationForm.get('surveyNumber')?.value,
-        farmOwnerId: this.farmOwnerIdParam,
-        farmMaintainerId: this.farmMaintainerIdParam,
+        farmOwnerId: this.selectedOwner.id,
+        farmMaintainerId: this.selectedMaintainer?.id || '',
         
         address: this.isKarnataka() ? {
           pincode: this.farmRegistrationForm.get('pincode')?.value,

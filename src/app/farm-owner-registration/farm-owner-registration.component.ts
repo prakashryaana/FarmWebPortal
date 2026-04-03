@@ -51,10 +51,6 @@ export class FarmOwnerRegistrationComponent implements OnInit {
   farmOwner: FarmOwner = {} as FarmOwner;
 
   registerFarmOwner() {
-    // this.router.navigate(
-    //         ['/maintainer-registration'],
-    //         { queryParams: { farmOwnerId: 'd' }}
-    //       );
     if (this.farmOwnerRegistrationForm.valid) {
       this.farmOwner = {
         ownerId: Date.now().toString(),
@@ -74,10 +70,10 @@ export class FarmOwnerRegistrationComponent implements OnInit {
         next: (response) => {
           console.log('Farm Owner Registration successful', response);
           this.snackBar.open('Farm Owner Registration successful!', 'Close', { duration: 5000 });
-          this.router.navigate(
-            ['/maintainer-registration'],
-            { queryParams: { farmOwnerId: response.ownerId }}
-          );
+          // this.router.navigate(
+          //   ['/maintainer-registration'],
+          //   { queryParams: { farmOwnerId: response.ownerId }}
+          // );
         },
         error: (error) => {
           console.error('Farm Owner Registration failed', error);

@@ -10,10 +10,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
+import { EntitySearchComponent } from '../entity-search/entity-search.component';
+import { FarmOwnerSearchResult, SearchResult } from '../entity-search/entity-search.service';
 
 @Component({
   selector: 'app-maintainer-registration',
-  imports: [ReactiveFormsModule, FileUploadComponent, MatFormFieldModule, MatIconModule, MatSelectModule, MatInputModule],
+  imports: [ReactiveFormsModule, FileUploadComponent, MatFormFieldModule, MatIconModule, MatSelectModule, MatInputModule, EntitySearchComponent],
   templateUrl: './maintainer-registration.component.html',
   styleUrl: './maintainer-registration.component.css',
 })
@@ -23,14 +25,16 @@ export class MaintainerRegistrationComponent {
   private snackBar = inject(MatSnackBar);
 
   //farmIdParam: string = '';
-  farmOwnerIdParam: string = '';
+  selectedOwner: FarmOwnerSearchResult | null = null;
+
+  onOwnerSelected(owner: SearchResult) {
+    // Type guard: ensure it's a FarmOwner or FarmHelp (has contactNumber)
+    console.log('Selected owner from search dialog:', owner);
+    this.selectedOwner = owner as FarmOwnerSearchResult;
+    // Proceed with registration using this owner's data
+  }
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.farmOwnerIdParam = params['farmOwnerId'];
-    });
-    // this.farmIdParam = this.route.snapshot.paramMap.get('farmId');
-    console.log('farmOwnerId: ', this.farmOwnerIdParam);
   }
 
   farmMaintainerRegistrationForm = new FormGroup({
@@ -47,13 +51,14 @@ export class MaintainerRegistrationComponent {
   isFileUploaded: boolean = false;
   maintainer: Maintainer = {} as Maintainer;
   maintainerId: string = '';
+  submitPressed: boolean = false;
 
   registerFarmMaintainer() {
-    // this.router.navigate(
-    //         ['/farm-registration'],
-    //         { queryParams: { farmOwnerId: this.farmOwnerIdParam, farmMaintainerId: 'dd' }}
-    //       );
-    if (this.farmMaintainerRegistrationForm.valid && this.farmOwnerIdParam && this.isFileUploaded) {
+    if (!this.submitPressed) {
+      return;
+    }
+    this.submitPressed = false;
+    if (this.farmMaintainerRegistrationForm.valid && this.selectedOwner && this.isFileUploaded) {
       this.maintainer = {
         maintainerId: Date.now().toString(),
         maintainerName: this.farmMaintainerRegistrationForm.get('fullName')?.value,
@@ -64,7 +69,7 @@ export class MaintainerRegistrationComponent {
         education: this.farmMaintainerRegistrationForm.get('education')?.value,
         identityProofDocument: this.farmMaintainerRegistrationForm.get('identityProofDocument')?.value,
         identityProofNumber: this.farmMaintainerRegistrationForm.get('identityProofNumber')?.value,
-        farmOwnerId: this.farmOwnerIdParam,
+        farmOwnerId: this.selectedOwner.id,
         //farmsMaintained: [this.farmIdParam]
       };
       console.log(this.farmMaintainerRegistrationForm.value);
@@ -73,10 +78,6 @@ export class MaintainerRegistrationComponent {
         next: (response) => {
           console.log('Maintainer Registration successful', response);
           this.snackBar.open('Maintainer Registration successful!', 'Close', { duration: 5000 });
-          this.router.navigate(
-            ['/farm-registration'],
-            { queryParams: { farmOwnerId: this.farmOwnerIdParam, farmMaintainerId: response.maintainerId }}
-          );
         },
         error: (error) => {
           console.error('Maintainer Registration failed', error);

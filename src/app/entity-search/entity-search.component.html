@@ -1,0 +1,27 @@
+<!-- Display search button or selected data -->
+@if (!isShowingResults) {
+  <button mat-icon-button (click)="openSearchDialog()" class="search-button" title="Search for entity">
+    <mat-icon>search</mat-icon>
+    <span class="search-text">Search</span>
+  </button>
+} @else {
+  <div class="selected-entity-display">
+    <div class="entity-info">
+      @if (selectedEntityData) {
+        <div class="entity-details">
+          <span class="entity-id">ID: {{ selectedEntityData.id }}</span>
+          <span class="entity-name">Name: {{ selectedEntityData.name }}</span>
+          <!-- @if ('contactNumber' in selectedEntityData) {
+            <span class="entity-contact">Contact: {{ selectedEntityData.contactNumber }}</span>
+          }
+          @if ('shadeNetArea' in selectedEntityData) {
+            <span class="entity-area">Shade Net Area: {{ selectedEntityData.shadeNetArea }}</span>
+          } -->
+        </div>
+      }
+    </div>
+    <button mat-icon-button (click)="openSearchAgain()" class="search-again-button" title="Search for another entity">
+      <mat-icon>search</mat-icon>
+    </button>
+  </div>
+}

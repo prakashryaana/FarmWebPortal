@@ -1,0 +1,113 @@
+<div class="entity-search-dialog">
+  <div class="dialog-header">
+    <h2>Entity Search</h2>
+  </div>
+
+  <div class="search-form-container">
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+      <!-- Entity Type Dropdown -->
+      <mat-form-field appearance="outline" class="entity-type-field">
+        <mat-label>Entity Type</mat-label>
+        <mat-select formControlName="entityType" (selectionChange)="onEntityTypeChange($event.value)">
+          <mat-option *ngFor="let option of entityTypeOptions" [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Search Text Input -->
+      <mat-form-field appearance="outline" class="search-text-field">
+        <mat-label>Search by ID or Name</mat-label>
+        <input matInput formControlName="searchText" placeholder="e.g., FARM-001 or John Doe" />
+        <mat-error *ngIf="searchForm.get('searchText')?.hasError('required')">
+          Search term is required
+        </mat-error>
+        <mat-error *ngIf="searchForm.get('searchText')?.hasError('minlength')">
+          Enter at least 2 characters
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Search Button -->
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="searchForm.invalid || isLoading"
+        class="search-button"
+      >
+        <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+        <ng-container *ngIf="!isLoading">
+          <mat-icon>search</mat-icon>
+          <span>Search</span>
+        </ng-container>
+      </button>
+    </form>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Searching...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="!isLoading && errorMessage" class="error-message">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Results Table -->
+  <div *ngIf="!isLoading && tableRows.length > 0" class="results-container">
+    <table mat-table [dataSource]="tableRows" class="results-table">
+      <!-- Select Column -->
+      <ng-container matColumnDef="select">
+        <th class="selectTableColumn" mat-header-cell *matHeaderCellDef>
+          <!-- <span class="select-header">Select</span> -->
+        </th>
+        <td mat-cell class="selectTableColumn" *matCellDef="let element">
+          <input
+            type="radio"
+            [checked]="selectedRowIndex === element.index"
+            (change)="toggleRowSelection(element.index)"
+            class="row-radio"
+          />
+        </td>
+      </ng-container>
+
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let element">{{ element.data.id }}</td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let element">{{ element.data.name }}</td>
+      </ng-container>
+
+      <!-- Table Header and Rows -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="getRowClass(row.index)" class="result-row" (click)="toggleRowSelection(row.index)"></tr>
+    </table>
+  </div>
+
+  <!-- Initial Message -->
+  <div *ngIf="!isLoading && tableRows.length === 0 && !errorMessage" class="no-search-performed">
+    <mat-icon>search</mat-icon>
+    <p>Enter search criteria and click Search to find entities</p>
+  </div>
+
+  <!-- Dialog Actions -->
+  <div class="dialog-actions">
+    <button mat-raised-button color="warn" (click)="onCancel()">Cancel</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="isSubmitDisabled()"
+    >
+      Submit
+    </button>
+  </div>
+</div>
