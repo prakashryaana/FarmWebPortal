@@ -68,7 +68,7 @@ export class AddActivityComponent implements AfterViewInit {
   photoFile: File | null = null;
   submitPressed: boolean = false;
 
-  productMappings = ['fertilizer', 'spray'];
+  productMappings = ['fertilizerRefill', 'spray'];
 
   activityTypes = [
     { value: 'watering', label: 'activity.watering' },
