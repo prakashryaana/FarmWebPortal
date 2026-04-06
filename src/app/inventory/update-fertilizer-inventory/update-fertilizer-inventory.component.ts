@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FertilizerInventoryService, FertilizerInventory } from './fertilizer-inventory.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
@@ -9,6 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CropFarmSelectorService } from '../../crop-farm-selector/crop-farm-selector.service';
 import { effect } from '@angular/core';
+
+interface FertilizerInventoryItem {
+  fertilizerName: string;
+  quantitySupplied: number;
+  quantityMetric: string;
+}
 
 @Component({
   selector: 'app-update-fertilizer-inventory',
@@ -28,19 +34,21 @@ export class UpdateFertilizerInventoryComponent {
   fertilizerNames = [
     'A1','A2','A3','A4','A5','B11','BF','C6','Drip Saff','CA','CHA','CSW','Trichoderma',
     'Pseudomonas','Bio Ferlilizer','VAM','FERT 1','FERT 2','FERT 3','FERT 4','Adjuvent'];
+  
+  quantityMetrics = ['Packets', 'Liters'];
 
   form = new FormGroup({
     inventoryId: new FormControl(''),
-    fertilizerName: new FormControl('', [Validators.required, Validators.maxLength(100)]),
-    quantitySupplied: new FormControl(0.0, [Validators.required]),
     suppliedDate: new FormControl(null),
     invoiceNumber: new FormControl('',[Validators.required]),
-    supplier: new FormControl('',[Validators.required])
+    supplier: new FormControl('',[Validators.required]),
+    fertilizerItems: new FormArray([], [Validators.required, Validators.minLength(1)])
   });
 
   list: FertilizerInventory[] = [];
   isFormExpanded = false;
   editingId: string | null = null;
+  expandedRowId: string | null = null;
 
   constructor() { 
     effect(() => {
@@ -48,10 +56,14 @@ export class UpdateFertilizerInventoryComponent {
     });
   }
 
+  get fertilizerItems(): FormArray {
+    return this.form.get('fertilizerItems') as FormArray;
+  }
+
   load() { 
     if(this.selectedFarmId){
       this.svc.list(this.selectedFarmId).subscribe({ 
-      next: r => this.list = r, 
+      next: r => this.list = r.data, 
       error: e => console.error(e) 
     }); 
     } else {
@@ -61,8 +73,10 @@ export class UpdateFertilizerInventoryComponent {
 
   openCreateForm() {
     this.form.reset();
+    this.form.setControl('fertilizerItems', new FormArray([], [Validators.required, Validators.minLength(1)]));
     this.editingId = null;
     this.isFormExpanded = true;
+    this.addFertilizerItem();
   }
 
   closeForm() {
@@ -71,15 +85,21 @@ export class UpdateFertilizerInventoryComponent {
     this.form.reset();
   }
 
-  selectForEdit(item: FertilizerInventory) {
-    this.form.patchValue({
-      inventoryId: item.inventoryId,
-      fertilizerName: item.fertilizerName,
-      quantitySupplied: item.quantitySupplied,
-      suppliedDate: item.suppliedDate ? new Date(item.suppliedDate) : null
+  addFertilizerItem() {
+    const itemForm = new FormGroup({
+      fertilizerName: new FormControl('', [Validators.required, Validators.maxLength(100)]),
+      quantitySupplied: new FormControl(0.0, [Validators.required]),
+      quantityMetric: new FormControl('Packets', [Validators.required])
     });
-    this.editingId = item.inventoryId || null;
-    this.isFormExpanded = true;
+    this.fertilizerItems.push(itemForm);
+  }
+
+  removeFertilizerItem(index: number) {
+    if (this.fertilizerItems.length > 1) {
+      this.fertilizerItems.removeAt(index);
+    } else {
+      this.snackBar.open('At least one fertilizer item is required', 'Close', { duration: 3000 });
+    }
   }
 
   submit() {
@@ -116,7 +136,7 @@ export class UpdateFertilizerInventoryComponent {
       width: '400px',
       data: {
         title: 'Confirm Deletion',
-        message: `Are you sure you want to delete "${item.fertilizerName}"?`,
+        message: `Are you sure you want to delete this fertilizer inventory entry?`,
         action: 'Delete'
       }
     });
@@ -133,14 +153,17 @@ export class UpdateFertilizerInventoryComponent {
     });
   }
 
+  toggleExpand(item: FertilizerInventory) {
+    this.expandedRowId = this.expandedRowId === item.inventoryId ? null : item.inventoryId || null;
+  }
+
   private buildPayload() {
     return {
-      fertilizerName: this.form.get('fertilizerName')?.value,
       farmId: this.selectedFarmId,
-      quantitySupplied: parseFloat(Number(this.form.get('quantitySupplied')?.value || 0).toFixed(2)),
       suppliedDate: this.form.get('suppliedDate')?.value,
       invoiceNumber: this.form.get('invoiceNumber')?.value,
-      supplier: this.form.get('supplier')?.value
+      supplier: this.form.get('supplier')?.value,
+      fertilizerItems: this.fertilizerItems.value
     };
   }
 }

@@ -3,41 +3,80 @@
 
   <!-- Create Button -->
   <button class="create-btn" (click)="openCreateForm()" *ngIf="!isFormExpanded">
-    <mat-icon>add</mat-icon> Add Fertilizer
+    <mat-icon>add</mat-icon> Add Fertilizer Inventory
   </button>
 
   <!-- Create/Edit Form (Collapsible) -->
   <div class="form-section" *ngIf="isFormExpanded">
-    <h2>{{ editingId ? 'Edit Fertilizer' : 'Add New Fertilizer' }}</h2>
+    <h2>{{ editingId ? 'Edit Fertilizer Inventory' : 'Add New Fertilizer Inventory' }}</h2>
     <form [formGroup]="form">
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Fertilizer Name</label>
-          <select formControlName="fertilizerName">
-            @for (fertilizerName of fertilizerNames; track $index) {
-            <option [value]="fertilizerName">{{fertilizerName}}</option>
-            }
-          </select>
+      <!-- Parent Fields -->
+      <div class="parent-fields-section">
+        <h3>Inventory Details</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Supplied Date</label>
+            <input formControlName="suppliedDate" type="datetime-local" />
+          </div>
+
+          <div class="form-group">
+            <label>Invoice Number <span class="required">*</span></label>
+            <input formControlName="invoiceNumber" type="text" />
+          </div>
+
+          <div class="form-group">
+            <label>Supplier <span class="required">*</span></label>
+            <input formControlName="supplier" type="text" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Child Items Section -->
+      <div class="child-items-section">
+        <div class="section-header">
+          <h3>Fertilizer Items</h3>
+          <button type="button" class="btn btn-add-item" (click)="addFertilizerItem()">
+            <mat-icon>add</mat-icon> Add Item
+          </button>
         </div>
 
-        <div class="form-group">
-          <label>Quantity Supplied (#Packets)</label>
-          <input formControlName="quantitySupplied" type="number" step="1" />
-        </div>
+        <div formArrayName="fertilizerItems">
+          <div *ngFor="let item of fertilizerItems.controls; let i = index" class="item-row" [formGroupName]="i">
+            <div class="item-content">
+              <div class="form-group">
+                <label>Fertilizer Name <span class="required">*</span></label>
+                <select formControlName="fertilizerName">
+                  <option value="">Select fertilizer...</option>
+                  @for (fertilizerName of fertilizerNames; track $index) {
+                  <option [value]="fertilizerName">{{fertilizerName}}</option>
+                  }
+                </select>
+              </div>
 
-        <div class="form-group">
-          <label>Supplied Date</label>
-          <input formControlName="suppliedDate" type="datetime-local" />
-        </div>
+              <div class="form-group">
+                <label>Quantity Supplied <span class="required">*</span></label>
+                <input formControlName="quantitySupplied" type="number" step="0.1" />
+              </div>
 
-        <div class="form-group">
-          <label>Invoice Number</label>
-          <input formControlName="invoiceNumber" type="text"/>
-        </div>
+              <div class="form-group">
+                <label>Quantity Metric <span class="required">*</span></label>
+                <select formControlName="quantityMetric">
+                  @for (metric of quantityMetrics; track $index) {
+                  <option [value]="metric">{{metric}}</option>
+                  }
+                </select>
+              </div>
 
-        <div class="form-group">
-          <label>Supplier</label>
-          <input formControlName="supplier" type="text" />
+              <button type="button" class="btn-remove-item" (click)="removeFertilizerItem(i)" 
+                      [disabled]="fertilizerItems.length === 1" title="Remove item">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="fertilizerItems.length === 0" class="no-items-message">
+            No items added. Click "Add Item" to add fertilizers.
+          </div>
         </div>
       </div>
 
@@ -50,38 +89,79 @@
 
   <!-- Table of existing items -->
   <div class="table-section">
-    <h2>Existing Fertilizers</h2>
-    <table class="data-table" *ngIf="list.length > 0">
-      <thead>
-        <tr>
-          <th>Fertilizer Name</th>
-          <th>Quantity Supplied (#Packets)</th>
-          <th>Supplied Date</th>
-          <th>Quantity Used</th>
-          <th>Used Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of list">
-          <td>{{ item.fertilizerName }}</td>
-          <td>{{ item.quantitySupplied }}</td>
-          <td>{{ item.suppliedDate ? (item.suppliedDate | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
-          <td>{{ item.quantityUsed }}</td>
-          <td>{{ item.usedDate ? (item.usedDate | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
-          <td class="actions-cell">
-            <!-- <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
-              <mat-icon>edit</mat-icon>
-            </button> -->
-            <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <h2>Existing Fertilizer Inventory</h2>
+    <div class="table-wrapper" *ngIf="list.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="expand-col"></th>
+            <th>Invoice Number</th>
+            <th>Supplier</th>
+            <th>Supplied Date</th>
+            <th>Item Count</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let item of list">
+            <tr class="parent-row" [class.expanded]="expandedRowId === item.inventoryId" 
+                (click)="toggleExpand(item)">
+              <td class="expand-col">
+                <button type="button" class="expand-btn" (click)="toggleExpand(item); $event.stopPropagation()" 
+                        title="Toggle details">
+                  <mat-icon>{{ expandedRowId === item.inventoryId ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </button>
+              </td>
+              <td>{{ item.invoiceNumber }}</td>
+              <td>{{ item.supplier }}</td>
+              <td>{{ item.suppliedDate ? (item.suppliedDate | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
+              <td class="item-count">{{ item.fertilizerItems?.length || 0 }}</td>
+              <td class="actions-cell">
+                <button class="btn-icon btn-delete" (click)="delete(item); $event.stopPropagation()" title="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Expanded Details Row -->
+            <tr *ngIf="expandedRowId === item.inventoryId" class="details-row">
+              <td colspan="6">
+                <div class="details-container">
+                  <!-- <h4>Fertilizer Items</h4> -->
+                  <table class="details-table">
+                    <thead>
+                      <tr>
+                        <th>Fertilizer Name</th>
+                        <th>Quantity Supplied</th>
+                        <th>Metric</th>
+                        <th>Quantity Used</th>
+                        <th>Used Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let childItem of item.fertilizerItems; let i = index">
+                        <td>{{ childItem.fertilizerName }}</td>
+                        <td>{{ childItem.quantitySupplied }}</td>
+                        <td>{{ childItem.quantityMetric || '-' }}</td>
+                        <td>{{ childItem.quantityUsed || '-' }}</td>
+                        <td>{{ (childItem.usedDate && !childItem.usedDate.startsWith('0001')) 
+     ? (childItem.usedDate | date: 'dd-MM-yyyy HH:mm') 
+     : '-' }}</td>
+                      </tr>
+                      <tr *ngIf="!item.fertilizerItems || item.fertilizerItems.length === 0" class="no-items-row">
+                        <td colspan="5" class="no-data-cell">No items in this inventory</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
     <div *ngIf="list.length === 0" class="no-data">
-      No fertilizers found. Add one to get started.
+      No fertilizer inventory found. Add one to get started.
     </div>
   </div>
 </div>

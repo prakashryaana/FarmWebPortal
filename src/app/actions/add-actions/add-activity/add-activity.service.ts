@@ -19,6 +19,8 @@ export interface Activity {
   activityType: string; // for spraying
   message?: string;
   activityId: string;
+  productName?: string;
+  quantity?: number;
   cropId: string;
   photo?: string;
 }

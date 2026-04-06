@@ -203,6 +203,8 @@ export class AddActivityComponent implements AfterViewInit {
         activityType: this.activityForm.value.type,
         message: this.activityForm.value.message,
         activityId: Date.now().toString(),
+        productName: this.activityForm.value.productName,
+        quantity: this.activityForm.value.quantity,
         cropId: this.selectedCropId,
         photo: photoPath
       };
