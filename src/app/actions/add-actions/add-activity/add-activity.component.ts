@@ -97,17 +97,23 @@ export class AddActivityComponent implements AfterViewInit {
     .subscribe(type => {
       console.log(type);
       const productNameControl = this.activityForm.get('productName');
+      const quantityControl = this.activityForm.get('quantity');
       
       if(this.productMappings.includes(type)) {
         this.showAdditionalFields = true;
         // Make productName mandatory for spray and fertilizerRefill
         productNameControl?.setValidators([Validators.required, Validators.maxLength(100)]);
+        // Make quantity mandatory for spray and fertilizerRefill
+        quantityControl?.setValidators([Validators.required, Validators.min(0)]);
       } else {
         this.showAdditionalFields = false;
         // Make productName optional for other types
         productNameControl?.setValidators([Validators.maxLength(100)]);
+        // Make quantity optional for other types
+        quantityControl?.setValidators([Validators.min(0)]);
       }
       productNameControl?.updateValueAndValidity();
+      quantityControl?.updateValueAndValidity();
     });
   }
 
@@ -199,13 +205,24 @@ export class AddActivityComponent implements AfterViewInit {
     }
     this.submitPressed = false;
 
-    // Validate that productName is provided for spray and fertilizerRefill activities
+    // Validate that productName and quantity are provided for spray and fertilizerRefill activities
     const activityType = this.activityForm.value.type;
     const productName = this.activityForm.value.productName;
+    const quantity = this.activityForm.value.quantity;
     
-    if (this.productMappings.includes(activityType) && !productName?.trim()) {
-      this.snackBar.open('Product name is required for this activity type', 'Close', { duration: 3000 });
-      return;
+    if (this.productMappings.includes(activityType)) {
+      if (!productName?.trim()) {
+        this.snackBar.open('Product name is required for this activity type', 'Close', { duration: 3000 });
+        return;
+      }
+      if (quantity === null || quantity === undefined || quantity === '') {
+        this.snackBar.open('Quantity is required for this activity type', 'Close', { duration: 3000 });
+        return;
+      }
+      if (quantity <= 0) {
+        this.snackBar.open('Quantity must be greater than 0', 'Close', { duration: 3000 });
+        return;
+      }
     }
 
     if (this.activityForm.valid && this.selectedCropId && this.selectedCropId !== environment.tempCropId) {
