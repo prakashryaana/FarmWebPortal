@@ -30,6 +30,12 @@
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>{{'activity.productNameLabel' | translate }}</mat-label>
             <input matInput id="product-name" formControlName="productName" placeholder="Enter product name" />
+            @if (activityForm.get('productName')?.hasError('required') && (activityForm.get('productName')?.touched || submitPressed)) {
+              <mat-error>Product name is required</mat-error>
+            }
+            @if (activityForm.get('productName')?.hasError('maxlength')) {
+              <mat-error>Product name cannot exceed 100 characters</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">

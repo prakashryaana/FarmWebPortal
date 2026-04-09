@@ -96,10 +96,18 @@ export class AddActivityComponent implements AfterViewInit {
     .pipe(takeUntilDestroyed())
     .subscribe(type => {
       console.log(type);
-      if(this.productMappings.includes(type))
-        this.showAdditionalFields = true
-      else
+      const productNameControl = this.activityForm.get('productName');
+      
+      if(this.productMappings.includes(type)) {
+        this.showAdditionalFields = true;
+        // Make productName mandatory for spray and fertilizerRefill
+        productNameControl?.setValidators([Validators.required, Validators.maxLength(100)]);
+      } else {
         this.showAdditionalFields = false;
+        // Make productName optional for other types
+        productNameControl?.setValidators([Validators.maxLength(100)]);
+      }
+      productNameControl?.updateValueAndValidity();
     });
   }
 
@@ -190,6 +198,16 @@ export class AddActivityComponent implements AfterViewInit {
       return;
     }
     this.submitPressed = false;
+
+    // Validate that productName is provided for spray and fertilizerRefill activities
+    const activityType = this.activityForm.value.type;
+    const productName = this.activityForm.value.productName;
+    
+    if (this.productMappings.includes(activityType) && !productName?.trim()) {
+      this.snackBar.open('Product name is required for this activity type', 'Close', { duration: 3000 });
+      return;
+    }
+
     if (this.activityForm.valid && this.selectedCropId && this.selectedCropId !== environment.tempCropId) {
       //add logic to handle photo upload if photoFile is not null
       let photoPath = '';

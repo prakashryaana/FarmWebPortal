@@ -69,6 +69,12 @@
   width: 100%;
 }
 
+.required {
+  color: #f44336;
+  font-weight: 600;
+  margin-left: 0.25rem;
+}
+
 /* QR Scanner Section */
 .qr-scanner-section {
   /* margin: 1rem 0; */

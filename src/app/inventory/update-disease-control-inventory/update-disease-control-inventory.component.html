@@ -3,41 +3,80 @@
 
   <!-- Create Button -->
   <button class="create-btn" (click)="openCreateForm()" *ngIf="!isFormExpanded">
-    <mat-icon>add</mat-icon> Add Disease Control
+    <mat-icon>add</mat-icon> Add Disease Control Inventory
   </button>
 
   <!-- Create/Edit Form (Collapsible) -->
   <div class="form-section" *ngIf="isFormExpanded">
-    <h2>{{ editingId ? 'Edit Disease Control' : 'Add New Disease Control' }}</h2>
+    <h2>{{ editingId ? 'Edit Disease Control Inventory' : 'Add New Disease Control Inventory' }}</h2>
     <form [formGroup]="form">
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Disease Control Name</label>
-          <select formControlName="diseaseControlName">
-            @for (diseaseControlName of diseaseControlNames; track $index) {
-            <option [value]="diseaseControlName">{{diseaseControlName}}</option>
-            }
-          </select>
+      <!-- Parent Fields -->
+      <div class="parent-fields-section">
+        <h3>Inventory Details</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Supplied Date</label>
+            <input formControlName="suppliedDate" type="datetime-local" />
+          </div>
+
+          <div class="form-group">
+            <label>Invoice Number <span class="required">*</span></label>
+            <input formControlName="invoiceNumber" type="text" />
+          </div>
+
+          <div class="form-group">
+            <label>Supplier <span class="required">*</span></label>
+            <input formControlName="supplier" type="text" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Child Items Section -->
+      <div class="child-items-section">
+        <div class="section-header">
+          <h3>Disease Control Items</h3>
+          <button type="button" class="btn btn-add-item" (click)="addDiseaseControlItem()">
+            <mat-icon>add</mat-icon> Add Item
+          </button>
         </div>
 
-        <div class="form-group">
-          <label>Quantity Supplied (ml/grams)</label>
-          <input formControlName="quantitySupplied" type="number" step="0.01" />
-        </div>
+        <div formArrayName="diseaseControlItems">
+          <div *ngFor="let item of diseaseControlItems.controls; let i = index" class="item-row" [formGroupName]="i">
+            <div class="item-content">
+              <div class="form-group">
+                <label>Disease Control Name <span class="required">*</span></label>
+                <select formControlName="diseaseControlName">
+                  <option value="">Select disease control...</option>
+                  @for (diseaseControlName of diseaseControlNames; track $index) {
+                  <option [value]="diseaseControlName">{{diseaseControlName}}</option>
+                  }
+                </select>
+              </div>
 
-        <div class="form-group">
-          <label>Supplied Date</label>
-          <input formControlName="suppliedDate" type="datetime-local" />
-        </div>
+              <div class="form-group">
+                <label>Quantity Supplied <span class="required">*</span></label>
+                <input formControlName="quantitySupplied" type="number" step="0.1" />
+              </div>
 
-        <div class="form-group">
-          <label>Invoice Number</label>
-          <input formControlName="invoiceNumber" type="text"/>
-        </div>
+              <div class="form-group">
+                <label>Quantity Metric <span class="required">*</span></label>
+                <select formControlName="quantityMetric">
+                  @for (metric of quantityMetrics; track $index) {
+                  <option [value]="metric">{{metric}}</option>
+                  }
+                </select>
+              </div>
 
-        <div class="form-group">
-          <label>Supplier</label>
-          <input formControlName="supplier" type="text" />
+              <button type="button" class="btn-remove-item" (click)="removeDiseaseControlItem(i)" 
+                      [disabled]="diseaseControlItems.length === 1" title="Remove item">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="diseaseControlItems.length === 0" class="no-items-message">
+            No items added. Click "Add Item" to add disease controls.
+          </div>
         </div>
       </div>
 
@@ -50,38 +89,79 @@
 
   <!-- Table of existing items -->
   <div class="table-section">
-    <h2>Existing Disease Controls</h2>
-    <table class="data-table" *ngIf="list.length > 0">
-      <thead>
-        <tr>
-          <th>Disease Control Name</th>
-          <th>Quantity Supplied (ml/grams)</th>
-          <th>Supplied Date</th>
-          <th>Quantity Used</th>
-          <th>Used Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of list">
-          <td>{{ item.diseaseControlName }}</td>
-          <td>{{ item.quantitySupplied }}</td>
-          <td>{{ item.suppliedDate ? (item.suppliedDate | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
-          <td>{{ item.quantityUsed }}</td>
-          <td>{{ item.usedDate ? (item.usedDate | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
-          <td class="actions-cell">
-            <!-- <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
-              <mat-icon>edit</mat-icon>
-            </button> -->
-            <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <h2>Existing Disease Control Inventory</h2>
+    <div class="table-wrapper" *ngIf="list.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="expand-col"></th>
+            <th>Invoice Number</th>
+            <th>Supplier</th>
+            <th>Supplied Date</th>
+            <th>Item Count</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let item of list">
+            <tr class="parent-row" [class.expanded]="expandedRowId === item.inventoryId" 
+                (click)="toggleExpand(item)">
+              <td class="expand-col">
+                <button type="button" class="expand-btn" (click)="toggleExpand(item); $event.stopPropagation()" 
+                        title="Toggle details">
+                  <mat-icon>{{ expandedRowId === item.inventoryId ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </button>
+              </td>
+              <td>{{ item.invoiceNumber }}</td>
+              <td>{{ item.supplier }}</td>
+              <td>{{ item.suppliedDate ? (item.suppliedDate | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
+              <td class="item-count">{{ item.diseaseControlItems?.length || 0 }}</td>
+              <td class="actions-cell">
+                <button class="btn-icon btn-delete" (click)="delete(item); $event.stopPropagation()" title="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Expanded Details Row -->
+            <tr *ngIf="expandedRowId === item.inventoryId" class="details-row">
+              <td colspan="6">
+                <div class="details-container">
+                  <!-- <h4>Disease Control Items</h4> -->
+                  <table class="details-table">
+                    <thead>
+                      <tr>
+                        <th>Disease Control Name</th>
+                        <th>Quantity Supplied</th>
+                        <th>Metric</th>
+                        <th>Quantity Used</th>
+                        <th>Used Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let childItem of item.diseaseControlItems; let i = index">
+                        <td>{{ childItem.diseaseControlName }}</td>
+                        <td>{{ childItem.quantitySupplied }}</td>
+                        <td>{{ childItem.quantityMetric || '-' }}</td>
+                        <td>{{ childItem.quantityUsed || '-' }}</td>
+                        <td>{{ (childItem.usedDate && !childItem.usedDate.startsWith('0001')) 
+     ? (childItem.usedDate | date: 'dd-MM-yyyy HH:mm') 
+     : '-' }}</td>
+                      </tr>
+                      <tr *ngIf="!item.diseaseControlItems || item.diseaseControlItems.length === 0" class="no-items-row">
+                        <td colspan="5" class="no-data-cell">No items in this inventory</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
     <div *ngIf="list.length === 0" class="no-data">
-      No disease controls found. Add one to get started.
+      No disease control inventory found. Add one to get started.
     </div>
   </div>
 </div>
