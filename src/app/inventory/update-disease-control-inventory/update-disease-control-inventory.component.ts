@@ -35,7 +35,7 @@ export class UpdateDiseaseControlInventoryComponent {
     'Yellow Trap','Blue Trap','BLITOX','SPINOSAD 45%','NINJA','SJ ERASER','THRIPO','FUNIMAN',
     'BEAUVERIA BASSIANA','BIO INSECTICIDE'];
   
-  quantityMetrics = ['Packets', 'Liters'];
+  quantityMetrics = ['Packets', 'Litres'];
 
   form = new FormGroup({
     inventoryId: new FormControl(''),

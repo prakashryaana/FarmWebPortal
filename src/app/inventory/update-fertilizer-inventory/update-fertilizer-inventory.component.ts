@@ -35,7 +35,7 @@ export class UpdateFertilizerInventoryComponent {
     'A1','A2','A3','A4','A5','B11','BF','C6','Drip Saff','CA','CHA','CSW','Trichoderma',
     'Pseudomonas','Bio Ferlilizer','VAM','FERT 1','FERT 2','FERT 3','FERT 4','Adjuvent'];
   
-  quantityMetrics = ['Packets', 'Liters'];
+  quantityMetrics = ['Packets', 'Litres'];
 
   form = new FormGroup({
     inventoryId: new FormControl(''),
