@@ -53,10 +53,10 @@ export class FarmOwnerRegistrationComponent implements OnInit {
   farmOwner: FarmOwner = {} as FarmOwner;
 
   registerFarmOwner() {
-    if (!this.isHealthReportUploaded && !this.farmOwnerRegistrationForm.get('healthReportUrl')?.value) {
-      this.snackBar.open('Health report is required', 'Close', { duration: 3000 });
-      return;
-    }
+    // if (!this.isHealthReportUploaded && !this.farmOwnerRegistrationForm.get('healthReportUrl')?.value) {
+    //   this.snackBar.open('Health report is required', 'Close', { duration: 3000 });
+    //   return;
+    // }
     if (this.farmOwnerRegistrationForm.valid) {
       this.farmOwner = {
         ownerId: Date.now().toString(),

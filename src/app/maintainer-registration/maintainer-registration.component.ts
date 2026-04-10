@@ -64,15 +64,15 @@ export class MaintainerRegistrationComponent {
         this.snackBar.open('Farm Owner selection is required', 'Close', { duration: 3000 });
         return;
     }
-    if (!this.isTrainingCertificateUploaded && !this.farmMaintainerRegistrationForm.get('trainingCertificateUrl')?.value) {
-      this.snackBar.open('Training certificate is required', 'Close', { duration: 3000 });
-      return;
-    }
-    if (!this.isHealthReportUploaded && !this.farmMaintainerRegistrationForm.get('healthReportUrl')?.value) {
-      this.snackBar.open('Health report is required', 'Close', { duration: 3000 });
-      return;
-    }
-    if (this.farmMaintainerRegistrationForm.valid && this.selectedOwner && this.isTrainingCertificateUploaded && this.isHealthReportUploaded) {
+    // if (!this.isTrainingCertificateUploaded && !this.farmMaintainerRegistrationForm.get('trainingCertificateUrl')?.value) {
+    //   this.snackBar.open('Training certificate is required', 'Close', { duration: 3000 });
+    //   return;
+    // }
+    // if (!this.isHealthReportUploaded && !this.farmMaintainerRegistrationForm.get('healthReportUrl')?.value) {
+    //   this.snackBar.open('Health report is required', 'Close', { duration: 3000 });
+    //   return;
+    // }
+    if (this.farmMaintainerRegistrationForm.valid) {
       this.maintainer = {
         maintainerId: Date.now().toString(),
         maintainerName: this.farmMaintainerRegistrationForm.get('fullName')?.value,
