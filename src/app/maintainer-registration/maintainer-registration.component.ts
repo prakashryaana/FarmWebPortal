@@ -42,13 +42,15 @@ export class MaintainerRegistrationComponent {
     address: new FormControl('', [Validators.required]),
     contactNumber: new FormControl('', [Validators.required, Validators.pattern('^\\+?[1-9]\\d{1,14}$')]),
     alternateContactNumber: new FormControl('', [Validators.pattern('^\\+?[1-9]\\d{1,14}$')]),
-    // role: new FormControl('', [Validators.required]),
     education: new FormControl('', [Validators.required]),
     trainingCertificateUrl: new FormControl(''),
+    healthReportUrl: new FormControl(''),
     identityProofDocument: new FormControl('', [Validators.required]),
     identityProofNumber: new FormControl('', [Validators.required])
   });
   isFileUploaded: boolean = false;
+  isTrainingCertificateUploaded: boolean = false;
+  isHealthReportUploaded: boolean = false;
   maintainer: Maintainer = {} as Maintainer;
   maintainerId: string = '';
   submitPressed: boolean = false;
@@ -58,12 +60,28 @@ export class MaintainerRegistrationComponent {
       return;
     }
     this.submitPressed = false;
-    if (this.farmMaintainerRegistrationForm.valid && this.selectedOwner && this.isFileUploaded) {
+    if (!this.selectedOwner || !this.selectedOwner.id) {
+        this.snackBar.open('Farm Owner selection is required', 'Close', { duration: 3000 });
+        return;
+    }
+    if (!this.isTrainingCertificateUploaded && !this.farmMaintainerRegistrationForm.get('trainingCertificateUrl')?.value) {
+      this.snackBar.open('Training certificate is required', 'Close', { duration: 3000 });
+      return;
+    }
+    if (!this.isHealthReportUploaded && !this.farmMaintainerRegistrationForm.get('healthReportUrl')?.value) {
+      this.snackBar.open('Health report is required', 'Close', { duration: 3000 });
+      return;
+    }
+    if (this.farmMaintainerRegistrationForm.valid && this.selectedOwner && this.isTrainingCertificateUploaded && this.isHealthReportUploaded) {
       this.maintainer = {
         maintainerId: Date.now().toString(),
         maintainerName: this.farmMaintainerRegistrationForm.get('fullName')?.value,
         address: this.farmMaintainerRegistrationForm.get('address')?.value,
         trainingCertificateUrl: this.farmMaintainerRegistrationForm.get('trainingCertificateUrl')?.value,
+        healthChecks: [{
+          healthReportUrl: this.farmMaintainerRegistrationForm.get('healthReportUrl')?.value,
+          createdAt: new Date().toISOString()
+        }],
         contactNumber: this.farmMaintainerRegistrationForm.get('contactNumber')?.value,
         alternateContactNumber: this.farmMaintainerRegistrationForm.get('alternateContactNumber')?.value,
         education: this.farmMaintainerRegistrationForm.get('education')?.value,
@@ -78,14 +96,21 @@ export class MaintainerRegistrationComponent {
         next: (response) => {
           console.log('Maintainer Registration successful', response);
           this.snackBar.open('Maintainer Registration successful!', 'Close', { duration: 5000 });
+          this.reset();
         },
         error: (error) => {
           console.error('Maintainer Registration failed', error);
-          this.snackBar.open('Maintainer Registration failed. Please try again.', 'Close', { duration: 5000 });
+          this.snackBar.open(`Maintainer Registration failed - ${error.error.detail}`, 'Close', { duration: 5000 });
         }
       }
       );
     }
+  }
+
+  reset() {
+    this.farmMaintainerRegistrationForm.reset();
+    this.isHealthReportUploaded = false;
+    this.isTrainingCertificateUploaded = false;
   }
 
   onFileChange(event: any) {
@@ -94,11 +119,19 @@ export class MaintainerRegistrationComponent {
     // You can implement file upload logic here
   }
 
-  handleFileUploaded(data: any): void {
-    console.log('File uploaded successfully in maintainer component!', data);
-    this.isFileUploaded = true;
+  handleTrainingCertificateUploaded(data: any): void {
+    console.log('Training certificate uploaded successfully in maintainer component!', data);
+    this.isTrainingCertificateUploaded = true;
     this.farmMaintainerRegistrationForm.get('trainingCertificateUrl')?.setValue(data.fullPath);
     // Process the uploaded file data received from the file-upload component
   }
+
+  handleHealthReportUploaded(data: any): void {
+    console.log('Health report uploaded successfully in maintainer component!', data);
+    this.isHealthReportUploaded = true;
+    this.farmMaintainerRegistrationForm.get('healthReportUrl')?.setValue(data.fullPath);
+    // Process the uploaded file data received from the file-upload component
+  }
+
 
 }

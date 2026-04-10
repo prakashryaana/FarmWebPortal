@@ -1,3 +1,5 @@
+import { HealthCheck } from "../maintainer-registration/maintainer";
+
 export interface FarmOwner {
     ownerId: string;
     ownerName: string | null | undefined;
@@ -10,4 +12,5 @@ export interface FarmOwner {
     address: string | null | undefined;
     identityProofDocument: string | null | undefined;
     identityProofNumber: string | null | undefined;
+    healthChecks: HealthCheck[];
 }

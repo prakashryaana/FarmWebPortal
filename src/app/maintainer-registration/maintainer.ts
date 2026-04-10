@@ -10,4 +10,10 @@ export interface Maintainer {
     identityProofDocument: string;
     identityProofNumber: string;
     trainingCertificateUrl: string;
+    healthChecks: HealthCheck[];
+}
+
+export interface HealthCheck {
+    healthReportUrl: string;
+    createdAt: string;
 }

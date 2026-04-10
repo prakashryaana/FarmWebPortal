@@ -12,16 +12,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { FileUploadComponent } from '../file-upload/file-upload.component';
 
 @Component({
   selector: 'app-farm-owner-registration',
   imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatButtonModule, MatIconModule],
+    MatSelectModule, MatButtonModule, MatIconModule, FileUploadComponent],
   templateUrl: './farm-owner-registration.component.html',
   styleUrl: './farm-owner-registration.component.css',
 })
 export class FarmOwnerRegistrationComponent implements OnInit {
-  //farmOwnerRegistrationService: FarmOwnerRegistrationService = inject(FarmOwnerRegistrationService);
+  isHealthReportUploaded: boolean = false;
   constructor(private router: Router, private route: ActivatedRoute, private farmOwnerRegistrationService: FarmOwnerRegistrationService) {}
 
   private snackBar = inject(MatSnackBar);
@@ -45,12 +46,17 @@ export class FarmOwnerRegistrationComponent implements OnInit {
     alternateContactNumber: new FormControl('', [Validators.pattern('^\\+?[1-9]\\d{1,14}$')]),
     emailId: new FormControl('', [Validators.required, Validators.email]),
     identityProofDocument: new FormControl('', [Validators.required]),
-    identityProofNumber: new FormControl('', [Validators.required])
+    identityProofNumber: new FormControl('', [Validators.required]),
+    healthReportUrl: new FormControl(''),
   });
 
   farmOwner: FarmOwner = {} as FarmOwner;
 
   registerFarmOwner() {
+    if (!this.isHealthReportUploaded && !this.farmOwnerRegistrationForm.get('healthReportUrl')?.value) {
+      this.snackBar.open('Health report is required', 'Close', { duration: 3000 });
+      return;
+    }
     if (this.farmOwnerRegistrationForm.valid) {
       this.farmOwner = {
         ownerId: Date.now().toString(),
@@ -62,7 +68,11 @@ export class FarmOwnerRegistrationComponent implements OnInit {
         address: this.farmOwnerRegistrationForm.get('address')?.value,
         emailId: this.farmOwnerRegistrationForm.get('emailId')?.value,
         identityProofDocument: this.farmOwnerRegistrationForm.get('identityProofDocument')?.value,
-        identityProofNumber: this.farmOwnerRegistrationForm.get('identityProofNumber')?.value
+        identityProofNumber: this.farmOwnerRegistrationForm.get('identityProofNumber')?.value,
+        healthChecks: [{
+          healthReportUrl: this.farmOwnerRegistrationForm.get('healthReportUrl')?.value,
+          createdAt: new Date().toISOString()
+        }],
       };
       console.log(this.farmOwner);
 
@@ -70,16 +80,25 @@ export class FarmOwnerRegistrationComponent implements OnInit {
         next: (response) => {
           console.log('Farm Owner Registration successful', response);
           this.snackBar.open('Farm Owner Registration successful!', 'Close', { duration: 5000 });
-          // this.router.navigate(
-          //   ['/maintainer-registration'],
-          //   { queryParams: { farmOwnerId: response.ownerId }}
-          // );
+          this.reset();
         },
         error: (error) => {
           console.error('Farm Owner Registration failed', error);
-          this.snackBar.open('Farm Owner Registration failed. Please try again.', 'Close', { duration: 5000 });
+          this.snackBar.open(`Farm Owner Registration failed - ${error.error.detail}`, 'Close', { duration: 5000 });
         }}
       );
     }
+  }
+
+  reset() {
+    this.farmOwnerRegistrationForm.reset();
+    this.isHealthReportUploaded = false;
+  }
+
+  handleHealthReportUploaded(data: any): void {
+    console.log('Health report uploaded successfully in farm owner component!', data);
+    this.isHealthReportUploaded = true;
+    this.farmOwnerRegistrationForm.get('healthReportUrl')?.setValue(data.fullPath);
+    // Process the uploaded file data received from the file-upload component
   }
 }
