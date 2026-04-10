@@ -60,16 +60,13 @@
 /* Tab Selection */
 .tab-selection {
   display: flex;
-  gap: 1rem;
+  /* gap: 1rem; */
   justify-content: center;
   flex-wrap: wrap;
   margin-bottom: 1rem;
 }
 
 .tab-button {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25) !important;
   font-size: 1rem !important;
   font-weight: 600;
   min-height: 48px;
@@ -79,12 +76,26 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  width: 45%;
+  width: 50%;
+  background: #e8eef5 !important;
+  color: #7f8c8d !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+}
+
+.tab-button:hover:not(.active) {
+  background: #d5dee8 !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
 .tab-button.active {
-  box-shadow: 0 10px 10px rgba(6, 139, 228, 0.35) !important;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+  color: white !important;
+  box-shadow: 0 8px 16px rgba(52, 152, 219, 0.3) !important;
   transform: translateY(-2px);
+}
+
+.tab-button.active:hover {
+  box-shadow: 0 10px 20px rgba(52, 152, 219, 0.35) !important;
 }
 
 .tab-button mat-icon {
