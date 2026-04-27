@@ -6,6 +6,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CropFarmSelectorService } from '../../../crop-farm-selector/crop-farm-selector.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { FileServerService } from '../../../file-upload/file-server.service';
 
 export interface GroupedObservation {
   rowType: 'group';
@@ -33,10 +35,20 @@ export type TableRow = GroupedObservation | DetailObservation;
 export class ListObservationComponent {
   private readonly observationService = inject(ObservationService);
   private readonly cropFarmSelector = inject(CropFarmSelectorService);
+  private readonly fileServerService = inject(FileServerService);
+  private readonly sanitizer = inject(DomSanitizer);
 
-  displayedColumns: string[] = ['expand', 'createdAt', 'observationType', 'message'];
+  displayedColumns: string[] = ['expand', 'createdAt', 'observationType', 'message', 'attachments'];
   dataSource = new MatTableDataSource<TableRow>([]);
   loading = false;
+
+  // Image popup properties
+  selectedImage: SafeUrl | null = null;
+  showImagePopup = false;
+
+  // Audio popup properties
+  selectedAudioUrl: SafeUrl | null = null;
+  showAudioPopup = false;
 
   constructor() {
     effect(() => {
@@ -141,5 +153,59 @@ export class ListObservationComponent {
 
   isGroupRow(row: TableRow): boolean {
     return row.rowType === 'group';
+  }
+
+  /**
+   * Checks if an observation has an image
+   */
+  hasImage(imageUrl: string | null | undefined): boolean {
+    return imageUrl != null && imageUrl.trim() !== '';
+  }
+
+  /**
+   * Checks if an observation has an audio file
+   */
+  hasAudio(voiceNoteUrl: string | null | undefined): boolean {
+    return voiceNoteUrl != null && voiceNoteUrl.trim() !== '';
+  }
+
+  /**
+   * Opens the image popup
+   * @param imageUrl The local file path of the image
+   */
+  openImagePopup(imageUrl: string): void {
+    const apiUrl = this.fileServerService.getImageUrl(imageUrl);
+    if (apiUrl) {
+      this.selectedImage = this.sanitizer.bypassSecurityTrustUrl(apiUrl);
+      this.showImagePopup = true;
+    }
+  }
+
+  /**
+   * Closes the image popup
+   */
+  closeImagePopup(): void {
+    this.showImagePopup = false;
+    this.selectedImage = null;
+  }
+
+  /**
+   * Opens the audio popup
+   * @param voiceNoteUrl The local file path of the audio
+   */
+  openAudioPopup(voiceNoteUrl: string): void {
+    const apiUrl = this.fileServerService.getImageUrl(voiceNoteUrl);
+    if (apiUrl) {
+      this.selectedAudioUrl = this.sanitizer.bypassSecurityTrustUrl(apiUrl);
+      this.showAudioPopup = true;
+    }
+  }
+
+  /**
+   * Closes the audio popup
+   */
+  closeAudioPopup(): void {
+    this.showAudioPopup = false;
+    this.selectedAudioUrl = null;
   }
 }

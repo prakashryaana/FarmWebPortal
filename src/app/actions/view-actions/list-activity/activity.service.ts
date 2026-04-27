@@ -25,10 +25,14 @@ export class ActivityService {
 // }
 
 export interface Activity {
+  id: string;
   activityId: string;
   cropId: string;
   activityType: string;
+  productName: string | null;
+  quantity: string | number | null;
+  message: string;
+  imageUrl: string | null;
   createdAt: string;        // ISO string from backend
   updatedAt: string;        // ISO string from backend
-  message: string;
 }

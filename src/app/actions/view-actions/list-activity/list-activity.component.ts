@@ -10,6 +10,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { Observable } from 'rxjs';
 import { CropFarmSelectorService } from '../../../crop-farm-selector/crop-farm-selector.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatDialogModule } from '@angular/material/dialog';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { FileServerService } from '../../../file-upload/file-server.service';
 
 export interface GroupedActivity {
   rowType: 'group';
@@ -30,7 +33,7 @@ export type TableRow = GroupedActivity | DetailActivity;
 @Component({
   selector: 'app-list-activity',
   standalone: true,
-  imports: [DatePipe, MatListModule, MatIconModule, MatProgressSpinnerModule, MatTableModule, MatButtonModule],
+  imports: [DatePipe, MatListModule, MatIconModule, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatDialogModule],
   templateUrl: './list-activity.component.html',
   styleUrls: ['./list-activity.component.css']
 })
@@ -38,10 +41,16 @@ export class ListActivityComponent {
   @Input() cropId!: string;
 
   private activityService = inject(ActivityService);
+  private fileServerService = inject(FileServerService);
+  private sanitizer = inject(DomSanitizer);
 
-  displayedColumns: string[] = ['expand', 'createdAt', 'activityType', 'message'];
+  displayedColumns: string[] = ['expand', 'createdAt', 'activityType', 'message', 'image'];
   dataSource = new MatTableDataSource<TableRow>([]);
   loading = false;
+
+  // Image popup properties
+  selectedImage: SafeUrl | null = null;
+  showImagePopup = false;
 
   activities$!: Observable<Activity[]>;
 
@@ -167,5 +176,54 @@ export class ListActivityComponent {
 
   isGroupRow(row: TableRow): boolean {
     return row.rowType === 'group';
+  }
+
+  /**
+   * Formats message to include productName and quantity in square brackets at the start
+   * @param activity The activity record
+   * @returns Formatted message string
+   */
+  formatMessage(activity: Activity): string {
+    const details: string[] = [];
+    
+    if (activity.productName) {
+      details.push(`Product: ${activity.productName}`);
+    }
+    
+    if (activity.quantity) {
+      details.push(`Qty: ${activity.quantity}`);
+    }
+    
+    const prefix = details.length > 0 ? `[${details.join(', ')}] ` : '';
+    return prefix + activity.message;
+  }
+
+  /**
+   * Opens the image popup
+   * @param imageUrl The local file path of the image
+   */
+  openImagePopup(imageUrl: string): void {
+    const apiUrl = this.fileServerService.getImageUrl(imageUrl);
+    if (apiUrl) {
+      this.selectedImage = this.sanitizer.bypassSecurityTrustUrl(apiUrl);
+      this.showImagePopup = true;
+    }
+  }
+
+  /**
+   * Closes the image popup
+   */
+  closeImagePopup(): void {
+    this.showImagePopup = false;
+    this.selectedImage = null;
+  }
+
+  /**
+   * Checks if an image URL is valid (not null or blank)
+   * @param imageUrl The URL to check
+   * @returns True if imageUrl is valid
+   */
+  hasImage(imageUrl: string | null): boolean {
+    return imageUrl != null && imageUrl.trim() !== '';
   }
 }

@@ -62,10 +62,13 @@ export interface ObservationRequest {
 }
 
 export interface Observation {
+  id?: string;
   observationId?: string;
   cropId: string;
   observationType: string;
   createdAt: string;
   updatedAt?: string;
   message?: string;
+  imageUrl?: string | null;
+  voiceNoteUrl?: string | null;
 }

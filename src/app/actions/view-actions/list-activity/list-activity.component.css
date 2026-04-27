@@ -32,6 +32,7 @@
 .activities-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .header-row {
@@ -46,15 +47,17 @@
 }
 
 .column-header {
-  padding: 1rem;
+  padding: 1rem 0.5rem;
   text-align: left;
   font-weight: 600;
   color: #2c3e50;
   font-size: 0.95rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-icon {
@@ -65,7 +68,7 @@
 
 .expand-header {
   width: 50px;
-  padding: 1rem 0.5rem;
+  padding: 1rem 0.25rem;
 }
 
 .expand-cell {
@@ -79,7 +82,32 @@
 }
 
 .date-cell {
-  min-width: 120px;
+  width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.image-cell {
+  width: 70px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.column-cell {
+  padding: 1rem 0.5rem;
+  font-size: 0.95rem;
+  color: #34495e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-text {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #7f8c8d;
 }
 
 .grouped-row {
@@ -109,11 +137,41 @@
 }
 
 .detail-row td {
-  padding: 0.75rem 1rem !important;
-  padding-left: 2rem !important;
+  padding: 0.75rem 0.5rem !important;
   font-size: 0.9rem;
   color: #34495e;
   border-bottom: 1px solid #f0f2f5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.detail-row td:first-child {
+  width: 50px;
+  text-align: center;
+  padding-left: 0.5rem !important;
+}
+
+.detail-row td:nth-child(2) {
+  width: 100px;
+  padding-left: 0.5rem !important;
+}
+
+.detail-row td:nth-child(3) {
+  width: auto;
+  min-width: 100px;
+  padding-left: 0.5rem !important;
+}
+
+.detail-row td:nth-child(4) {
+  flex: 1;
+  padding-left: 0.5rem !important;
+}
+
+.detail-row td:nth-child(5) {
+  width: 70px;
+  text-align: center;
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
 }
 
 .detail-row-wrapper {
@@ -198,29 +256,32 @@
   border-bottom: none;
 }
 
-.column-cell {
-  padding: 1rem;
-  font-size: 0.95rem;
-  color: #34495e;
-}
-
 .activity-type-badge {
   display: inline-block;
-  padding: 0.35rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   background: #e3f2fd;
   color: #1976d2;
   border-radius: 4px;
   font-weight: 500;
-  /* font-size: 0.85rem; */
-}
-
-.message-text {
-  display: block;
-  max-width: 300px;
+  font-size: 0.8rem;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #7f8c8d;
+}
+
+.activity-type-badge.detail-badge {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.detail-message {
+  color: #555;
+  display: block;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Empty State */
@@ -256,6 +317,103 @@
   color: #7f8c8d;
   margin: 0;
   font-size: 0.95rem;
+}
+
+/* Image Cell Styling */
+.image-cell {
+  width: 70px;
+  text-align: center;
+}
+
+.image-button {
+  color: #3498db;
+  transition: all 0.2s ease;
+}
+
+.image-button:hover {
+  color: #2980b9;
+  transform: scale(1.1);
+}
+
+/* Image Popup Overlay */
+.image-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.image-popup-container {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  max-width: 90vh;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1001;
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #2c3e50;
+  border-radius: 50%;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: white !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-button mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.popup-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Responsive Design */
