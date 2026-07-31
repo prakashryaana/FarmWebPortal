@@ -40,7 +40,7 @@
             @if (isGroupRow(row)) {
               {{ row.date }}
             } @else {
-              {{ row.data.createdAt | date: 'short' }}
+              {{ row.data.createdAt | date: 'dd/MM/yyyy, h:mm a' }}
             }
           </td>
         </ng-container>
@@ -53,11 +53,9 @@
           </th>
           <td mat-cell *matCellDef="let row" class="column-cell">
             @if (isGroupRow(row)) {
-              <span class="observation-type-badge" [title]="getFullTypeList(row)">
-                {{ row.types }}
-              </span>
+              <textarea readonly class="table-text-field type-field">{{ row.types }}</textarea>
             } @else {
-              <span class="observation-type-badge detail-badge">{{ row.data.observationType }}</span>
+              <textarea readonly class="table-text-field type-field">{{ row.data.observationType }}</textarea>
             }
           </td>
         </ng-container>
@@ -70,11 +68,9 @@
           </th>
           <td mat-cell *matCellDef="let row" class="column-cell">
             @if (isGroupRow(row)) {
-              <span class="message-text" [title]="getFullMessageList(row)">
-                {{ row.messages }}
-              </span>
+              <textarea readonly class="table-text-field message-field">{{ row.messages }}</textarea>
             } @else {
-              <span class="detail-message">{{ row.data.message }}</span>
+              <textarea readonly class="table-text-field message-field">{{ row.data.message }}</textarea>
             }
           </td>
         </ng-container>

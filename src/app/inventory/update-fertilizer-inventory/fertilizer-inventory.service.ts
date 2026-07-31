@@ -69,4 +69,12 @@ export class FertilizerInventoryService {
   delete(inventoryId: string) { 
     return this.http.delete(`${this.api}/RemoveInventory/${inventoryId}`); 
   }
+
+  getInputCatalogNames(type: string): Observable<string[]> {
+    return this.http.get<string[]>(`${this.api}/GetInputCatalogNames/${type}`);
+  }
+
+  createInputCatalog(catalog: { type: string, name: string }): Observable<any> {
+    return this.http.post(`${this.api}/CreateInputCatalog`, catalog);
+  }
 }

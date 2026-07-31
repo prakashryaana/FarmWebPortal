@@ -31,9 +31,7 @@ export class UpdateDiseaseControlInventoryComponent {
   get selectedFarmName() { return this.cropFarmSelector.selectedFarmName(); }
   get selectedFarmId() { return this.cropFarmSelector.selectedFarmId(); }
 
-  diseaseControlNames = [
-    'Yellow Trap','Blue Trap','BLITOX','SPINOSAD 45%','NINJA','SJ ERASER','THRIPO','FUNIMAN',
-    'BEAUVERIA BASSIANA','BIO INSECTICIDE'];
+  diseaseControlNames: string[] = [];
   
   quantityMetrics = ['Packets', 'Litres'];
 
@@ -53,6 +51,14 @@ export class UpdateDiseaseControlInventoryComponent {
   constructor() { 
     effect(() => {
       this.load();
+    });
+    this.loadCatalogNames();
+  }
+
+  loadCatalogNames() {
+    this.svc.getInputCatalogNames('DISEASE_CONTROL').subscribe({
+      next: names => this.diseaseControlNames = names,
+      error: e => console.error(e)
     });
   }
 

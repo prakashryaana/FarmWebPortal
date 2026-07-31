@@ -49,7 +49,7 @@ describe('UpdateDiseaseControlInventoryComponent', () => {
   ];
 
   beforeEach(async () => {
-    mockService = jasmine.createSpyObj('DiseaseControlInventoryService', ['list', 'create', 'update', 'delete']);
+    mockService = jasmine.createSpyObj('DiseaseControlInventoryService', ['list', 'create', 'update', 'delete', 'getInputCatalogNames']);
     mockSnackBar = jasmine.createSpyObj('MatSnackBar', ['open']);
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
 
@@ -63,6 +63,7 @@ describe('UpdateDiseaseControlInventoryComponent', () => {
     }).compileComponents();
 
     mockService.list.and.returnValue(of({ success: true, data: mockData }));
+    mockService.getInputCatalogNames.and.returnValue(of(['BLITOX', 'SPINOSAD 45%']));
     fixture = TestBed.createComponent(UpdateDiseaseControlInventoryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

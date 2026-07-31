@@ -94,9 +94,9 @@ export class ListObservationComponent {
   }
 
   private groupByDate(observations: Observation[]): GroupedObservation[] {
-    // Sort observations by date ascending
+    // Sort observations by date descending
     const sorted = [...observations].sort((a, b) => 
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     // Group by date (yyyy-MM-dd)
@@ -104,7 +104,10 @@ export class ListObservationComponent {
     
     sorted.forEach(observation => {
       const date = new Date(observation.createdAt);
-      const dateKey = date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const dateKey = `${day}/${month}/${year}`;
       
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
@@ -112,7 +115,7 @@ export class ListObservationComponent {
       grouped[dateKey].push(observation);
     });
 
-    // Convert to GroupedObservation array
+    // Convert to GroupedObservation array and sort groups descending by date
     return Object.entries(grouped).map(([date, records]) => ({
       rowType: 'group' as const,
       date,
@@ -120,17 +123,17 @@ export class ListObservationComponent {
       messages: this.concatenateMessages(records),
       originalRecords: records,
       isExpanded: false
-    }));
+    })).sort((a, b) => 
+      new Date(b.originalRecords[0].createdAt).getTime() - new Date(a.originalRecords[0].createdAt).getTime()
+    );
   }
 
   private concatenateTypes(observations: Observation[]): string {
-    const types = observations.map(o => o.observationType).join(', ');
-    return types.length > 20 ? types.substring(0, 17) + '...' : types;
+    return observations.map(o => o.observationType).join(', ');
   }
 
   private concatenateMessages(observations: Observation[]): string {
-    const messages = observations.map(o => o.message || '').filter(m => m).join(', ');
-    return messages.length > 20 ? messages.substring(0, 17) + '...' : messages;
+    return observations.map(o => o.message || '').filter(m => m).join(', ');
   }
 
   toggleExpand(group: GroupedObservation): void {

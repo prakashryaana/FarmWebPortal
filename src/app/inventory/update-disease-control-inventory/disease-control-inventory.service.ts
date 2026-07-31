@@ -69,4 +69,8 @@ export class DiseaseControlInventoryService {
   delete(inventoryId: string) { 
     return this.http.delete(`${this.api}/RemoveInventory/${inventoryId}`); 
   }
+
+  getInputCatalogNames(type: string): Observable<string[]> {
+    return this.http.get<string[]>(`${environment.baseApiUrl}api/fertilizerinventory/GetInputCatalogNames/${type}`);
+  }
 }

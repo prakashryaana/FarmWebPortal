@@ -116,9 +116,9 @@ export class ListActivityComponent {
   }
 
   private groupByDate(activities: Activity[]): GroupedActivity[] {
-    // Sort activities by date ascending
+    // Sort activities by date descending
     const sorted = [...activities].sort((a, b) => 
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     // Group by date (yyyy-MM-dd)
@@ -126,7 +126,10 @@ export class ListActivityComponent {
     
     sorted.forEach(activity => {
       const date = new Date(activity.createdAt);
-      const dateKey = date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const dateKey = `${day}/${month}/${year}`;
       
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
@@ -134,7 +137,7 @@ export class ListActivityComponent {
       grouped[dateKey].push(activity);
     });
 
-    // Convert to GroupedActivity array
+    // Convert to GroupedActivity array and sort groups descending by date
     return Object.entries(grouped).map(([date, records]) => ({
       rowType: 'group' as const,
       date,
@@ -142,17 +145,17 @@ export class ListActivityComponent {
       messages: this.concatenateMessages(records),
       originalRecords: records,
       isExpanded: false
-    }));
+    })).sort((a, b) => 
+      new Date(b.originalRecords[0].createdAt).getTime() - new Date(a.originalRecords[0].createdAt).getTime()
+    );
   }
 
   private concatenateTypes(activities: Activity[]): string {
-    const types = activities.map(a => a.activityType).join(', ');
-    return types.length > 20 ? types.substring(0, 17) + '...' : types;
+    return activities.map(a => a.activityType).join(', ');
   }
 
   private concatenateMessages(activities: Activity[]): string {
-    const messages = activities.map(a => a.message).join(', ');
-    return messages.length > 20 ? messages.substring(0, 17) + '...' : messages;
+    return activities.map(a => a.message).join(', ');
   }
 
   toggleExpand(group: GroupedActivity): void {
