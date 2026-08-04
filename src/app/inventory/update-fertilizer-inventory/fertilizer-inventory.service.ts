@@ -77,4 +77,8 @@ export class FertilizerInventoryService {
   createInputCatalog(catalog: { type: string, name: string }): Observable<any> {
     return this.http.post(`${this.api}/CreateInputCatalog`, catalog);
   }
+
+  deleteInputCatalog(type: string, name: string): Observable<any> {
+    return this.http.delete(`${this.api}/RemoveInputCatalog/${type}/${name}`);
+  }
 }

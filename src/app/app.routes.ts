@@ -22,6 +22,7 @@ import { AddActionsComponent } from './actions/add-actions/add-actions.component
 import { UpdateCropMasterComponent } from './master/update-crop-master/update-crop-master.component';
 import { UpdateFertilizerInventoryComponent } from './inventory/update-fertilizer-inventory/update-fertilizer-inventory.component';
 import { UpdateDiseaseControlInventoryComponent } from './inventory/update-disease-control-inventory/update-disease-control-inventory.component';
+import { FertilizerMasterComponent } from './master/fertilizer-master/fertilizer-master.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { roleGuard } from './role-guard';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
@@ -52,6 +53,8 @@ export const routes: Routes = [
     , { path: 'crop-master', component: UpdateCropMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
     , { path: 'fertilizer-inventory', component: UpdateFertilizerInventoryComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
     , { path: 'disease-control-inventory', component: UpdateDiseaseControlInventoryComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    , { path: 'fertilizer-master', component: FertilizerMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], type: 'FERTILIZER' } }
+    , { path: 'disease-control-master', component: FertilizerMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], type: 'DISEASE_CONTROL' } }
     , { path: 'user-profile', component: UserProfileComponent, canActivate: [authGuard] }
     , { path: 'unauthorized', component: UnauthorizedComponent }
     // {

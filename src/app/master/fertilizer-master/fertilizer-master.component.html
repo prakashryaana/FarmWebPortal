@@ -1,0 +1,57 @@
+<div class="container">
+  <div class="header-with-back">
+    <button class="back-btn" (click)="goBack()" title="Back to Masters">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ title }}</h1>
+  </div>
+
+  <!-- Create Button -->
+  <button class="create-btn" (click)="openCreateForm()" *ngIf="!isFormExpanded">
+    <mat-icon>add</mat-icon> Create New Item
+  </button>
+
+  <!-- Create Form (Collapsible) -->
+  <div class="form-section" *ngIf="isFormExpanded">
+    <h2>Create New Catalog Item</h2>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Item Name</label>
+          <input formControlName="name" type="text" maxlength="100" placeholder="Enter name..." />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Create</button>
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table of existing items -->
+  <div class="table-section">
+    <h2>Existing Items</h2>
+    <table class="data-table" *ngIf="list.length > 0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of list">
+          <td>{{ item }}</td>
+          <td class="actions-cell">
+            <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="list.length === 0" class="no-data">
+      No items found. Create one to get started.
+    </div>
+  </div>
+</div>

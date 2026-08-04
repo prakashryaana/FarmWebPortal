@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../users/confirm-dialog/confirm-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-update-crop-master',
@@ -18,6 +19,25 @@ export class UpdateCropMasterComponent {
   private snackBar = inject(MatSnackBar);
   private service = inject(CropMasterService);
   private confirmDialog = inject(MatDialog);
+  private router = inject(Router);
+
+  showLanding = true;
+
+  goToCropMaster() {
+    this.showLanding = false;
+  }
+
+  goToFertilizerMaster() {
+    this.router.navigate(['/fertilizer-master']);
+  }
+
+  goToDiseaseControlMaster() {
+    this.router.navigate(['/disease-control-master']);
+  }
+
+  goBack() {
+    this.showLanding = true;
+  }
 
   months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 

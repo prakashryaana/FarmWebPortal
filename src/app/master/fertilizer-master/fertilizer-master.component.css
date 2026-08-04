@@ -58,19 +58,13 @@ h2 {
   flex-direction: column;
 }
 
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
 .form-group label {
   font-weight: 600;
   color: #333;
   margin-bottom: 0.5rem;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
+.form-group input {
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -78,22 +72,10 @@ h2 {
   font-family: inherit;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.form-group input:focus {
   outline: none;
   border-color: #4CAF50;
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-}
-
-.month-range {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.month-range select {
-  flex: 1;
 }
 
 .form-actions {
@@ -116,8 +98,13 @@ h2 {
   color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: #45a049;
+}
+
+.btn-primary:disabled {
+  background-color: #a5d6a7;
+  cursor: not-allowed;
 }
 
 .btn-secondary {
@@ -165,6 +152,19 @@ h2 {
   background-color: #f9f9f9;
 }
 
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+  font-style: italic;
+}
+
+mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
 .actions-cell {
   display: flex;
   gap: 0.5rem;
@@ -182,138 +182,12 @@ h2 {
   transition: all 0.3s;
 }
 
-.btn-edit {
-  color: #2196F3;
-}
-
-.btn-edit:hover {
-  background-color: #e3f2fd;
-}
-
 .btn-delete {
   color: #f44336;
 }
 
 .btn-delete:hover {
   background-color: #ffebee;
-}
-
-.no-data {
-  text-align: center;
-  padding: 2rem;
-  color: #999;
-  font-style: italic;
-}
-
-mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-}
-
-/* Landing Container Styling */
-.landing-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 3rem 1.5rem;
-}
-
-.landing-title {
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 0.5rem;
-  border-bottom: none !important;
-  padding-bottom: 0 !important;
-}
-
-.landing-subtitle {
-  font-size: 1.1rem;
-  color: #64748b;
-  margin-bottom: 3rem;
-  max-width: 600px;
-}
-
-/* Landing Grid */
-.landing-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  width: 100%;
-  max-width: 1000px;
-}
-
-/* Card Buttons */
-.landing-card-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2.5rem 2rem;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  text-align: center;
-  outline: none;
-  font-family: inherit;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.landing-card-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.landing-card-icon {
-  font-size: 40px !important;
-  width: 40px !important;
-  height: 40px !important;
-  margin-bottom: 1.5rem;
-  transition: transform 0.3s ease;
-}
-
-.landing-card-btn:hover .landing-card-icon {
-  transform: scale(1.1);
-}
-
-.landing-card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #0f172a;
-  margin-bottom: 0.75rem;
-}
-
-.landing-card-desc {
-  font-size: 0.9rem;
-  color: #64748b;
-  line-height: 1.5;
-}
-
-/* Card Themes (Hover Borders and Icons) */
-.crop-card:hover {
-  border-color: #22c55e;
-}
-.crop-card .landing-card-icon {
-  color: #22c55e;
-}
-
-.fertilizer-card:hover {
-  border-color: #3b82f6;
-}
-.fertilizer-card .landing-card-icon {
-  color: #3b82f6;
-}
-
-.disease-card:hover {
-  border-color: #ec4899;
-}
-.disease-card .landing-card-icon {
-  color: #ec4899;
 }
 
 /* Header With Back Button */
@@ -358,5 +232,3 @@ mat-icon {
   width: 20px;
   height: 20px;
 }
-
-
