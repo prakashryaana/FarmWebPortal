@@ -18,6 +18,7 @@ export interface GroupedActivity {
   rowType: 'group';
   date: string;
   types: string;
+  uniqueTypes: string[];
   messages: string;
   originalRecords: Activity[];
   isExpanded: boolean;
@@ -44,7 +45,7 @@ export class ListActivityComponent {
   private fileServerService = inject(FileServerService);
   private sanitizer = inject(DomSanitizer);
 
-  displayedColumns: string[] = ['expand', 'createdAt', 'activityType', 'message', 'image'];
+  displayedColumns: string[] = ['createdAt', 'activityType', 'message', 'image'];
   dataSource = new MatTableDataSource<TableRow>([]);
   loading = false;
 
@@ -142,6 +143,7 @@ export class ListActivityComponent {
       rowType: 'group' as const,
       date,
       types: this.concatenateTypes(records),
+      uniqueTypes: Array.from(new Set(records.map(r => r.activityType))),
       messages: this.concatenateMessages(records),
       originalRecords: records,
       isExpanded: false
@@ -165,6 +167,15 @@ export class ListActivityComponent {
     this.dataSource.data = this.flattenRows(grouped);
   }
 
+  onRowClick(row: TableRow): void {
+    if (this.isGroupRow(row)) {
+      const group = row as GroupedActivity;
+      if (group.originalRecords.length > 1) {
+        this.toggleExpand(group);
+      }
+    }
+  }
+
   getFullTypeList(group: GroupedActivity): string {
     return group.originalRecords.map(r => r.activityType).join(', ');
   }
@@ -173,11 +184,11 @@ export class ListActivityComponent {
     return group.originalRecords.map(r => r.message).join(', ');
   }
 
-  isDetailRow(row: TableRow): boolean {
+  isDetailRow(row: TableRow): row is DetailActivity {
     return row.rowType === 'detail';
   }
 
-  isGroupRow(row: TableRow): boolean {
+  isGroupRow(row: TableRow): row is GroupedActivity {
     return row.rowType === 'group';
   }
 

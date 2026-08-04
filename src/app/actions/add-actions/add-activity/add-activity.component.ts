@@ -249,7 +249,10 @@ export class AddActivityComponent implements AfterViewInit {
       this.addActivityService.addActivity(activity).subscribe({
         next: (response) => {
           console.log('Activity successfully saved:', response);
-          this.snackBar.open('Activity successfully saved!', 'Close', { duration: 5000 });
+          this.snackBar.open('Activity successfully saved!', 'Close', {
+            duration: 5000,
+            panelClass: ['centered-success-snackbar']
+          });
           // Reset form and camera after successful submission
           this.reset();
         },

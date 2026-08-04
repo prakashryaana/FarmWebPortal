@@ -12,20 +12,6 @@
   <div class="table-container">
     <table mat-table [dataSource]="dataSource" class="activities-table">
 
-      <!-- Expand Column -->
-      <ng-container matColumnDef="expand">
-        <th mat-header-cell *matHeaderCellDef class="expand-header"></th>
-        <td mat-cell *matCellDef="let row" class="expand-cell">
-          @if (isGroupRow(row)) {
-          @if (row.originalRecords.length > 1) {
-          <button mat-icon-button (click)="toggleExpand(row)" class="expand-button"
-            [attr.aria-expanded]="row.isExpanded">
-            <mat-icon>{{ row.isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
-          </button>
-          }
-          }
-        </td>
-      </ng-container>
 
       <!-- Date Column -->
       <ng-container matColumnDef="createdAt">
@@ -50,9 +36,13 @@
         </th>
         <td mat-cell *matCellDef="let row" class="column-cell">
           @if (isGroupRow(row)) {
-          <textarea readonly class="table-text-field type-field">{{ row.types }}</textarea>
+          <div class="badges-container">
+            @for (type of row.uniqueTypes; track type) {
+            <span class="activity-type-badge">{{ type }}</span>
+            }
+          </div>
           } @else {
-          <textarea readonly class="table-text-field type-field">{{ row.data.activityType }}</textarea>
+          <span class="activity-type-badge">{{ row.data.activityType }}</span>
           }
         </td>
       </ng-container>
@@ -76,7 +66,7 @@
       <ng-container matColumnDef="image">
         <th mat-header-cell *matHeaderCellDef class="column-header">
           <!-- <mat-icon class="header-icon">image</mat-icon> -->
-          Image
+          Attachments
         </th>
         <td mat-cell *matCellDef="let row" class="column-cell image-cell">
           @if (isDetailRow(row) && hasImage(row.data.imageUrl)) {
@@ -96,7 +86,7 @@
       <!-- Table Rows -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns" class="header-row"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.grouped-row]="isGroupRow(row)"
-        [class.detail-row]="isDetailRow(row)"></tr>
+        [class.detail-row]="isDetailRow(row)" (click)="onRowClick(row)"></tr>
     </table>
   </div>
   }

@@ -13,6 +13,7 @@ export interface GroupedObservation {
   rowType: 'group';
   date: string;
   types: string;
+  uniqueTypes: string[];
   messages: string;
   originalRecords: Observation[];
   isExpanded: boolean;
@@ -38,7 +39,7 @@ export class ListObservationComponent {
   private readonly fileServerService = inject(FileServerService);
   private readonly sanitizer = inject(DomSanitizer);
 
-  displayedColumns: string[] = ['expand', 'createdAt', 'observationType', 'message', 'attachments'];
+  displayedColumns: string[] = ['createdAt', 'observationType', 'message', 'attachments'];
   dataSource = new MatTableDataSource<TableRow>([]);
   loading = false;
 
@@ -120,6 +121,7 @@ export class ListObservationComponent {
       rowType: 'group' as const,
       date,
       types: this.concatenateTypes(records),
+      uniqueTypes: Array.from(new Set(records.map(r => r.observationType))),
       messages: this.concatenateMessages(records),
       originalRecords: records,
       isExpanded: false
@@ -142,6 +144,15 @@ export class ListObservationComponent {
     this.dataSource.data = this.flattenRows(grouped);
   }
 
+  onRowClick(row: TableRow): void {
+    if (this.isGroupRow(row)) {
+      const group = row as GroupedObservation;
+      if (group.originalRecords.length > 1) {
+        this.toggleExpand(group);
+      }
+    }
+  }
+
   getFullTypeList(group: GroupedObservation): string {
     return group.originalRecords.map(r => r.observationType).join(', ');
   }
@@ -150,11 +161,11 @@ export class ListObservationComponent {
     return group.originalRecords.map(r => r.message || '').filter(m => m).join(', ');
   }
 
-  isDetailRow(row: TableRow): boolean {
+  isDetailRow(row: TableRow): row is DetailObservation {
     return row.rowType === 'detail';
   }
 
-  isGroupRow(row: TableRow): boolean {
+  isGroupRow(row: TableRow): row is GroupedObservation {
     return row.rowType === 'group';
   }
 

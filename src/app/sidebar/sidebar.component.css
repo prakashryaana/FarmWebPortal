@@ -65,6 +65,7 @@
   overflow-y: auto;
 }
 
+
 .btn-logout {
   display: flex;
   align-items: center;
@@ -440,6 +441,7 @@
     overflow-x: auto;
     overflow-y: hidden;
   }
+
 
   .menu-icon {
     min-width: 18px;

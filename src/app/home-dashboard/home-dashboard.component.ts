@@ -36,7 +36,7 @@ export class HomeDashboardComponent implements OnInit {
   constructor(public auth: AuthService) { }
 
   ngOnInit(): void {
-    if (this.auth.hasRole('FARMOWNER')) {
+    if (this.auth.hasRole('FARMOWNER') || this.auth.hasRole('FARMHELP')) {
       this.router.navigate(['/add-actions']);
     }
   }

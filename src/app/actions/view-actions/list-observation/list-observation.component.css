@@ -66,20 +66,7 @@
   flex-shrink: 0;
 }
 
-.expand-header {
-  width: 50px;
-  padding: 1rem 0.25rem;
-}
 
-.expand-cell {
-  width: 50px;
-  padding: 0.5rem;
-  text-align: center;
-}
-
-.expand-button {
-  padding: 0;
-}
 
 .date-cell {
   width: 100px;
@@ -104,9 +91,8 @@
   font-weight: 500;
   font-size: 0.8rem;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .message-text {
@@ -153,29 +139,24 @@
   text-overflow: ellipsis;
 }
 
-.detail-row td:first-child {
-  width: 50px;
-  text-align: center;
-  padding-left: 0.5rem !important;
-}
-
-.detail-row td:nth-child(2) {
+.detail-row td.mat-column-createdAt {
   width: 100px;
   padding-left: 0.5rem !important;
 }
 
-.detail-row td:nth-child(3) {
-  width: auto;
+.detail-row td.mat-column-observationType {
+  width: 130px !important;
   min-width: 100px;
   padding-left: 0.5rem !important;
 }
 
-.detail-row td:nth-child(4) {
+.detail-row td.mat-column-message {
+  width: auto !important;
   flex: 1;
   padding-left: 0.5rem !important;
 }
 
-.detail-row td:nth-child(5) {
+.detail-row td.mat-column-attachments {
   width: 100px;
   text-align: center;
   padding-left: 0.5rem !important;
@@ -603,10 +584,13 @@
   text-overflow: clip !important;
 }
 
-.detail-row td:nth-child(3) {
-  width: 130px !important;
+.badges-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: flex-start;
 }
 
-.detail-row td:nth-child(4) {
-  width: auto !important;
-}
+
+
