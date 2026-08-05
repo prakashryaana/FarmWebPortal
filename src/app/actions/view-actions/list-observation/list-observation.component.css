@@ -592,5 +592,90 @@
   justify-content: flex-start;
 }
 
+/* Attachment Badges and Summaries */
+.attachment-badge-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attachment-badge-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  color: white;
+  border-radius: 50%;
+  padding: 1px 5px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  line-height: 1.2;
+  min-width: 12px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border: 1px solid white;
+}
+
+.image-badge-bg {
+  background-color: #e67e22; /* Matches orange image theme */
+}
+
+.audio-badge-bg {
+  background-color: #9b59b6; /* Matches purple audio theme */
+}
+
+.attachment-summary-container {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.summary-badge {
+  color: #7f8c8d;
+  background: #f1f2f6;
+  border-radius: 4px;
+  padding: 4px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.summary-badge mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.summary-badge .attachment-badge-count {
+  position: static;
+  background-color: #7f8c8d;
+  color: white;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 0.75rem;
+  box-shadow: none;
+  border: none;
+  min-width: auto;
+}
+
+.image-summary {
+  color: #e67e22;
+  background: #fdf2e9;
+}
+
+.image-summary .attachment-badge-count {
+  background-color: #e67e22;
+}
+
+.audio-summary {
+  color: #9b59b6;
+  background: #f5eef8;
+}
+
+.audio-summary .attachment-badge-count {
+  background-color: #9b59b6;
+}
+
 
 

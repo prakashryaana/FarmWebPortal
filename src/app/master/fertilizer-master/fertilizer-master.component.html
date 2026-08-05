@@ -7,35 +7,38 @@
   </div>
 
   <!-- Create Button -->
-  <button class="create-btn" (click)="openCreateForm()" *ngIf="!isFormExpanded">
-    <mat-icon>add</mat-icon> Create New Item
+  <button class="create-btn" (click)="openCreateForm()">
+    <mat-icon>add</mat-icon> Create New {{ itemTypeName }}
   </button>
 
-  <!-- Create Form (Collapsible) -->
-  <div class="form-section" *ngIf="isFormExpanded">
-    <h2>Create New Catalog Item</h2>
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Item Name</label>
-          <input formControlName="name" type="text" maxlength="100" placeholder="Enter name..." />
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Create</button>
-        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
-      </div>
-    </form>
-  </div>
+  <!-- Create/Edit Form (Dialog Template) -->
+  <ng-template #dialogTemplate>
+    <div class="dialog-wrapper">
+      <h2 mat-dialog-title class="dialog-title">{{ editingName ? 'Edit ' + itemTypeName : 'Create New ' + itemTypeName }}</h2>
+      <mat-dialog-content class="dialog-content">
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid-dialog">
+            <div class="form-group">
+              <label>{{ itemTypeName }} Name</label>
+              <input formControlName="name" type="text" maxlength="100" placeholder="Enter {{ itemTypeName.toLowerCase() }} name..." />
+            </div>
+          </div>
+        </form>
+      </mat-dialog-content>
+      <mat-dialog-actions align="end" class="dialog-actions">
+        <button mat-button class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button mat-button class="btn btn-primary" [disabled]="!form.valid" (click)="submit()">{{ editingName ? 'Update' : 'Create' }}</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
 
   <!-- Table of existing items -->
   <div class="table-section">
-    <h2>Existing Items</h2>
+    <h2>Existing {{ itemTypeName }}s</h2>
     <table class="data-table" *ngIf="list.length > 0">
       <thead>
         <tr>
-          <th>Name</th>
+          <th>{{ itemTypeName }} Name</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -43,6 +46,9 @@
         <tr *ngFor="let item of list">
           <td>{{ item }}</td>
           <td class="actions-cell">
+            <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
             <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
               <mat-icon>delete</mat-icon>
             </button>
@@ -51,7 +57,7 @@
       </tbody>
     </table>
     <div *ngIf="list.length === 0" class="no-data">
-      No items found. Create one to get started.
+      No {{ itemTypeName.toLowerCase() }}s found. Create one to get started.
     </div>
   </div>
 </div>

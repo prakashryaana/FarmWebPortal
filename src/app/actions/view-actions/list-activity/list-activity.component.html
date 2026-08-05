@@ -70,15 +70,23 @@
         </th>
         <td mat-cell *matCellDef="let row" class="column-cell image-cell">
           @if (isDetailRow(row) && hasImage(row.data.imageUrl)) {
-          <button mat-icon-button (click)="openImagePopup(row.data.imageUrl!)" class="image-button" title="View image">
+          <button mat-icon-button (click)="openImagePopup(row.data.imageUrl!); $event.stopPropagation()" class="image-button" title="View image">
             <mat-icon>image</mat-icon>
           </button>
-          } @else if (isGroupRow(row) && row.originalRecords.length === 1 && hasImage(row.originalRecords[0].imageUrl))
-          {
-          <button mat-icon-button (click)="openImagePopup(row.originalRecords[0].imageUrl!)" class="image-button"
-            title="View image">
-            <mat-icon>image</mat-icon>
-          </button>
+          } @else if (isGroupRow(row) && getImageCount(row) > 0) {
+            @if (row.originalRecords.length === 1 && hasImage(row.originalRecords[0].imageUrl)) {
+            <button mat-icon-button (click)="openImagePopup(row.originalRecords[0].imageUrl!); $event.stopPropagation()" class="image-button"
+              title="View image">
+              <mat-icon>image</mat-icon>
+            </button>
+            } @else if (!row.isExpanded) {
+            <div class="attachment-summary-container">
+              <div class="summary-badge image-summary" title="Total images in group">
+                <mat-icon>image</mat-icon>
+                <span class="attachment-badge-count">{{ getImageCount(row) }}</span>
+              </div>
+            </div>
+            }
           }
         </td>
       </ng-container>

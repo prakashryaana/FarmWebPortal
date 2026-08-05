@@ -240,4 +240,18 @@ export class ListActivityComponent {
   hasImage(imageUrl: string | null): boolean {
     return imageUrl != null && imageUrl.trim() !== '';
   }
+
+  /**
+   * Gets the count of images attached to a row
+   * @param row The table row
+   * @returns Number of images
+   */
+  getImageCount(row: TableRow): number {
+    if (this.isDetailRow(row)) {
+      return this.hasImage(row.data.imageUrl) ? 1 : 0;
+    } else if (this.isGroupRow(row)) {
+      return row.originalRecords.filter(r => this.hasImage(r.imageUrl)).length;
+    }
+    return 0;
+  }
 }

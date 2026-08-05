@@ -1,10 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FertilizerInventoryService } from '../../inventory/update-fertilizer-inventory/fertilizer-inventory.service';
 import { ConfirmDialogComponent } from '../../users/confirm-dialog/confirm-dialog.component';
@@ -12,7 +12,7 @@ import { ConfirmDialogComponent } from '../../users/confirm-dialog/confirm-dialo
 @Component({
   selector: 'app-fertilizer-master',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatButtonModule, MatDialogModule],
   templateUrl: './fertilizer-master.component.html',
   styleUrls: ['./fertilizer-master.component.css']
 })
@@ -26,7 +26,11 @@ export class FertilizerMasterComponent implements OnInit {
   type: 'FERTILIZER' | 'DISEASE_CONTROL' = 'FERTILIZER';
   title = 'Fertilizer Master';
   list: string[] = [];
-  isFormExpanded = false;
+  editingName: string | null = null;
+
+  get itemTypeName(): string {
+    return this.type === 'DISEASE_CONTROL' ? 'Disease Control' : 'Fertilizer';
+  }
 
   form = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.maxLength(100)])
@@ -59,14 +63,33 @@ export class FertilizerMasterComponent implements OnInit {
     });
   }
 
+  @ViewChild('dialogTemplate') dialogTemplate!: TemplateRef<any>;
+  private dialogRef?: any;
+
   openCreateForm() {
     this.form.reset();
-    this.isFormExpanded = true;
+    this.editingName = null;
+    this.dialogRef = this.confirmDialog.open(this.dialogTemplate, {
+      width: '400px',
+      disableClose: true
+    });
   }
 
   closeForm() {
-    this.isFormExpanded = false;
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
+    this.editingName = null;
     this.form.reset();
+  }
+
+  selectForEdit(name: string) {
+    this.form.patchValue({ name });
+    this.editingName = name;
+    this.dialogRef = this.confirmDialog.open(this.dialogTemplate, {
+      width: '400px',
+      disableClose: true
+    });
   }
 
   submit() {
@@ -76,21 +99,58 @@ export class FertilizerMasterComponent implements OnInit {
     }
 
     const nameValue = this.form.get('name')?.value || '';
+    const trimmedName = nameValue.trim();
     
-    this.service.createInputCatalog({ type: this.type, name: nameValue }).subscribe({
-      next: () => {
-        this.snackBar.open('Created successfully', 'Close', {
-          duration: 3000,
-          panelClass: ['centered-success-snackbar']
-        });
-        this.loadList();
-        this.closeForm();
-      },
-      error: (err) => {
-        console.error('Failed to create catalog entry', err);
-        this.snackBar.open('Creation failed', 'Close', { duration: 4000 });
+    // Client-side duplicate check (case-insensitive)
+    const isDuplicate = this.list.some(item => item.toLowerCase() === trimmedName.toLowerCase());
+
+    if (this.editingName) {
+      if (isDuplicate && trimmedName.toLowerCase() !== this.editingName.toLowerCase()) {
+        this.snackBar.open(`${this.itemTypeName} already exists`, 'Close', { duration: 4000 });
+        return;
       }
-    });
+
+      this.service.updateInputCatalog({ type: this.type, oldName: this.editingName, newName: trimmedName }).subscribe({
+        next: () => {
+          this.snackBar.open('Updated successfully', 'Close', {
+            duration: 3000,
+            panelClass: ['centered-success-snackbar']
+          });
+          this.loadList();
+          this.closeForm();
+        },
+        error: (err) => {
+          console.error('Failed to update catalog entry', err);
+          const message = err.status === 400 && (err.error?.detail || err.error?.title || '').toLowerCase().includes('already exists')
+            ? `${this.itemTypeName} already exists`
+            : 'Update failed';
+          this.snackBar.open(message, 'Close', { duration: 4000 });
+        }
+      });
+    } else {
+      if (isDuplicate) {
+        this.snackBar.open(`${this.itemTypeName} already exists`, 'Close', { duration: 4000 });
+        return;
+      }
+
+      this.service.createInputCatalog({ type: this.type, name: trimmedName }).subscribe({
+        next: () => {
+          this.snackBar.open('Created successfully', 'Close', {
+            duration: 3000,
+            panelClass: ['centered-success-snackbar']
+          });
+          this.loadList();
+          this.closeForm();
+        },
+        error: (err) => {
+          console.error('Failed to create catalog entry', err);
+          const message = err.status === 400 && (err.error?.detail || err.error?.title || '').toLowerCase().includes('already exists')
+            ? `${this.itemTypeName} already exists`
+            : 'Creation failed';
+          this.snackBar.open(message, 'Close', { duration: 4000 });
+        }
+      });
+    }
   }
 
   delete(name: string) {

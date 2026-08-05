@@ -73,7 +73,7 @@
                 @if (hasImage(row.data.imageUrl)) {
                   <button 
                     mat-icon-button 
-                    (click)="openImagePopup(row.data.imageUrl!)" 
+                    (click)="openImagePopup(row.data.imageUrl!); $event.stopPropagation()" 
                     class="attachment-button image-button"
                     title="View image">
                     <mat-icon>image</mat-icon>
@@ -82,32 +82,49 @@
                 @if (hasAudio(row.data.voiceNoteUrl)) {
                   <button 
                     mat-icon-button 
-                    (click)="openAudioPopup(row.data.voiceNoteUrl!)" 
+                    (click)="openAudioPopup(row.data.voiceNoteUrl!); $event.stopPropagation()" 
                     class="attachment-button audio-button"
                     title="Play audio">
                     <mat-icon>audiotrack</mat-icon>
                   </button>
                 }
               </div>
-            } @else if (isGroupRow(row) && row.originalRecords.length === 1) {
+            } @else if (isGroupRow(row)) {
               <div class="attachments-container">
-                @if (hasImage(row.originalRecords[0].imageUrl)) {
-                  <button 
-                    mat-icon-button 
-                    (click)="openImagePopup(row.originalRecords[0].imageUrl!)" 
-                    class="attachment-button image-button"
-                    title="View image">
-                    <mat-icon>image</mat-icon>
-                  </button>
-                }
-                @if (hasAudio(row.originalRecords[0].voiceNoteUrl)) {
-                  <button 
-                    mat-icon-button 
-                    (click)="openAudioPopup(row.originalRecords[0].voiceNoteUrl!)" 
-                    class="attachment-button audio-button"
-                    title="Play audio">
-                    <mat-icon>audiotrack</mat-icon>
-                  </button>
+                @if (row.originalRecords.length === 1) {
+                  @if (hasImage(row.originalRecords[0].imageUrl)) {
+                    <button 
+                      mat-icon-button 
+                      (click)="openImagePopup(row.originalRecords[0].imageUrl!); $event.stopPropagation()" 
+                      class="attachment-button image-button"
+                      title="View image">
+                      <mat-icon>image</mat-icon>
+                    </button>
+                  }
+                  @if (hasAudio(row.originalRecords[0].voiceNoteUrl)) {
+                    <button 
+                      mat-icon-button 
+                      (click)="openAudioPopup(row.originalRecords[0].voiceNoteUrl!); $event.stopPropagation()" 
+                      class="attachment-button audio-button"
+                      title="Play audio">
+                      <mat-icon>audiotrack</mat-icon>
+                    </button>
+                  }
+                } @else if (!row.isExpanded) {
+                  <div class="attachment-summary-container">
+                    @if (getImageCount(row) > 0) {
+                      <div class="summary-badge image-summary" title="Total images in group">
+                        <mat-icon>image</mat-icon>
+                        <span class="attachment-badge-count">{{ getImageCount(row) }}</span>
+                      </div>
+                    }
+                    @if (getAudioCount(row) > 0) {
+                      <div class="summary-badge audio-summary" title="Total audios in group">
+                        <mat-icon>audiotrack</mat-icon>
+                        <span class="attachment-badge-count">{{ getAudioCount(row) }}</span>
+                      </div>
+                    }
+                  </div>
                 }
               </div>
             }

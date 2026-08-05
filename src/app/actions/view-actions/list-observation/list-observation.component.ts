@@ -184,6 +184,34 @@ export class ListObservationComponent {
   }
 
   /**
+   * Gets the count of images attached to a row
+   * @param row The table row
+   * @returns Number of images
+   */
+  getImageCount(row: TableRow): number {
+    if (this.isDetailRow(row)) {
+      return this.hasImage(row.data.imageUrl) ? 1 : 0;
+    } else if (this.isGroupRow(row)) {
+      return row.originalRecords.filter(r => this.hasImage(r.imageUrl)).length;
+    }
+    return 0;
+  }
+
+  /**
+   * Gets the count of audios attached to a row
+   * @param row The table row
+   * @returns Number of audios
+   */
+  getAudioCount(row: TableRow): number {
+    if (this.isDetailRow(row)) {
+      return this.hasAudio(row.data.voiceNoteUrl) ? 1 : 0;
+    } else if (this.isGroupRow(row)) {
+      return row.originalRecords.filter(r => this.hasAudio(r.voiceNoteUrl)).length;
+    }
+    return 0;
+  }
+
+  /**
    * Opens the image popup
    * @param imageUrl The local file path of the image
    */
