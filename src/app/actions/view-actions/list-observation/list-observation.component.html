@@ -136,6 +136,112 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.grouped-row]="isGroupRow(row)" [class.detail-row]="isDetailRow(row)" (click)="onRowClick(row)"></tr>
       </table>
     </div>
+
+  <!-- Cards View (Mobile/Tablet) -->
+  <div class="cards-container">
+    @for (row of dataSource.data; track row) {
+      @if (isGroupRow(row)) {
+        <mat-card class="observation-card group-card" [class.expandable]="row.originalRecords.length > 1" (click)="onRowClick(row)">
+          <mat-card-header>
+            <div class="card-header-main">
+              <mat-card-title class="card-date">{{ row.date }}</mat-card-title>
+              @if (row.originalRecords.length > 1) {
+                <span class="records-count">({{ row.originalRecords.length }} items)</span>
+              }
+            </div>
+            <div class="card-header-actions">
+              @if (row.originalRecords.length > 1) {
+                <mat-icon class="expand-icon">{{ row.isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+              }
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="badges-container card-section">
+              @for (type of row.uniqueTypes; track type) {
+                <span class="observation-type-badge">{{ type }}</span>
+              }
+            </div>
+            <div class="card-message-text card-section">
+              {{ row.messages }}
+            </div>
+          </mat-card-content>
+          <mat-card-actions class="card-actions-row" (click)="$event.stopPropagation()">
+            @if (row.originalRecords.length === 1) {
+              @if (hasImage(row.originalRecords[0].imageUrl)) {
+                <button 
+                  mat-icon-button 
+                  (click)="openImagePopup(row.originalRecords[0].imageUrl!); $event.stopPropagation()" 
+                  class="attachment-button image-button"
+                  title="View image">
+                  <mat-icon>image</mat-icon>
+                </button>
+              }
+              @if (hasAudio(row.originalRecords[0].voiceNoteUrl)) {
+                <button 
+                  mat-icon-button 
+                  (click)="openAudioPopup(row.originalRecords[0].voiceNoteUrl!); $event.stopPropagation()" 
+                  class="attachment-button audio-button"
+                  title="Play audio">
+                  <mat-icon>audiotrack</mat-icon>
+                </button>
+              }
+            } @else if (!row.isExpanded) {
+              <div class="attachment-summary-container">
+                @if (getImageCount(row) > 0) {
+                  <div class="summary-badge image-summary" title="Total images in group">
+                    <mat-icon>image</mat-icon>
+                    <span class="attachment-badge-count">{{ getImageCount(row) }}</span>
+                  </div>
+                }
+                @if (getAudioCount(row) > 0) {
+                  <div class="summary-badge audio-summary" title="Total audios in group">
+                    <mat-icon>audiotrack</mat-icon>
+                    <span class="attachment-badge-count">{{ getAudioCount(row) }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </mat-card-actions>
+        </mat-card>
+      } @else if (isDetailRow(row)) {
+        <mat-card class="observation-card detail-card">
+          <mat-card-header>
+            <mat-card-subtitle class="card-time">
+              {{ row.data.createdAt | date: 'h:mm a' }}
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="card-type-row card-section">
+              <span class="observation-type-badge detail-badge">{{ row.data.observationType }}</span>
+            </div>
+            <div class="card-message-text card-section">
+              {{ row.data.message }}
+            </div>
+          </mat-card-content>
+          <mat-card-actions class="card-actions-row" (click)="$event.stopPropagation()">
+            @if (hasImage(row.data.imageUrl)) {
+              <button 
+                mat-icon-button 
+                (click)="openImagePopup(row.data.imageUrl!); $event.stopPropagation()" 
+                class="attachment-button image-button"
+                title="View image">
+                <mat-icon>image</mat-icon>
+              </button>
+            }
+            @if (hasAudio(row.data.voiceNoteUrl)) {
+              <button 
+                mat-icon-button 
+                (click)="openAudioPopup(row.data.voiceNoteUrl!); $event.stopPropagation()" 
+                class="attachment-button audio-button"
+                title="Play audio">
+                <mat-icon>audiotrack</mat-icon>
+              </button>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+    }
+  </div>
   }
 
   <!-- Empty State -->

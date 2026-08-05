@@ -13,6 +13,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { FileServerService } from '../../../file-upload/file-server.service';
+import { MatCardModule } from '@angular/material/card';
 
 export interface GroupedActivity {
   rowType: 'group';
@@ -34,7 +35,7 @@ export type TableRow = GroupedActivity | DetailActivity;
 @Component({
   selector: 'app-list-activity',
   standalone: true,
-  imports: [DatePipe, MatListModule, MatIconModule, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatDialogModule],
+  imports: [DatePipe, MatListModule, MatIconModule, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatDialogModule, MatCardModule],
   templateUrl: './list-activity.component.html',
   styleUrls: ['./list-activity.component.css']
 })

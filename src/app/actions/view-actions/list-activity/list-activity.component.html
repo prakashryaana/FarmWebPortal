@@ -97,6 +97,78 @@
         [class.detail-row]="isDetailRow(row)" (click)="onRowClick(row)"></tr>
     </table>
   </div>
+
+  <!-- Cards View (Mobile/Tablet) -->
+  <div class="cards-container">
+    @for (row of dataSource.data; track row) {
+      @if (isGroupRow(row)) {
+        <mat-card class="activity-card group-card" [class.expandable]="row.originalRecords.length > 1" (click)="onRowClick(row)">
+          <mat-card-header>
+            <div class="card-header-main">
+              <mat-card-title class="card-date">{{ row.date }}</mat-card-title>
+              @if (row.originalRecords.length > 1) {
+                <span class="records-count">({{ row.originalRecords.length }} items)</span>
+              }
+            </div>
+            <div class="card-header-actions">
+              @if (row.originalRecords.length > 1) {
+                <mat-icon class="expand-icon">{{ row.isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+              }
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="badges-container card-section">
+              @for (type of row.uniqueTypes; track type) {
+                <span class="activity-type-badge">{{ type }}</span>
+              }
+            </div>
+            <div class="card-message-text card-section">
+              {{ row.messages }}
+            </div>
+          </mat-card-content>
+          <mat-card-actions class="card-actions-row" (click)="$event.stopPropagation()">
+            @if (getImageCount(row) > 0) {
+              @if (row.originalRecords.length === 1 && hasImage(row.originalRecords[0].imageUrl)) {
+                <button mat-icon-button (click)="openImagePopup(row.originalRecords[0].imageUrl!); $event.stopPropagation()" class="image-button" title="View image">
+                  <mat-icon>image</mat-icon>
+                </button>
+              } @else if (!row.isExpanded) {
+                <div class="attachment-summary-container">
+                  <div class="summary-badge image-summary" title="Total images in group">
+                    <mat-icon>image</mat-icon>
+                    <span class="attachment-badge-count">{{ getImageCount(row) }}</span>
+                  </div>
+                </div>
+              }
+            }
+          </mat-card-actions>
+        </mat-card>
+      } @else if (isDetailRow(row)) {
+        <mat-card class="activity-card detail-card">
+          <mat-card-header>
+            <mat-card-subtitle class="card-time">
+              {{ row.data.createdAt | date: 'h:mm a' }}
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="card-type-row card-section">
+              <span class="activity-type-badge detail-badge">{{ row.data.activityType }}</span>
+            </div>
+            <div class="card-message-text card-section">
+              {{ formatMessage(row.data) }}
+            </div>
+          </mat-card-content>
+          <mat-card-actions class="card-actions-row" (click)="$event.stopPropagation()">
+            @if (hasImage(row.data.imageUrl)) {
+              <button mat-icon-button (click)="openImagePopup(row.data.imageUrl!); $event.stopPropagation()" class="image-button" title="View image">
+                <mat-icon>image</mat-icon>
+              </button>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+    }
+  </div>
   }
 
   <!-- Empty State -->

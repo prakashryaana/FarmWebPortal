@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CropFarmSelectorService } from '../../../crop-farm-selector/crop-farm-selector.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { FileServerService } from '../../../file-upload/file-server.service';
+import { MatCardModule } from '@angular/material/card';
 
 export interface GroupedObservation {
   rowType: 'group';
@@ -29,7 +30,7 @@ export type TableRow = GroupedObservation | DetailObservation;
 @Component({
   selector: 'app-list-observation',
   standalone: true,
-  imports: [DatePipe, MatTableModule, MatProgressSpinnerModule, MatIconModule, MatButtonModule],
+  imports: [DatePipe, MatTableModule, MatProgressSpinnerModule, MatIconModule, MatButtonModule, MatCardModule],
   templateUrl: './list-observation.component.html',
   styleUrls: ['./list-observation.component.css']
 })
