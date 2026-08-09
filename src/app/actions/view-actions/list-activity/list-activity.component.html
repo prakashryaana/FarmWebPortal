@@ -55,9 +55,9 @@
         </th>
         <td mat-cell *matCellDef="let row" class="column-cell">
           @if (isGroupRow(row)) {
-          <textarea readonly class="table-text-field message-field">{{ row.messages }}</textarea>
+          <span class="table-message-text" [title]="row.messages">{{ getDisplayMessage(row) }}</span>
           } @else {
-          <textarea readonly class="table-text-field message-field">{{ formatMessage(row.data) }}</textarea>
+          <span class="table-message-text">{{ formatMessage(row.data) }}</span>
           }
         </td>
       </ng-container>
@@ -122,8 +122,8 @@
                 <span class="activity-type-badge">{{ type }}</span>
               }
             </div>
-            <div class="card-message-text card-section">
-              {{ row.messages }}
+            <div class="card-message-text card-section" [title]="row.messages">
+              {{ getDisplayMessage(row) }}
             </div>
           </mat-card-content>
           <mat-card-actions class="card-actions-row" (click)="$event.stopPropagation()">

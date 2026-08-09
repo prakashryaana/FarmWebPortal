@@ -193,6 +193,17 @@ export class ListActivityComponent {
     return row.rowType === 'group';
   }
 
+  getDisplayMessage(row: TableRow): string {
+    if (this.isGroupRow(row)) {
+      const msg = row.messages || '';
+      if (row.originalRecords.length === 1) {
+        return msg;
+      }
+      return msg.substring(0, 17) + '...';
+    }
+    return '';
+  }
+
   /**
    * Formats message to include productName and quantity in square brackets at the start
    * @param activity The activity record

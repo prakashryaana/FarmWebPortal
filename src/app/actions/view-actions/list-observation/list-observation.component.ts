@@ -170,6 +170,17 @@ export class ListObservationComponent {
     return row.rowType === 'group';
   }
 
+  getDisplayMessage(row: TableRow): string {
+    if (this.isGroupRow(row)) {
+      const msg = row.messages || '';
+      if (row.originalRecords.length === 1) {
+        return msg;
+      }
+      return msg.substring(0, 17) + '...';
+    }
+    return '';
+  }
+
   /**
    * Checks if an observation has an image
    */
