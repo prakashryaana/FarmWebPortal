@@ -106,7 +106,10 @@ export class FertilizerMasterComponent implements OnInit {
 
     if (this.editingName) {
       if (isDuplicate && trimmedName.toLowerCase() !== this.editingName.toLowerCase()) {
-        this.snackBar.open(`${this.itemTypeName} already exists`, 'Close', { duration: 4000 });
+        this.snackBar.open(`${this.itemTypeName} already exists`, 'Close', {
+          duration: 4000,
+          panelClass: ['centered-warning-snackbar']
+        });
         return;
       }
 
@@ -121,15 +124,22 @@ export class FertilizerMasterComponent implements OnInit {
         },
         error: (err) => {
           console.error('Failed to update catalog entry', err);
-          const message = err.status === 400 && (err.error?.detail || err.error?.title || '').toLowerCase().includes('already exists')
+          const isExists = err.status === 400 && (err.error?.detail || err.error?.title || '').toLowerCase().includes('already exists');
+          const message = isExists
             ? `${this.itemTypeName} already exists`
             : 'Update failed';
-          this.snackBar.open(message, 'Close', { duration: 4000 });
+          this.snackBar.open(message, 'Close', {
+            duration: 4000,
+            panelClass: isExists ? ['centered-warning-snackbar'] : []
+          });
         }
       });
     } else {
       if (isDuplicate) {
-        this.snackBar.open(`${this.itemTypeName} already exists`, 'Close', { duration: 4000 });
+        this.snackBar.open(`${this.itemTypeName} already exists`, 'Close', {
+          duration: 4000,
+          panelClass: ['centered-warning-snackbar']
+        });
         return;
       }
 
@@ -144,10 +154,14 @@ export class FertilizerMasterComponent implements OnInit {
         },
         error: (err) => {
           console.error('Failed to create catalog entry', err);
-          const message = err.status === 400 && (err.error?.detail || err.error?.title || '').toLowerCase().includes('already exists')
+          const isExists = err.status === 400 && (err.error?.detail || err.error?.title || '').toLowerCase().includes('already exists');
+          const message = isExists
             ? `${this.itemTypeName} already exists`
             : 'Creation failed';
-          this.snackBar.open(message, 'Close', { duration: 4000 });
+          this.snackBar.open(message, 'Close', {
+            duration: 4000,
+            panelClass: isExists ? ['centered-warning-snackbar'] : []
+          });
         }
       });
     }
@@ -167,7 +181,10 @@ export class FertilizerMasterComponent implements OnInit {
       if (!confirmed) return;
       this.service.deleteInputCatalog(this.type, name).subscribe({
         next: () => {
-          this.snackBar.open('Deleted successfully', 'Close', { duration: 3000 });
+          this.snackBar.open(`${this.itemTypeName} deleted successfully`, 'Close', {
+            duration: 3000,
+            panelClass: ['centered-error-snackbar']
+          });
           this.loadList();
         },
         error: (err) => {
