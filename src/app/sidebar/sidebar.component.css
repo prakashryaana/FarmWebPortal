@@ -609,3 +609,18 @@
     display: none;
   }
 }
+
+@media (min-width: 769px) {
+  .sidebar.collapsed app-language-switcher {
+    display: none;
+  }
+  
+  .sidebar.collapsed .btn-logout .lbl-logout {
+    display: none;
+  }
+
+  .sidebar.collapsed .btn-logout {
+    justify-content: center;
+    padding: 0.6rem;
+  }
+}
