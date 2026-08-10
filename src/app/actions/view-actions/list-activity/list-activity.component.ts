@@ -13,11 +13,13 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { FileServerService } from '../../../file-upload/file-server.service';
+import { MatCardModule } from '@angular/material/card';
 
 export interface GroupedActivity {
   rowType: 'group';
   date: string;
   types: string;
+  uniqueTypes: string[];
   messages: string;
   originalRecords: Activity[];
   isExpanded: boolean;
@@ -33,7 +35,7 @@ export type TableRow = GroupedActivity | DetailActivity;
 @Component({
   selector: 'app-list-activity',
   standalone: true,
-  imports: [DatePipe, MatListModule, MatIconModule, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatDialogModule],
+  imports: [DatePipe, MatListModule, MatIconModule, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatDialogModule, MatCardModule],
   templateUrl: './list-activity.component.html',
   styleUrls: ['./list-activity.component.css']
 })
@@ -44,7 +46,7 @@ export class ListActivityComponent {
   private fileServerService = inject(FileServerService);
   private sanitizer = inject(DomSanitizer);
 
-  displayedColumns: string[] = ['expand', 'createdAt', 'activityType', 'message', 'image'];
+  displayedColumns: string[] = ['createdAt', 'activityType', 'message', 'image'];
   dataSource = new MatTableDataSource<TableRow>([]);
   loading = false;
 
@@ -116,9 +118,9 @@ export class ListActivityComponent {
   }
 
   private groupByDate(activities: Activity[]): GroupedActivity[] {
-    // Sort activities by date ascending
+    // Sort activities by date descending
     const sorted = [...activities].sort((a, b) => 
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     // Group by date (yyyy-MM-dd)
@@ -126,7 +128,10 @@ export class ListActivityComponent {
     
     sorted.forEach(activity => {
       const date = new Date(activity.createdAt);
-      const dateKey = date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const dateKey = `${day}/${month}/${year}`;
       
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
@@ -134,25 +139,26 @@ export class ListActivityComponent {
       grouped[dateKey].push(activity);
     });
 
-    // Convert to GroupedActivity array
+    // Convert to GroupedActivity array and sort groups descending by date
     return Object.entries(grouped).map(([date, records]) => ({
       rowType: 'group' as const,
       date,
       types: this.concatenateTypes(records),
+      uniqueTypes: Array.from(new Set(records.map(r => r.activityType))),
       messages: this.concatenateMessages(records),
       originalRecords: records,
       isExpanded: false
-    }));
+    })).sort((a, b) => 
+      new Date(b.originalRecords[0].createdAt).getTime() - new Date(a.originalRecords[0].createdAt).getTime()
+    );
   }
 
   private concatenateTypes(activities: Activity[]): string {
-    const types = activities.map(a => a.activityType).join(', ');
-    return types.length > 20 ? types.substring(0, 17) + '...' : types;
+    return activities.map(a => a.activityType).join(', ');
   }
 
   private concatenateMessages(activities: Activity[]): string {
-    const messages = activities.map(a => a.message).join(', ');
-    return messages.length > 20 ? messages.substring(0, 17) + '...' : messages;
+    return activities.map(a => a.message).join(', ');
   }
 
   toggleExpand(group: GroupedActivity): void {
@@ -160,6 +166,15 @@ export class ListActivityComponent {
     // Refresh flattened data
     const grouped = this.dataSource.data.filter(r => r.rowType === 'group') as GroupedActivity[];
     this.dataSource.data = this.flattenRows(grouped);
+  }
+
+  onRowClick(row: TableRow): void {
+    if (this.isGroupRow(row)) {
+      const group = row as GroupedActivity;
+      if (group.originalRecords.length > 1) {
+        this.toggleExpand(group);
+      }
+    }
   }
 
   getFullTypeList(group: GroupedActivity): string {
@@ -170,12 +185,23 @@ export class ListActivityComponent {
     return group.originalRecords.map(r => r.message).join(', ');
   }
 
-  isDetailRow(row: TableRow): boolean {
+  isDetailRow(row: TableRow): row is DetailActivity {
     return row.rowType === 'detail';
   }
 
-  isGroupRow(row: TableRow): boolean {
+  isGroupRow(row: TableRow): row is GroupedActivity {
     return row.rowType === 'group';
+  }
+
+  getDisplayMessage(row: TableRow): string {
+    if (this.isGroupRow(row)) {
+      const msg = row.messages || '';
+      if (row.originalRecords.length === 1) {
+        return msg;
+      }
+      return msg.substring(0, 17) + '...';
+    }
+    return '';
   }
 
   /**
@@ -225,5 +251,19 @@ export class ListActivityComponent {
    */
   hasImage(imageUrl: string | null): boolean {
     return imageUrl != null && imageUrl.trim() !== '';
+  }
+
+  /**
+   * Gets the count of images attached to a row
+   * @param row The table row
+   * @returns Number of images
+   */
+  getImageCount(row: TableRow): number {
+    if (this.isDetailRow(row)) {
+      return this.hasImage(row.data.imageUrl) ? 1 : 0;
+    } else if (this.isGroupRow(row)) {
+      return row.originalRecords.filter(r => this.hasImage(r.imageUrl)).length;
+    }
+    return 0;
   }
 }

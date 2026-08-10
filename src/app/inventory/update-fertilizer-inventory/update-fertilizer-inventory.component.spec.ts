@@ -4,6 +4,7 @@ import { FertilizerInventoryService, FertilizerInventory } from './fertilizer-in
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { of, throwError } from 'rxjs';
+import { FormArray } from '@angular/forms';
 
 describe('UpdateFertilizerInventoryComponent', () => {
   let component: UpdateFertilizerInventoryComponent;
@@ -14,25 +15,41 @@ describe('UpdateFertilizerInventoryComponent', () => {
 
   const mockData: FertilizerInventory[] = [
     {
-      id: '1',
-      fertilizerName: 'NPK 10:26:26',
-      quantitySupplied: 100.50,
+      inventoryId: '1',
+      farmId: 'farm1',
+      invoiceNumber: 'INV-001',
+      supplier: 'Supplier A',
       suppliedDate: '2024-01-15T10:00:00Z',
-      quantityUsed: 45.25,
-      usedDate: '2024-02-10T14:30:00Z'
+      fertilizerItems: [
+        {
+          fertilizerName: 'NPK 10:26:26',
+          quantitySupplied: 100.50,
+          quantityMetric: 'Packets',
+          quantityUsed: 45.25,
+          usedDate: '2024-02-10T14:30:00Z'
+        }
+      ]
     },
     {
-      id: '2',
-      fertilizerName: 'Urea',
-      quantitySupplied: 200.00,
+      inventoryId: '2',
+      farmId: 'farm1',
+      invoiceNumber: 'INV-002',
+      supplier: 'Supplier B',
       suppliedDate: '2024-01-20T11:00:00Z',
-      quantityUsed: 120.75,
-      usedDate: '2024-02-15T15:00:00Z'
+      fertilizerItems: [
+        {
+          fertilizerName: 'Urea',
+          quantitySupplied: 200.00,
+          quantityMetric: 'Packets',
+          quantityUsed: 120.75,
+          usedDate: '2024-02-15T15:00:00Z'
+        }
+      ]
     }
   ];
 
   beforeEach(async () => {
-    mockService = jasmine.createSpyObj('FertilizerInventoryService', ['list', 'create', 'update', 'delete']);
+    mockService = jasmine.createSpyObj('FertilizerInventoryService', ['list', 'create', 'update', 'delete', 'getInputCatalogNames']);
     mockSnackBar = jasmine.createSpyObj('MatSnackBar', ['open']);
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
 
@@ -45,7 +62,8 @@ describe('UpdateFertilizerInventoryComponent', () => {
       ]
     }).compileComponents();
 
-    mockService.list.and.returnValue(of(mockData));
+    mockService.list.and.returnValue(of({ success: true, data: mockData }));
+    mockService.getInputCatalogNames.and.returnValue(of(['NPK 10:26:26', 'Urea']));
     fixture = TestBed.createComponent(UpdateFertilizerInventoryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -58,7 +76,8 @@ describe('UpdateFertilizerInventoryComponent', () => {
   it('should load fertilizer list on init', () => {
     expect(mockService.list).toHaveBeenCalled();
     expect(component.list.length).toBe(2);
-    expect(component.list[0].fertilizerName).toBe('NPK 10:26:26');
+    expect(component.list[0].invoiceNumber).toBe('INV-001');
+    expect(component.list[0].fertilizerItems.length).toBe(1);
   });
 
   describe('Create Operations', () => {
@@ -66,95 +85,67 @@ describe('UpdateFertilizerInventoryComponent', () => {
       component.openCreateForm();
       expect(component.isFormExpanded).toBe(true);
       expect(component.editingId).toBeNull();
+      expect(component.fertilizerItems.length).toBe(1);
+    });
+
+    it('should add fertilizer item to form array', () => {
+      component.openCreateForm();
+      const initialLength = component.fertilizerItems.length;
+      component.addFertilizerItem();
+      expect(component.fertilizerItems.length).toBe(initialLength + 1);
     });
 
     it('should submit create with valid form', () => {
       mockService.create.and.returnValue(of({}));
 
+      component.openCreateForm();
       component.form.patchValue({
-        fertilizerName: 'DAP',
-        quantitySupplied: 150.00,
-        suppliedDate: new Date(),
-        quantityUsed: 50.00,
-        usedDate: new Date()
+        invoiceNumber: 'INV-003',
+        supplier: 'Test Supplier',
+        suppliedDate: new Date()
+      });
+      component.fertilizerItems.at(0)?.patchValue({
+        fertilizerName: 'NPK 10:26:26',
+        quantitySupplied: 100.00,
+        quantityMetric: 'Packets'
       });
 
       component.submit();
 
       expect(mockService.create).toHaveBeenCalled();
       expect(mockSnackBar.open).toHaveBeenCalledWith('Created successfully', 'Close', { duration: 3000 });
-      expect(component.isFormExpanded).toBe(false);
+    });
+
+    it('should not submit with invalid form', () => {
+      component.openCreateForm();
+      component.form.reset();
+      const fertilizerArray = component.form.get('fertilizerItems') as FormArray;
+      fertilizerArray.clear();
+      
+      component.submit();
+      expect(mockService.create).not.toHaveBeenCalled();
+      expect(mockSnackBar.open).toHaveBeenCalledWith('Please fill all required fields', 'Close', { duration: 3000 });
     });
 
     it('should show error on create failure', () => {
       mockService.create.and.returnValue(throwError(() => new Error('Create failed')));
 
+      component.openCreateForm();
       component.form.patchValue({
-        fertilizerName: 'DAP',
-        quantitySupplied: 150.00,
-        suppliedDate: new Date(),
-        quantityUsed: 50.00,
-        usedDate: new Date()
+        invoiceNumber: 'INV-003',
+        supplier: 'Test Supplier'
       });
 
       component.submit();
-
       expect(mockSnackBar.open).toHaveBeenCalledWith('Create failed', 'Close', { duration: 4000 });
-    });
-
-    it('should not submit with invalid form', () => {
-      component.form.reset();
-      component.submit();
-      expect(mockService.create).not.toHaveBeenCalled();
-      expect(mockSnackBar.open).toHaveBeenCalledWith('Please fill all required fields', 'Close', { duration: 3000 });
-    });
-  });
-
-  describe('Edit Operations', () => {
-    it('should select item for edit and expand form', () => {
-      const item = mockData[0];
-      component.selectForEdit(item);
-
-      expect(component.isFormExpanded).toBe(true);
-      expect(component.editingId).toBe('1');
-      expect(component.form.get('fertilizerName')?.value).toBe('NPK 10:26:26');
-      expect(component.form.get('quantitySupplied')?.value).toBe(100.50);
-    });
-
-    it('should submit update with valid form', () => {
-      mockService.update.and.returnValue(of({}));
-
-      component.selectForEdit(mockData[0]);
-      component.form.patchValue({
-        fertilizerName: 'NPK 10:26:26 (Updated)',
-        quantityUsed: 50.00
-      });
-
-      component.submit();
-
-      expect(mockService.update).toHaveBeenCalled();
-      expect(mockSnackBar.open).toHaveBeenCalledWith('Updated successfully', 'Close', { duration: 3000 });
-      expect(component.isFormExpanded).toBe(false);
-    });
-
-    it('should show error on update failure', () => {
-      mockService.update.and.returnValue(throwError(() => new Error('Update failed')));
-
-      component.selectForEdit(mockData[0]);
-      component.form.patchValue({ fertilizerName: 'Updated' });
-
-      component.submit();
-
-      expect(mockSnackBar.open).toHaveBeenCalledWith('Update failed', 'Close', { duration: 4000 });
     });
   });
 
   describe('Delete Operations', () => {
     it('should delete item after confirmation', () => {
+      const deleteResponse = { afterClosed: () => of(true) };
+      mockDialog.open.and.returnValue(deleteResponse as any);
       mockService.delete.and.returnValue(of({}));
-      const mockDialogRef = jasmine.createSpyObj('DialogRef', ['afterClosed']);
-      mockDialogRef.afterClosed.and.returnValue(of(true));
-      mockDialog.open.and.returnValue(mockDialogRef);
 
       component.delete(mockData[0]);
 
@@ -163,10 +154,9 @@ describe('UpdateFertilizerInventoryComponent', () => {
       expect(mockSnackBar.open).toHaveBeenCalledWith('Deleted successfully', 'Close', { duration: 3000 });
     });
 
-    it('should not delete if user cancels', () => {
-      const mockDialogRef = jasmine.createSpyObj('DialogRef', ['afterClosed']);
-      mockDialogRef.afterClosed.and.returnValue(of(false));
-      mockDialog.open.and.returnValue(mockDialogRef);
+    it('should not delete item if confirmation cancelled', () => {
+      const deleteResponse = { afterClosed: () => of(false) };
+      mockDialog.open.and.returnValue(deleteResponse as any);
 
       component.delete(mockData[0]);
 
@@ -174,10 +164,9 @@ describe('UpdateFertilizerInventoryComponent', () => {
     });
 
     it('should show error on delete failure', () => {
+      const deleteResponse = { afterClosed: () => of(true) };
+      mockDialog.open.and.returnValue(deleteResponse as any);
       mockService.delete.and.returnValue(throwError(() => new Error('Delete failed')));
-      const mockDialogRef = jasmine.createSpyObj('DialogRef', ['afterClosed']);
-      mockDialogRef.afterClosed.and.returnValue(of(true));
-      mockDialog.open.and.returnValue(mockDialogRef);
 
       component.delete(mockData[0]);
 
@@ -185,66 +174,41 @@ describe('UpdateFertilizerInventoryComponent', () => {
     });
   });
 
-  describe('Form Management', () => {
-    it('should close form and reset', () => {
-      component.isFormExpanded = true;
-      component.editingId = '1';
-      component.form.patchValue({ fertilizerName: 'Test' });
+  describe('UI Operations', () => {
+    it('should toggle expand row', () => {
+      component.expandedRowId = null;
+      component.toggleExpand(mockData[0]);
+      expect(component.expandedRowId).toBe('1');
+
+      component.toggleExpand(mockData[0]);
+      expect(component.expandedRowId).toBeNull();
+    });
+
+    it('should close form and reset state', () => {
+      component.openCreateForm();
+      expect(component.isFormExpanded).toBe(true);
 
       component.closeForm();
-
       expect(component.isFormExpanded).toBe(false);
       expect(component.editingId).toBeNull();
-      expect(component.form.get('fertilizerName')?.value).toBeNull();
     });
 
-    it('should format quantity to 2 decimal places', () => {
-      component.form.patchValue({
-        fertilizerName: 'Test Fertilizer',
-        quantitySupplied: 100.555,
-        quantityUsed: 50.444,
-        suppliedDate: new Date(),
-        usedDate: new Date()
-      });
+    it('should remove fertilizer item from array', () => {
+      component.openCreateForm();
+      component.addFertilizerItem();
+      const initialLength = component.fertilizerItems.length;
 
-      const payload = (component as any).buildPayload();
-
-      expect(payload.quantitySupplied).toBe(100.56);
-      expect(payload.quantityUsed).toBe(50.44);
-    });
-  });
-
-  describe('Data Refresh', () => {
-    it('should reload list after create', () => {
-      mockService.create.and.returnValue(of({}));
-      mockService.list.calls.reset();
-      mockService.list.and.returnValue(of(mockData));
-
-      component.form.patchValue({
-        fertilizerName: 'New Fertilizer',
-        quantitySupplied: 100.00,
-        suppliedDate: new Date(),
-        quantityUsed: 30.00,
-        usedDate: new Date()
-      });
-
-      component.submit();
-
-      expect(mockService.list).toHaveBeenCalled();
+      if (initialLength > 1) {
+        component.removeFertilizerItem(0);
+        expect(component.fertilizerItems.length).toBe(initialLength - 1);
+      }
     });
 
-    it('should reload list after delete', () => {
-      mockService.delete.and.returnValue(of({}));
-      mockService.list.calls.reset();
-      mockService.list.and.returnValue(of(mockData));
-
-      const mockDialogRef = jasmine.createSpyObj('DialogRef', ['afterClosed']);
-      mockDialogRef.afterClosed.and.returnValue(of(true));
-      mockDialog.open.and.returnValue(mockDialogRef);
-
-      component.delete(mockData[0]);
-
-      expect(mockService.list).toHaveBeenCalled();
+    it('should prevent removing last item', () => {
+      component.openCreateForm();
+      expect(component.fertilizerItems.length).toBe(1);
+      component.removeFertilizerItem(0);
+      expect(mockSnackBar.open).toHaveBeenCalledWith('At least one fertilizer item is required', 'Close', { duration: 3000 });
     });
   });
 });

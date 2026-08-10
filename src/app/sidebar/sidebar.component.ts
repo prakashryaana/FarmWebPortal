@@ -26,7 +26,7 @@ interface MenuItem {
   selector: 'app-sidebar',
   standalone: true,
   imports: [RouterLink, CommonModule, MatIconModule, MatTooltipModule, MatProgressSpinnerModule,
-     TranslateModule, LanguageSwitcherComponent],
+    TranslateModule, LanguageSwitcherComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
@@ -40,7 +40,7 @@ export class SidebarComponent {
 
   menuItems: MenuItem[] = [];
 
-  constructor(private router: Router, private auth:AuthService) {
+  constructor(private router: Router, private auth: AuthService) {
     this.loadUserProfile();
   }
 
@@ -60,9 +60,9 @@ export class SidebarComponent {
   }
 
   setMenuByRole() {
-    if(this.authService.hasRole('FARMOWNER')){
+    if (this.authService.hasRole('FARMOWNER')) {
       this.menuItems = [
-        { label: 'navigation.setupCrop', route: '/crop-registration', icon: 'grass' },
+        //{ label: 'navigation.setupCrop', route: '/crop-registration', icon: 'grass' },
         { label: 'actions.addAction', route: '/add-actions', icon: 'add_circle' },
         { label: 'actions.viewActions', route: '/view-actions', icon: 'list' }
       ];
@@ -77,16 +77,16 @@ export class SidebarComponent {
         { label: 'navigation.farmHelpRegistration', route: '/maintainer-registration', icon: 'person_add' },
         { label: 'navigation.farmRegistration', route: '/farm-registration', icon: 'agriculture' },
         { label: 'navigation.setupCrop', route: '/crop-registration', icon: 'grass' },
-        { label: 'actions.addAction' , route: '/add-actions', icon: 'add_circle' },
+        { label: 'actions.addAction', route: '/add-actions', icon: 'add_circle' },
         { label: 'actions.viewActions', route: '/view-actions', icon: 'list' },
         // {
         //   label: 'Manage',
         //   icon: 'settings',
         //   submenu: [
-            { label: 'navigation.manageUsers', route: '/user-management', icon: 'group' },
-            { label: 'navigation.manageCropMaster', route: '/crop-master', icon: 'local_florist' },
-            { label: 'navigation.manageFertilizerInventory', route: '/fertilizer-inventory', icon: 'grain' },
-            { label: 'navigation.manageDiseaseControlInventory', route: '/disease-control-inventory', icon: 'medical_services' }
+        { label: 'navigation.manageUsers', route: '/user-management', icon: 'group' },
+        { label: 'navigation.manageCropMaster', route: '/crop-master', icon: 'local_florist' },
+        { label: 'navigation.manageFertilizerInventory', route: '/fertilizer-inventory', icon: 'grain' },
+        { label: 'navigation.manageDiseaseControlInventory', route: '/disease-control-inventory', icon: 'medical_services' }
         //   ]
         // }
       ];
@@ -118,7 +118,7 @@ export class SidebarComponent {
     return this.expandedMenus().includes(menuLabel);
   }
 
-  logout(){
+  logout() {
     this.auth.logout();
   }
 }

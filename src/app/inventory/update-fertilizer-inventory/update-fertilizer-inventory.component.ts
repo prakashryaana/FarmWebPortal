@@ -31,9 +31,7 @@ export class UpdateFertilizerInventoryComponent {
   get selectedFarmName() { return this.cropFarmSelector.selectedFarmName(); }
   get selectedFarmId() { return this.cropFarmSelector.selectedFarmId(); }
 
-  fertilizerNames = [
-    'A1','A2','A3','A4','A5','B11','BF','C6','Drip Saff','CA','CHA','CSW','Trichoderma',
-    'Pseudomonas','Bio Ferlilizer','VAM','FERT 1','FERT 2','FERT 3','FERT 4','Adjuvent'];
+  fertilizerNames: string[] = [];
   
   quantityMetrics = ['Packets', 'Litres'];
 
@@ -50,9 +48,25 @@ export class UpdateFertilizerInventoryComponent {
   editingId: string | null = null;
   expandedRowId: string | null = null;
 
+  isCatalogFormExpanded = false;
+
+  catalogForm = new FormGroup({
+    type: new FormControl('', [Validators.required]),
+    customType: new FormControl(''),
+    name: new FormControl('', [Validators.required, Validators.maxLength(100)])
+  });
+
   constructor() { 
     effect(() => {
       this.load();
+    });
+    this.loadCatalogNames();
+  }
+
+  loadCatalogNames() {
+    this.svc.getInputCatalogNames('FERTILIZER').subscribe({
+      next: names => this.fertilizerNames = names,
+      error: e => console.error(e)
     });
   }
 
@@ -63,7 +77,13 @@ export class UpdateFertilizerInventoryComponent {
   load() { 
     if(this.selectedFarmId){
       this.svc.list(this.selectedFarmId).subscribe({ 
-      next: r => this.list = r.data, 
+      next: r => {
+        this.list = (r.data || []).sort((a, b) => {
+          const dateA = a.suppliedDate ? new Date(a.suppliedDate).getTime() : 0;
+          const dateB = b.suppliedDate ? new Date(b.suppliedDate).getTime() : 0;
+          return dateB - dateA;
+        });
+      }, 
       error: e => console.error(e) 
     }); 
     } else {
@@ -72,6 +92,7 @@ export class UpdateFertilizerInventoryComponent {
   }
 
   openCreateForm() {
+    this.closeCatalogForm();
     this.form.reset();
     this.form.setControl('fertilizerItems', new FormArray([], [Validators.required, Validators.minLength(1)]));
     this.editingId = null;
@@ -83,6 +104,63 @@ export class UpdateFertilizerInventoryComponent {
     this.isFormExpanded = false;
     this.editingId = null;
     this.form.reset();
+  }
+
+  openCatalogForm() {
+    this.closeForm();
+    this.catalogForm.reset({
+      type: '',
+      customType: '',
+      name: ''
+    });
+    this.catalogForm.get('customType')?.clearValidators();
+    this.catalogForm.get('customType')?.updateValueAndValidity();
+    this.isCatalogFormExpanded = true;
+  }
+
+  closeCatalogForm() {
+    this.isCatalogFormExpanded = false;
+    this.catalogForm.reset();
+  }
+
+  onCatalogTypeChange() {
+    const typeCtrl = this.catalogForm.get('type');
+    const customTypeCtrl = this.catalogForm.get('customType');
+    if (typeCtrl?.value === 'OTHERS') {
+      customTypeCtrl?.setValidators([Validators.required, Validators.maxLength(100)]);
+    } else {
+      customTypeCtrl?.clearValidators();
+      customTypeCtrl?.setValue('');
+    }
+    customTypeCtrl?.updateValueAndValidity();
+  }
+
+  submitCatalog() {
+    if (!this.catalogForm.valid) {
+      this.snackBar.open('Please fill all required fields', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const typeValue = this.catalogForm.get('type')?.value;
+    const customTypeValue = this.catalogForm.get('customType')?.value;
+    const nameValue = this.catalogForm.get('name')?.value;
+
+    const payload = {
+      type: typeValue === 'OTHERS' ? customTypeValue : typeValue,
+      name: nameValue
+    } as any;
+
+    this.svc.createInputCatalog(payload).subscribe({
+      next: () => {
+        this.snackBar.open('Catalog created successfully', 'Close', { duration: 3000 });
+        this.closeCatalogForm();
+        this.loadCatalogNames();
+      },
+      error: (e) => {
+        console.error(e);
+        this.snackBar.open('Failed to create catalog', 'Close', { duration: 4000 });
+      }
+    });
   }
 
   addFertilizerItem() {

@@ -65,6 +65,7 @@
   overflow-y: auto;
 }
 
+
 .btn-logout {
   display: flex;
   align-items: center;
@@ -441,6 +442,7 @@
     overflow-y: hidden;
   }
 
+
   .menu-icon {
     min-width: 18px;
     font-size: 18px;
@@ -605,5 +607,20 @@
 
   .btn-logout .lbl-logout {
     display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .sidebar.collapsed app-language-switcher {
+    display: none;
+  }
+  
+  .sidebar.collapsed .btn-logout .lbl-logout {
+    display: none;
+  }
+
+  .sidebar.collapsed .btn-logout {
+    justify-content: center;
+    padding: 0.6rem;
   }
 }

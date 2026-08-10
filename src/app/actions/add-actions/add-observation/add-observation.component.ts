@@ -122,7 +122,10 @@ export class AddObservationComponent implements OnDestroy {
   // Success handling (reference form directly)
   effect(() => {
     if (!this.serviceLoading() && this.wasLoading()) {
-      this.snackBar.open('Observation saved successfully!', 'Close', { duration: 3000 });
+      this.snackBar.open('Observation saved successfully!', 'Close', {
+        duration: 3000,
+        panelClass: ['centered-success-snackbar']
+      });
       this.reset();
       this.wasLoading.set(false);
     }

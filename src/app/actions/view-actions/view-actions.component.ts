@@ -61,18 +61,32 @@ export class ViewActionsComponent {
     }
   }
 
+  private formatDate(isoString: string): string {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    return `${day}/${month}/${year}, ${hours}:${minutes} ${ampm}`;
+  }
+
   private buildReportHtml(farm: string, crop: string, activities: any[], observations: any[]) {
     const sanitize = (s: any) => (s === null || s === undefined) ? '' : String(s);
     const activityRows = (activities || []).map(a => `
       <tr>
-        <td>${sanitize(a.createdAt)}</td>
+        <td>${this.formatDate(a.createdAt)}</td>
         <td>${sanitize(a.activityType)}</td>
         <td>${sanitize(a.message)}</td>
       </tr>`).join('');
 
     const observationRows = (observations || []).map(o => `
       <tr>
-        <td>${sanitize(o.createdAt)}</td>
+        <td>${this.formatDate(o.createdAt)}</td>
         <td>${sanitize(o.observationType)}</td>
         <td>${sanitize(o.message)}</td>
       </tr>`).join('');

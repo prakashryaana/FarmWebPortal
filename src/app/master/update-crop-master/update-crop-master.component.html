@@ -1,5 +1,35 @@
-<div class="container">
-  <h1>Crop Master Management</h1>
+<div class="container" *ngIf="showLanding">
+  <h1 class="landing-title">Master Data Management</h1>
+  <p class="landing-subtitle">Configure crops, fertilizers, and disease control records.</p>
+  
+  <div class="landing-grid">
+    <button class="landing-card-btn crop-card" (click)="goToCropMaster()">
+      <mat-icon class="landing-card-icon">local_florist</mat-icon>
+      <span class="landing-card-title">Crop Master</span>
+      <span class="landing-card-desc">Add and manage crop varieties, sowing methods, durations, and yields.</span>
+    </button>
+
+    <button class="landing-card-btn fertilizer-card" (click)="goToFertilizerMaster()">
+      <mat-icon class="landing-card-icon">grain</mat-icon>
+      <span class="landing-card-title">Fertilizer Master</span>
+      <span class="landing-card-desc">Configure fertilizer inventory, application requirements, and data.</span>
+    </button>
+
+    <button class="landing-card-btn disease-card" (click)="goToDiseaseControlMaster()">
+      <mat-icon class="landing-card-icon">medical_services</mat-icon>
+      <span class="landing-card-title">Disease Control Master</span>
+      <span class="landing-card-desc">Manage disease control inventory, solutions, and treatments.</span>
+    </button>
+  </div>
+</div>
+
+<div class="container" *ngIf="!showLanding">
+  <div class="header-with-back">
+    <button class="back-btn" (click)="goBack()" title="Back to Masters">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Crop Master Management</h1>
+  </div>
 
   <!-- Create Button -->
   <button class="create-btn" (click)="openCreateForm()" *ngIf="!isFormExpanded">
