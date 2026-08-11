@@ -179,6 +179,7 @@
   },
   "common": {
     "crop": "Crop",
+    "farm": "Farm",
     "save": "Save",
     "reset": "Reset",
     "cancel": "Cancel",

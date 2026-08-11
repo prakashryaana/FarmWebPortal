@@ -1,12 +1,12 @@
 <div class="crop-farm-toolbar">
-    <div class="selection-item crop-item" (click)="openSelectorDialog()">
+    <div class="selection-item farm-item" (click)="openSelectorDialog()">
         @if (!hasSelection){
         <span class="placeholder-text">{{ 'crop.selector.emptyCropSelection' | translate }}</span>
         }
         @else {
-        <span class="label">{{ 'common.crop' | translate }}:</span>
-        <span class="value" [matTooltip]="'Crop ID: ' + selectedCropId" matTooltipPosition="below">
-            {{ selectedCropName }}
+        <span class="label">{{ 'common.farm' | translate }}:</span>
+        <span class="value" [matTooltip]="'Farm ID: ' + selectedFarmId" matTooltipPosition="below">
+            {{ selectedFarmName }}
         </span>
         }
     </div>
