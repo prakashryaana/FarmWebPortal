@@ -46,7 +46,7 @@ export class ListActivityComponent {
   private fileServerService = inject(FileServerService);
   private sanitizer = inject(DomSanitizer);
 
-  displayedColumns: string[] = ['createdAt', 'activityType', 'message', 'image'];
+  displayedColumns: string[] = ['createdAt', 'activityType', 'message', 'image', 'expand'];
   dataSource = new MatTableDataSource<TableRow>([]);
   loading = false;
 

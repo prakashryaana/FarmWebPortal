@@ -150,6 +150,12 @@
   padding-left: 0.5rem !important;
 }
 
+.detail-row td.mat-column-expand {
+  width: 60px !important;
+  text-align: center;
+  padding-left: 0.5rem !important;
+}
+
 .detail-row td.mat-column-message {
   width: auto !important;
   flex: 1;
@@ -579,6 +585,23 @@
 
 .table-text-field::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+.mat-column-expand {
+  width: 60px !important;
+  text-align: center;
+  overflow: visible !important;
+}
+
+.double-arrow-icon {
+  color: #3498db;
+  font-weight: bold;
+  vertical-align: middle;
+  transition: transform 0.2s ease;
+}
+
+.grouped-row:hover .double-arrow-icon {
+  transform: scale(1.2);
 }
 
 .mat-column-observationType {
