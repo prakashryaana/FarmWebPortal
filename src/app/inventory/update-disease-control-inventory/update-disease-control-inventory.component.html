@@ -1,10 +1,16 @@
 <div class="container">
   <h1>Disease Control Inventory Management - {{selectedFarmName}}</h1>
 
-  <!-- Create Button -->
-  <button class="create-btn" (click)="openCreateForm()" *ngIf="!isFormExpanded">
-    <mat-icon>add</mat-icon> Add Disease Control Inventory
-  </button>
+  <!-- Actions Header with Buttons -->
+  <div class="actions-header" *ngIf="!isFormExpanded">
+    <button class="create-btn" (click)="openCreateForm()">
+      <mat-icon>add</mat-icon> Add Disease Control Inventory
+    </button>
+    <button class="report-btn" (click)="toggleReportView()">
+      <mat-icon>{{ showReportView ? 'view_list' : 'assessment' }}</mat-icon>
+      {{ showReportView ? 'View Inventory List' : 'View Usage Report' }}
+    </button>
+  </div>
 
   <!-- Create/Edit Form (Collapsible) -->
   <div class="form-section" *ngIf="isFormExpanded">
@@ -67,8 +73,8 @@
                 </select>
               </div>
 
-              <button type="button" class="btn-remove-item" (click)="removeDiseaseControlItem(i)" 
-                      [disabled]="diseaseControlItems.length === 1" title="Remove item">
+              <button type="button" class="btn-remove-item" (click)="removeDiseaseControlItem(i)"
+                [disabled]="diseaseControlItems.length === 1" title="Remove item">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
@@ -88,7 +94,7 @@
   </div>
 
   <!-- Table of existing items -->
-  <div class="table-section">
+  <div class="table-section" *ngIf="!showReportView && !isFormExpanded">
     <h2>Existing Disease Control Inventory</h2>
     <div class="table-wrapper" *ngIf="list.length > 0">
       <table class="data-table">
@@ -104,11 +110,10 @@
         </thead>
         <tbody>
           <ng-container *ngFor="let item of list">
-            <tr class="parent-row" [class.expanded]="expandedRowId === item.inventoryId" 
-                (click)="toggleExpand(item)">
+            <tr class="parent-row" [class.expanded]="expandedRowId === item.inventoryId" (click)="toggleExpand(item)">
               <td class="expand-col">
-                <button type="button" class="expand-btn" (click)="toggleExpand(item); $event.stopPropagation()" 
-                        title="Toggle details">
+                <button type="button" class="expand-btn" (click)="toggleExpand(item); $event.stopPropagation()"
+                  title="Toggle details">
                   <mat-icon>{{ expandedRowId === item.inventoryId ? 'expand_less' : 'expand_more' }}</mat-icon>
                 </button>
               </td>
@@ -144,11 +149,12 @@
                         <td>{{ childItem.quantitySupplied }}</td>
                         <td>{{ childItem.quantityMetric || '-' }}</td>
                         <td>{{ childItem.quantityUsed || '-' }}</td>
-                        <td>{{ (childItem.usedDate && !childItem.usedDate.startsWith('0001')) 
-     ? (childItem.usedDate | date: 'dd-MM-yyyy HH:mm') 
-     : '-' }}</td>
+                        <td>{{ (childItem.usedDate && !childItem.usedDate.startsWith('0001'))
+                          ? (childItem.usedDate | date: 'dd-MM-yyyy HH:mm')
+                          : '-' }}</td>
                       </tr>
-                      <tr *ngIf="!item.diseaseControlItems || item.diseaseControlItems.length === 0" class="no-items-row">
+                      <tr *ngIf="!item.diseaseControlItems || item.diseaseControlItems.length === 0"
+                        class="no-items-row">
                         <td colspan="5" class="no-data-cell">No items in this inventory</td>
                       </tr>
                     </tbody>
@@ -162,6 +168,141 @@
     </div>
     <div *ngIf="list.length === 0" class="no-data">
       No disease control inventory found. Add one to get started.
+    </div>
+  </div>
+
+  <!-- Disease Control Usage & Stock Report Section -->
+  <div class="report-section" *ngIf="showReportView && !isFormExpanded">
+    <div class="report-header-container">
+      <button class="back-btn" (click)="toggleReportView()" title="Back to Inventory List">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h2>Disease Control Usage & Stock Report</h2>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="reportLoading">
+      <div class="spinner"></div>
+      <p>Loading report data, please wait...</p>
+    </div>
+
+    <!-- No Selected Farm -->
+    <div class="no-data" *ngIf="!selectedFarmId && !reportLoading">
+      Please select a farm to view the report.
+    </div>
+
+    <!-- Loaded Report Content -->
+    <div class="report-grid" *ngIf="selectedFarmId && !reportLoading">
+      <!-- Left Column: Disease Control Summary List -->
+      <div class="summary-column">
+        <h3>Disease Control Summaries</h3>
+        <div class="fertilizer-cards">
+          <div *ngFor="let summary of diseaseControlSummaries" class="fertilizer-card"
+            [class.active]="selectedDiseaseControl?.name === summary.name" (click)="selectDiseaseControl(summary)">
+            <div class="card-header">
+              <span class="fertilizer-title">{{ summary.name }}</span>
+              <span class="metric-badge">{{ summary.metric }}</span>
+            </div>
+
+            <div class="card-body">
+              <div class="card-metric">
+                <span class="label">Supplied</span>
+                <span class="value supplied-val">{{ summary.totalSupplied }}</span>
+              </div>
+              <div class="card-metric">
+                <span class="label">Used</span>
+                <span class="value used-val">{{ summary.totalUsed }}</span>
+              </div>
+              <div class="card-metric highlight">
+                <span class="label">Remaining</span>
+                <span class="value remaining-val" [class.low-stock]="summary.remaining === 0"
+                  [class.good-stock]="summary.remaining > 0">
+                  {{ summary.remaining }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="diseaseControlSummaries.length === 0" class="no-fertilizers">
+            No disease controls registered in the catalog or inventory.
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Details for Selected Disease Control -->
+      <div class="details-column">
+        <div *ngIf="selectedDiseaseControl" class="selected-details">
+          <div class="details-header">
+            <h3>Details for: <strong>{{ selectedDiseaseControl.name }}</strong></h3>
+            <span class="stock-summary">
+              Available: <strong>{{ selectedDiseaseControl.remaining }} {{ selectedDiseaseControl.metric }}</strong>
+            </span>
+          </div>
+
+          <!-- Supply History Section -->
+          <div class="detail-section">
+            <h4>Supply History</h4>
+            <div class="table-wrapper">
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Invoice Number</th>
+                    <th>Supplier</th>
+                    <th>Quantity Supplied</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let supply of selectedDiseaseControl.supplies">
+                    <td>{{ supply.date ? (supply.date | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
+                    <td>{{ supply.invoiceNumber }}</td>
+                    <td>{{ supply.supplier }}</td>
+                    <td>{{ supply.quantitySupplied }} {{ supply.quantityMetric }}</td>
+                  </tr>
+                  <tr *ngIf="selectedDiseaseControl.supplies.length === 0">
+                    <td colspan="4" class="no-data-cell">No supply logs found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Usage History Section -->
+          <div class="detail-section">
+            <h4>Usage History</h4>
+            <div class="table-wrapper">
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Crop</th>
+                    <th>Activity Type</th>
+                    <th>Quantity Used</th>
+                    <th>Message / Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let usage of selectedDiseaseControl.usages">
+                    <td>{{ usage.date ? (usage.date | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
+                    <td><span class="crop-badge">{{ usage.cropName }}</span></td>
+                    <td>{{ usage.activityType }}</td>
+                    <td>{{ usage.quantityUsed }} {{ selectedDiseaseControl.metric }}</td>
+                    <td>{{ usage.message }}</td>
+                  </tr>
+                  <tr *ngIf="selectedDiseaseControl.usages.length === 0">
+                    <td colspan="5" class="no-data-cell">No usage logs found. (Not yet consumed in crop activities)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <div *ngIf="!selectedDiseaseControl" class="select-prompt">
+          <mat-icon>info</mat-icon> Select a disease control from the left column to view supply and consumption logs.
+        </div>
+      </div>
     </div>
   </div>
 </div>
