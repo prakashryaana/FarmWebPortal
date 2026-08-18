@@ -24,6 +24,7 @@ import { UploadService } from '../../../file-upload/upload.service';
 import { lastValueFrom } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { FertilizerInventoryService } from '../../../inventory/update-fertilizer-inventory/fertilizer-inventory.service';
 
 @Component({
   selector: 'app-add-activity',
@@ -42,6 +43,7 @@ export class AddActivityComponent implements AfterViewInit {
   @ViewChild(CameraControlComponent, { static: false }) cameraControl!: CameraControlComponent;
 
   private snackBar = inject(MatSnackBar);
+  private fertilizerSvc = inject(FertilizerInventoryService);
   //#region gets the global selected crop farm
   // inject the service
   private readonly cropFarmSelector = inject(CropFarmSelectorService);
@@ -67,6 +69,8 @@ export class AddActivityComponent implements AfterViewInit {
   photoFileName: string = '';
   photoFile: File | null = null;
   submitPressed: boolean = false;
+  fertilizerNames: string[] = [];
+  diseaseControlNames: string[] = [];
 
   productMappings = ['fertilizerRefill', 'spray'];
 
@@ -119,6 +123,30 @@ export class AddActivityComponent implements AfterViewInit {
 
   ngOnInit() {
     this.activityTypes.sort((a, b) => a.label.localeCompare(b.label));
+    this.loadFertilizerNames();
+    this.loadDiseaseControlNames();
+  }
+
+  loadFertilizerNames() {
+    this.fertilizerSvc.getInputCatalogNames('FERTILIZER').subscribe({
+      next: (names) => {
+        this.fertilizerNames = names || [];
+      },
+      error: (err) => {
+        console.error('Error loading fertilizer catalog names:', err);
+      }
+    });
+  }
+
+  loadDiseaseControlNames() {
+    this.fertilizerSvc.getInputCatalogNames('DISEASE_CONTROL').subscribe({
+      next: (names) => {
+        this.diseaseControlNames = names || [];
+      },
+      error: (err) => {
+        console.error('Error loading disease control catalog names:', err);
+      }
+    });
   }
 
   ngAfterViewInit() {

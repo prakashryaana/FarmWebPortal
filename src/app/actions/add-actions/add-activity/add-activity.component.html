@@ -27,16 +27,44 @@
 
         <!-- Spray Details (conditional) -->
         @if (showAdditionalFields) {
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{'activity.productNameLabel' | translate }}</mat-label>
-            <input matInput id="product-name" formControlName="productName" placeholder="Enter product name" />
-            @if (activityForm.get('productName')?.hasError('required') && (activityForm.get('productName')?.touched || submitPressed)) {
-              <mat-error>Product name is required</mat-error>
-            }
-            @if (activityForm.get('productName')?.hasError('maxlength')) {
-              <mat-error>Product name cannot exceed 100 characters</mat-error>
-            }
-          </mat-form-field>
+          @if (activityForm.get('type')?.value === 'fertilizerRefill') {
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{'activity.productNameLabel' | translate }}</mat-label>
+              <mat-select id="product-name" formControlName="productName">
+                <mat-option value="">Select fertilizer</mat-option>
+                @for (name of fertilizerNames; track name) {
+                  <mat-option [value]="name">{{ name }}</mat-option>
+                }
+              </mat-select>
+              @if (activityForm.get('productName')?.hasError('required') && (activityForm.get('productName')?.touched || submitPressed)) {
+                <mat-error>Product name is required</mat-error>
+              }
+            </mat-form-field>
+          } @else if (activityForm.get('type')?.value === 'spray') {
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{'activity.productNameLabel' | translate }}</mat-label>
+              <mat-select id="product-name" formControlName="productName">
+                <mat-option value="">Select disease control</mat-option>
+                @for (name of diseaseControlNames; track name) {
+                  <mat-option [value]="name">{{ name }}</mat-option>
+                }
+              </mat-select>
+              @if (activityForm.get('productName')?.hasError('required') && (activityForm.get('productName')?.touched || submitPressed)) {
+                <mat-error>Product name is required</mat-error>
+              }
+            </mat-form-field>
+          } @else {
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{'activity.productNameLabel' | translate }}</mat-label>
+              <input matInput id="product-name" formControlName="productName" placeholder="Enter product name" />
+              @if (activityForm.get('productName')?.hasError('required') && (activityForm.get('productName')?.touched || submitPressed)) {
+                <mat-error>Product name is required</mat-error>
+              }
+              @if (activityForm.get('productName')?.hasError('maxlength')) {
+                <mat-error>Product name cannot exceed 100 characters</mat-error>
+              }
+            </mat-form-field>
+          }
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>{{'activity.quantityLabel' | translate }}</mat-label>
