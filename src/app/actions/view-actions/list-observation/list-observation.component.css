@@ -593,15 +593,26 @@
   overflow: visible !important;
 }
 
-.double-arrow-icon {
-  color: #3498db;
-  font-weight: bold;
+.expand-caret-icon {
+  display: inline-block;
+  color: #64748b;
   vertical-align: middle;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.grouped-row:hover .double-arrow-icon {
-  transform: scale(1.2);
+.expand-caret-icon.expanded {
+  transform: rotate(-180deg);
+  color: #3498db;
+}
+
+.grouped-row:hover .expand-caret-icon {
+  color: #3498db;
+  transform: scale(1.15);
+}
+
+.grouped-row:hover .expand-caret-icon.expanded {
+  color: #3498db;
+  transform: rotate(-180deg) scale(1.15);
 }
 
 .mat-column-observationType {

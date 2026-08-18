@@ -227,7 +227,10 @@ export class UpdateFertilizerInventoryComponent {
     if (this.editingId) {
       this.svc.update(this.editingId, payload).subscribe({
         next: () => {
-          this.snackBar.open('Updated successfully', 'Close', { duration: 3000 });
+          this.snackBar.open('Updated successfully', 'Close', { 
+            duration: 5000,
+            panelClass: ['centered-success-snackbar']
+          });
           this.load();
           this.closeForm();
         },
@@ -236,7 +239,10 @@ export class UpdateFertilizerInventoryComponent {
     } else {
       this.svc.create(payload).subscribe({
         next: () => {
-          this.snackBar.open('Created successfully', 'Close', { duration: 3000 });
+          this.snackBar.open('Created successfully', 'Close', { 
+            duration: 5000,
+            panelClass: ['centered-success-snackbar']
+          });
           this.load();
           this.closeForm();
         },
@@ -259,7 +265,10 @@ export class UpdateFertilizerInventoryComponent {
       if (!confirmed) return;
       this.svc.delete(item.inventoryId || '').subscribe({
         next: () => {
-          this.snackBar.open('Deleted successfully', 'Close', { duration: 3000 });
+          this.snackBar.open('Deleted successfully', 'Close', { 
+            duration: 5000,
+            panelClass: ['centered-success-snackbar']
+          });
           this.load();
         },
         error: (e) => { console.error(e); this.snackBar.open('Delete failed', 'Close', { duration: 4000 }); }
