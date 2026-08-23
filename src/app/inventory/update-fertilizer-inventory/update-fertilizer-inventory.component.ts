@@ -12,6 +12,7 @@ import { effect } from '@angular/core';
 import { ActivityService, Activity } from '../../actions/view-actions/list-activity/activity.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { AuthService } from '../../auth/auth.service';
 
 interface FertilizerInventoryItem {
   fertilizerName: string;
@@ -53,6 +54,9 @@ export class UpdateFertilizerInventoryComponent {
   private confirmDialog = inject(MatDialog);
   private readonly cropFarmSelector = inject(CropFarmSelectorService);
   private activityService = inject(ActivityService);
+  private authService = inject(AuthService);
+
+  get isAdmin() { return this.authService.hasRole('EASYGROWADMIN'); }
 
   showReportView = true;
   reportLoading = false;

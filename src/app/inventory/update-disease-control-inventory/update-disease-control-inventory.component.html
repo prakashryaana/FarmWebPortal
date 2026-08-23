@@ -3,7 +3,7 @@
 
   <!-- Actions Header with Buttons -->
   <div class="actions-header" *ngIf="!isFormExpanded">
-    <button class="create-btn" (click)="openCreateForm()">
+    <button class="create-btn" (click)="openCreateForm()" *ngIf="isAdmin">
       <mat-icon>add</mat-icon> Add Disease Control Inventory
     </button>
     <button class="report-btn" (click)="toggleReportView()">

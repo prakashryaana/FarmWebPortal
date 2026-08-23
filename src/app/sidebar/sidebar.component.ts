@@ -64,7 +64,9 @@ export class SidebarComponent {
       this.menuItems = [
         //{ label: 'navigation.setupCrop', route: '/crop-registration', icon: 'grass' },
         { label: 'actions.addAction', route: '/add-actions', icon: 'add_circle' },
-        { label: 'actions.viewActions', route: '/view-actions', icon: 'list' }
+        { label: 'actions.viewActions', route: '/view-actions', icon: 'list' },
+        { label: 'navigation.manageFertilizerInventory', route: '/fertilizer-inventory', icon: 'grain' },
+        { label: 'navigation.manageDiseaseControlInventory', route: '/disease-control-inventory', icon: 'medical_services' }
       ];
     } else if (this.authService.hasRole('FARMHELP')) {
       this.menuItems = [

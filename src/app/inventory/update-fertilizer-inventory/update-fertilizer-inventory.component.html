@@ -3,7 +3,7 @@
 
   <!-- Actions Header with Buttons -->
   <div class="actions-header" *ngIf="!isFormExpanded && !isCatalogFormExpanded">
-    <button class="create-btn" (click)="openCreateForm()">
+    <button class="create-btn" (click)="openCreateForm()" *ngIf="isAdmin">
       <mat-icon>add</mat-icon> Add Fertilizer Inventory
     </button>
     <!-- <button class="catalog-btn" (click)="openCatalogForm()">
