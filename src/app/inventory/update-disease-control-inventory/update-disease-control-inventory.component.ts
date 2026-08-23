@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DiseaseControlInventoryService, DiseaseControlInventory } from './disease-control-inventory.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
@@ -45,7 +45,7 @@ interface DiseaseControlInventoryItem {
   selector: 'app-update-disease-control-inventory',
   templateUrl: './update-disease-control-inventory.component.html',
   styleUrls: ['./update-disease-control-inventory.component.css'],
-  imports: [ReactiveFormsModule, CommonModule, MatIconModule, MatButtonModule]
+  imports: [ReactiveFormsModule, FormsModule, CommonModule, MatIconModule, MatButtonModule]
 })
 export class UpdateDiseaseControlInventoryComponent {
   private snackBar = inject(MatSnackBar);
@@ -54,10 +54,19 @@ export class UpdateDiseaseControlInventoryComponent {
   private readonly cropFarmSelector = inject(CropFarmSelectorService);
   private activityService = inject(ActivityService);
 
-  showReportView = false;
+  showReportView = true;
   reportLoading = false;
   diseaseControlSummaries: DiseaseControlSummary[] = [];
   selectedDiseaseControl: DiseaseControlSummary | null = null;
+  searchQuery = '';
+
+  get filteredDiseaseControlSummaries() {
+    if (!this.searchQuery || !this.searchQuery.trim()) {
+      return this.diseaseControlSummaries;
+    }
+    const query = this.searchQuery.toLowerCase().trim();
+    return this.diseaseControlSummaries.filter(s => s.name && s.name.toLowerCase().includes(query));
+  }
 
   get selectedFarmName() { return this.cropFarmSelector.selectedFarmName(); }
   get selectedFarmId() { return this.cropFarmSelector.selectedFarmId(); }

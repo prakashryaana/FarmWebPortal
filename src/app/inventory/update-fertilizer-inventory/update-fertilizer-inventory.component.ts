@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FertilizerInventoryService, FertilizerInventory } from './fertilizer-inventory.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
@@ -45,7 +45,7 @@ export interface FertilizerSummary {
   selector: 'app-update-fertilizer-inventory',
   templateUrl: './update-fertilizer-inventory.component.html',
   styleUrls: ['./update-fertilizer-inventory.component.css'],
-  imports: [ReactiveFormsModule, CommonModule, MatIconModule, MatButtonModule]
+  imports: [ReactiveFormsModule, FormsModule, CommonModule, MatIconModule, MatButtonModule]
 })
 export class UpdateFertilizerInventoryComponent {
   private snackBar = inject(MatSnackBar);
@@ -54,10 +54,19 @@ export class UpdateFertilizerInventoryComponent {
   private readonly cropFarmSelector = inject(CropFarmSelectorService);
   private activityService = inject(ActivityService);
 
-  showReportView = false;
+  showReportView = true;
   reportLoading = false;
   fertilizerSummaries: FertilizerSummary[] = [];
   selectedFertilizer: FertilizerSummary | null = null;
+  searchQuery = '';
+
+  get filteredFertilizerSummaries() {
+    if (!this.searchQuery || !this.searchQuery.trim()) {
+      return this.fertilizerSummaries;
+    }
+    const query = this.searchQuery.toLowerCase().trim();
+    return this.fertilizerSummaries.filter(s => s.name && s.name.toLowerCase().includes(query));
+  }
 
   get selectedFarmName() { return this.cropFarmSelector.selectedFarmName(); }
   get selectedFarmId() { return this.cropFarmSelector.selectedFarmId(); }

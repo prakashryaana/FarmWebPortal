@@ -11,7 +11,7 @@
     </button> -->
     <button class="report-btn" (click)="toggleReportView()">
       <mat-icon>{{ showReportView ? 'view_list' : 'assessment' }}</mat-icon>
-      {{ showReportView ? 'View Inventory List' : 'View Usage Report' }}
+      {{ showReportView ? 'Inward Log' : 'View Usage Report' }}
     </button>
   </div>
 
@@ -213,9 +213,9 @@
   <!-- Fertilizer Usage & Stock Report Section -->
   <div class="report-section" *ngIf="showReportView && !isFormExpanded && !isCatalogFormExpanded">
     <div class="report-header-container">
-      <button class="back-btn" (click)="toggleReportView()" title="Back to Inventory List">
+      <!-- <button class="back-btn" (click)="toggleReportView()" title="Back to Inventory List">
         <mat-icon>arrow_back</mat-icon>
-      </button>
+      </button> -->
       <h2>Fertilizer Usage & Stock Report</h2>
     </div>
 
@@ -235,8 +235,18 @@
       <!-- Left Column: Fertilizer Summary List -->
       <div class="summary-column">
         <h3>Fertilizer Summaries</h3>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input type="text" [(ngModel)]="searchQuery" placeholder="Search by name..." class="search-input" />
+          <button *ngIf="searchQuery" (click)="searchQuery = ''" class="clear-search-btn" title="Clear Search">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
         <div class="fertilizer-cards">
-          <div *ngFor="let summary of fertilizerSummaries" class="fertilizer-card"
+          <div *ngFor="let summary of filteredFertilizerSummaries" class="fertilizer-card"
             [class.active]="selectedFertilizer?.name === summary.name" (click)="selectFertilizer(summary)">
             <div class="card-header">
               <span class="fertilizer-title">{{ summary.name }}</span>

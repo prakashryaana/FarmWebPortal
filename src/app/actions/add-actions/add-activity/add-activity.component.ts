@@ -32,7 +32,7 @@ import { FertilizerInventoryService } from '../../../inventory/update-fertilizer
   imports: [
     CommonModule, ReactiveFormsModule,
     MatCardModule, MatButtonModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatRadioModule, 
+    MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatRadioModule,
     TranslateModule, MatIconModule, CameraControlComponent
   ],
   templateUrl: './add-activity.component.html',
@@ -54,10 +54,10 @@ export class AddActivityComponent implements AfterViewInit {
   }
 
   // If you want direct ids/names:
-  get selectedFarmId()  { return this.cropFarmSelector.selectedFarmId(); }
-  get selectedCropId()  { return this.cropFarmSelector.selectedCropId(); }
-  get selectedFarmName(){ return this.cropFarmSelector.selectedFarmName(); }
-  get selectedCropName(){ return this.cropFarmSelector.selectedCropName(); }
+  get selectedFarmId() { return this.cropFarmSelector.selectedFarmId(); }
+  get selectedCropId() { return this.cropFarmSelector.selectedCropId(); }
+  get selectedFarmName() { return this.cropFarmSelector.selectedFarmName(); }
+  get selectedCropName() { return this.cropFarmSelector.selectedCropName(); }
   //#endregion gets the global selected crop farm
 
   activityForm: FormGroup;
@@ -97,28 +97,28 @@ export class AddActivityComponent implements AfterViewInit {
     });
 
     this.activityForm.get('type')?.valueChanges
-    .pipe(takeUntilDestroyed())
-    .subscribe(type => {
-      console.log(type);
-      const productNameControl = this.activityForm.get('productName');
-      const quantityControl = this.activityForm.get('quantity');
-      
-      if(this.productMappings.includes(type)) {
-        this.showAdditionalFields = true;
-        // Make productName mandatory for spray and fertilizerRefill
-        productNameControl?.setValidators([Validators.required, Validators.maxLength(100)]);
-        // Make quantity mandatory for spray and fertilizerRefill
-        quantityControl?.setValidators([Validators.required, Validators.min(0)]);
-      } else {
-        this.showAdditionalFields = false;
-        // Make productName optional for other types
-        productNameControl?.setValidators([Validators.maxLength(100)]);
-        // Make quantity optional for other types
-        quantityControl?.setValidators([Validators.min(0)]);
-      }
-      productNameControl?.updateValueAndValidity();
-      quantityControl?.updateValueAndValidity();
-    });
+      .pipe(takeUntilDestroyed())
+      .subscribe(type => {
+        console.log(type);
+        const productNameControl = this.activityForm.get('productName');
+        const quantityControl = this.activityForm.get('quantity');
+
+        if (this.productMappings.includes(type)) {
+          this.showAdditionalFields = true;
+          // Make productName mandatory for spray and fertilizerRefill
+          productNameControl?.setValidators([Validators.required, Validators.maxLength(100)]);
+          // Make quantity mandatory for spray and fertilizerRefill
+          quantityControl?.setValidators([Validators.required, Validators.min(0)]);
+        } else {
+          this.showAdditionalFields = false;
+          // Make productName optional for other types
+          productNameControl?.setValidators([Validators.maxLength(100)]);
+          // Make quantity optional for other types
+          quantityControl?.setValidators([Validators.min(0)]);
+        }
+        productNameControl?.updateValueAndValidity();
+        quantityControl?.updateValueAndValidity();
+      });
   }
 
   ngOnInit() {
@@ -195,6 +195,7 @@ export class AddActivityComponent implements AfterViewInit {
     if (!this.scanInProgress) {
       this.scanInProgress = true;
       this.qrResult = decodedText;
+      console.log(this.qrResult);
       try {
         const scannedData = JSON.parse(decodedText);
         console.log('Scanned Data:', scannedData);
@@ -214,8 +215,48 @@ export class AddActivityComponent implements AfterViewInit {
 
   private populateFormFromScan(scannedData: any) {
     const { productName, type } = scannedData;
-    if (productName) this.activityForm.patchValue({ productName });
-    if (type) this.activityForm.patchValue({ type });
+    let mappedType = type;
+    let matchedProductName = productName;
+    console.log('productName', productName);
+    console.log('type', type);
+    if (type) {
+      const normalizedType = type.toLowerCase().trim();
+      console.log('normalizedType', normalizedType);
+      if (normalizedType === 'disease control' || normalizedType === 'disease_control' || normalizedType === 'diseasecontrol') {
+        mappedType = 'spray';
+      } else if (normalizedType === 'fertilizer') {
+        mappedType = 'fertilizerRefill';
+      }
+    }
+
+    if (mappedType) {
+      this.activityForm.patchValue({ type: mappedType });
+
+      // Match the scanned product name case-insensitively with loaded dropdown names
+      if (productName) {
+        const normalizedProduct = productName.toLowerCase().trim();
+        if (mappedType === 'fertilizerRefill') {
+          const found = this.fertilizerNames.find(
+            name => name.toLowerCase().trim() === normalizedProduct
+          );
+          if (found) {
+            matchedProductName = found;
+          }
+        } else if (mappedType === 'spray') {
+          const found = this.diseaseControlNames.find(
+            name => name.toLowerCase().trim() === normalizedProduct
+          );
+          if (found) {
+            matchedProductName = found;
+          }
+        }
+      }
+    }
+
+    if (matchedProductName) {
+      this.activityForm.patchValue({ productName: matchedProductName });
+    }
+
     this.activityForm.patchValue({ message: `Scanned: Product - ${productName}, type - ${type}` });
   }
 
@@ -237,7 +278,7 @@ export class AddActivityComponent implements AfterViewInit {
     const activityType = this.activityForm.value.type;
     const productName = this.activityForm.value.productName;
     const quantity = this.activityForm.value.quantity;
-    
+
     if (this.productMappings.includes(activityType)) {
       if (!productName?.trim()) {
         this.snackBar.open('Product name is required for this activity type', 'Close', { duration: 3000 });
