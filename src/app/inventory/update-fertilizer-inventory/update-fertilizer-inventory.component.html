@@ -288,34 +288,6 @@
             </span>
           </div>
 
-          <!-- Supply History Section -->
-          <div class="detail-section">
-            <h4>Supply History</h4>
-            <div class="table-wrapper">
-              <table class="report-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Invoice Number</th>
-                    <th>Supplier</th>
-                    <th>Quantity Supplied</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let supply of selectedFertilizer.supplies">
-                    <td>{{ supply.date ? (supply.date | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
-                    <td>{{ supply.invoiceNumber }}</td>
-                    <td>{{ supply.supplier }}</td>
-                    <td>{{ supply.quantitySupplied }} {{ supply.quantityMetric }}</td>
-                  </tr>
-                  <tr *ngIf="selectedFertilizer.supplies.length === 0">
-                    <td colspan="4" class="no-data-cell">No supply logs found.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
           <!-- Usage History Section -->
           <div class="detail-section">
             <h4>Usage History</h4>
@@ -340,6 +312,34 @@
                   </tr>
                   <tr *ngIf="selectedFertilizer.usages.length === 0">
                     <td colspan="5" class="no-data-cell">No usage logs found. (Not yet consumed in crop activities)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Supply History Section -->
+          <div class="detail-section">
+            <h4>Supply History</h4>
+            <div class="table-wrapper">
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Invoice Number</th>
+                    <th>Supplier</th>
+                    <th>Quantity Supplied</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let supply of selectedFertilizer.supplies">
+                    <td>{{ supply.date ? (supply.date | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
+                    <td>{{ supply.invoiceNumber }}</td>
+                    <td>{{ supply.supplier }}</td>
+                    <td>{{ supply.quantitySupplied }} {{ supply.quantityMetric }}</td>
+                  </tr>
+                  <tr *ngIf="selectedFertilizer.supplies.length === 0">
+                    <td colspan="4" class="no-data-cell">No supply logs found.</td>
                   </tr>
                 </tbody>
               </table>
