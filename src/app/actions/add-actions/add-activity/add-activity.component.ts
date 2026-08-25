@@ -24,7 +24,7 @@ import { UploadService } from '../../../file-upload/upload.service';
 import { lastValueFrom } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
-import { FertilizerInventoryService } from '../../../inventory/update-fertilizer-inventory/fertilizer-inventory.service';
+import { FertilizerInventoryService, InputCatalogItem } from '../../../inventory/update-fertilizer-inventory/fertilizer-inventory.service';
 
 @Component({
   selector: 'app-add-activity',
@@ -71,6 +71,8 @@ export class AddActivityComponent implements AfterViewInit {
   submitPressed: boolean = false;
   fertilizerNames: string[] = [];
   diseaseControlNames: string[] = [];
+  fertilizerCatalog: InputCatalogItem[] = [];
+  diseaseControlCatalog: InputCatalogItem[] = [];
 
   productMappings = ['fertilizerRefill', 'spray'];
 
@@ -80,6 +82,7 @@ export class AddActivityComponent implements AfterViewInit {
     { value: 'deWeeding', label: 'activity.deWeeding' },
     //{ value: 'fertilizer', label: 'activity.fertilizer' },
     { value: 'spray', label: 'activity.spray' },
+    { value: 'seeding', label: 'activity.seeding' },
     { value: 'reSeeding', label: 'activity.reSeeding' },
     { value: 'growingMediaAddition', label: 'activity.growingMediaAddition' },
     { value: 'reWatering', label: 'activity.reWatering' },
@@ -129,8 +132,9 @@ export class AddActivityComponent implements AfterViewInit {
 
   loadFertilizerNames() {
     this.fertilizerSvc.getInputCatalogNames('FERTILIZER').subscribe({
-      next: (names) => {
-        this.fertilizerNames = names || [];
+      next: (items) => {
+        this.fertilizerCatalog = items || [];
+        this.fertilizerNames = this.fertilizerCatalog.map(x => x.name);
       },
       error: (err) => {
         console.error('Error loading fertilizer catalog names:', err);
@@ -140,13 +144,50 @@ export class AddActivityComponent implements AfterViewInit {
 
   loadDiseaseControlNames() {
     this.fertilizerSvc.getInputCatalogNames('DISEASE_CONTROL').subscribe({
-      next: (names) => {
-        this.diseaseControlNames = names || [];
+      next: (items) => {
+        this.diseaseControlCatalog = items || [];
+        this.diseaseControlNames = this.diseaseControlCatalog.map(x => x.name);
       },
       error: (err) => {
         console.error('Error loading disease control catalog names:', err);
       }
     });
+  }
+
+  get selectedUnitType(): string {
+    const type = this.activityForm.get('type')?.value;
+    const productName = this.activityForm.get('productName')?.value;
+    if (!type || !productName) return '';
+
+    if (type === 'fertilizerRefill') {
+      const match = this.fertilizerCatalog.find(x => x.name.toLowerCase() === productName.toLowerCase());
+      return match?.unitType || '';
+    } else if (type === 'spray') {
+      const match = this.diseaseControlCatalog.find(x => x.name.toLowerCase() === productName.toLowerCase());
+      return match?.unitType || '';
+    }
+    return '';
+  }
+
+  get unitSummaryDetails() {
+    const type = this.activityForm.get('type')?.value;
+    const productName = this.activityForm.get('productName')?.value;
+    if (!type || !productName) return null;
+
+    let match: InputCatalogItem | undefined;
+    if (type === 'fertilizerRefill') {
+      match = this.fertilizerCatalog.find(x => x.name.toLowerCase() === productName.toLowerCase());
+    } else if (type === 'spray') {
+      match = this.diseaseControlCatalog.find(x => x.name.toLowerCase() === productName.toLowerCase());
+    }
+
+    if (match && match.quantityPerUnit !== undefined && match.quantityPerUnit !== null && match.unitType) {
+      return {
+        quantity: match.quantityPerUnit,
+        unit: match.unitType
+      };
+    }
+    return null;
   }
 
   ngAfterViewInit() {

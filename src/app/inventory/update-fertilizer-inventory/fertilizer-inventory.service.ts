@@ -3,6 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export interface InputCatalogItem {
+  name: string;
+  unitType?: string;
+  quantityPerUnit?: number;
+}
+
 export interface FertilizerInventoryItem {
   fertilizerName: string;
   quantitySupplied: number;
@@ -70,15 +76,15 @@ export class FertilizerInventoryService {
     return this.http.delete(`${this.api}/RemoveInventory/${inventoryId}`); 
   }
 
-  getInputCatalogNames(type: string): Observable<string[]> {
-    return this.http.get<string[]>(`${this.api}/GetInputCatalogNames/${type}`);
+  getInputCatalogNames(type: string): Observable<InputCatalogItem[]> {
+    return this.http.get<InputCatalogItem[]>(`${this.api}/GetInputCatalogNames/${type}`);
   }
 
-  createInputCatalog(catalog: { type: string, name: string }): Observable<any> {
+  createInputCatalog(catalog: { type: string, name: string, unitType?: string, quantityPerUnit?: number }): Observable<any> {
     return this.http.post(`${this.api}/CreateInputCatalog`, catalog);
   }
 
-  updateInputCatalog(catalog: { type: string, oldName: string, newName: string }): Observable<any> {
+  updateInputCatalog(catalog: { type: string, oldName: string, newName: string, unitType?: string, quantityPerUnit?: number }): Observable<any> {
     return this.http.put(`${this.api}/UpdateInputCatalog`, catalog);
   }
 

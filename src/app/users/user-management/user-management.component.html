@@ -25,58 +25,91 @@
           <div class="loading-text">Loading users...</div>
         </div>
 
-        <table mat-table [dataSource]="userRows()" class="mat-elevation-z8" *ngIf="!loading() && userRows().length > 0">
+        <div class="hide-on-mobile" *ngIf="!loading() && userRows().length > 0">
+          <table mat-table [dataSource]="userRows()" class="mat-elevation-z8">
+  
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let user">{{ user.name }}</td>
+            </ng-container>
+  
+            <ng-container matColumnDef="mobile">
+              <th mat-header-cell *matHeaderCellDef>Mobile</th>
+              <td mat-cell *matCellDef="let user">{{ user.mobile }}</td>
+            </ng-container>
+  
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef>Email</th>
+              <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+            </ng-container>
+  
+            <ng-container matColumnDef="roles">
+              <th mat-header-cell *matHeaderCellDef>Roles</th>
+              <td mat-cell *matCellDef="let user">{{ user.displayRoles }}</td>
+            </ng-container>
+  
+            <ng-container matColumnDef="systemStatus">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let user">
+                <span [class.active-status]="user.systemStatus === 'ACTIVE'" [class.inactive-status]="user.systemStatus !== 'ACTIVE'">
+                  {{ user.systemStatus }}
+                </span>
+              </td>
+            </ng-container>
+  
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let user">
+                <button mat-icon-button color="primary" (click)="editUser(user)" aria-label="Edit user">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="accent" (click)="setTempPassword(user)" aria-label="Set temporary password">
+                  <mat-icon>vpn_key</mat-icon>
+                </button>
+                <button mat-icon-button (click)="setSystemStatus(user)" matTooltip="{{user.systemStatus === 'ACTIVE' ? 'Deactivate' : 'Activate'}}">
+                  <mat-icon>{{ user.systemStatus === 'ACTIVE' ? 'thumb_down' : 'thumb_up' }}</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteUser(user)" aria-label="Delete user">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+  
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
 
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let user">{{ user.name }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="mobile">
-            <th mat-header-cell *matHeaderCellDef>Mobile</th>
-            <td mat-cell *matCellDef="let user">{{ user.mobile }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef>Email</th>
-            <td mat-cell *matCellDef="let user">{{ user.email }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="roles">
-            <th mat-header-cell *matHeaderCellDef>Roles</th>
-            <td mat-cell *matCellDef="let user">{{ user.displayRoles }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="systemStatus">
-            <th mat-header-cell *matHeaderCellDef>Status</th>
-            <td mat-cell *matCellDef="let user">
-              <span [class.active-status]="user.systemStatus === 'ACTIVE'" [class.inactive-status]="user.systemStatus !== 'ACTIVE'">
+        <!-- Mobile User Cards View -->
+        <div class="mobile-user-cards show-on-mobile" *ngIf="!loading() && userRows().length > 0">
+          <div class="user-card" *ngFor="let user of userRows()">
+            <div class="user-card-header">
+              <span class="user-card-title">{{ user.name }}</span>
+              <span [class.active-status-badge]="user.systemStatus === 'ACTIVE'" [class.inactive-status-badge]="user.systemStatus !== 'ACTIVE'">
                 {{ user.systemStatus }}
               </span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let user">
-              <button mat-icon-button color="primary" (click)="editUser(user)" aria-label="Edit user">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="accent" (click)="setTempPassword(user)" aria-label="Set temporary password">
-                <mat-icon>vpn_key</mat-icon>
-              </button>
-              <button mat-icon-button (click)="setSystemStatus(user)" matTooltip="{{user.systemStatus === 'ACTIVE' ? 'Deactivate' : 'Activate'}}">
-                <mat-icon>{{ user.systemStatus === 'ACTIVE' ? 'thumb_down' : 'thumb_up' }}</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="deleteUser(user)" aria-label="Delete user">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+            </div>
+            <div class="user-card-body">
+              <p><strong>Mobile:</strong> {{ user.mobile || '-' }}</p>
+              <p><strong>Email:</strong> {{ user.email || '-' }}</p>
+              <p><strong>Roles:</strong> {{ user.displayRoles }}</p>
+              <div class="user-card-actions">
+                <button mat-icon-button color="primary" (click)="editUser(user)" aria-label="Edit user" title="Edit">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="accent" (click)="setTempPassword(user)" aria-label="Set temporary password" title="Set Password">
+                  <mat-icon>vpn_key</mat-icon>
+                </button>
+                <button mat-icon-button (click)="setSystemStatus(user)" title="{{user.systemStatus === 'ACTIVE' ? 'Deactivate' : 'Activate'}}">
+                  <mat-icon>{{ user.systemStatus === 'ACTIVE' ? 'thumb_down' : 'thumb_up' }}</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteUser(user)" aria-label="Delete user" title="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div *ngIf="!loading() && userRows().length === 0" class="empty">
           <mat-icon>people_outline</mat-icon>

@@ -22,6 +22,18 @@
               <label>{{ itemTypeName }} Name</label>
               <input formControlName="name" type="text" maxlength="100" placeholder="Enter {{ itemTypeName.toLowerCase() }} name..." />
             </div>
+
+            <div class="form-group">
+              <label>Unit Type</label>
+              <select formControlName="unitType">
+                <option *ngFor="let u of unitTypes" [value]="u">{{ u }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Quantity per Unit</label>
+              <input formControlName="quantityPerUnit" type="number" step="any" placeholder="Enter quantity per unit..." />
+            </div>
           </div>
         </form>
       </mat-dialog-content>
@@ -35,27 +47,55 @@
   <!-- Table of existing items -->
   <div class="table-section">
     <h2>Existing {{ itemTypeName }}s</h2>
-    <table class="data-table" *ngIf="list.length > 0">
-      <thead>
-        <tr>
-          <th>{{ itemTypeName }} Name</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of list">
-          <td>{{ item }}</td>
-          <td class="actions-cell">
+    <div class="table-wrapper hide-on-mobile" *ngIf="list.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ itemTypeName }} Name</th>
+            <th>Unit Type</th>
+            <th>Quantity per Unit</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of list">
+            <td>{{ item.name }}</td>
+            <td>{{ item.unitType || '-' }}</td>
+            <td>{{ item.quantityPerUnit !== null && item.quantityPerUnit !== undefined ? item.quantityPerUnit : '-' }}</td>
+            <td class="actions-cell">
+              <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Mat Cards View -->
+    <div class="mobile-master-cards show-on-mobile" *ngIf="list.length > 0">
+      <div class="master-card" *ngFor="let item of list">
+        <div class="master-card-header">
+          <span class="master-card-title">{{ item.name }}</span>
+        </div>
+        <div class="master-card-body">
+          <p><strong>Unit Type:</strong> {{ item.unitType || '-' }}</p>
+          <p><strong>Quantity per Unit:</strong> {{ item.quantityPerUnit !== null && item.quantityPerUnit !== undefined ? item.quantityPerUnit : '-' }}</p>
+          <div class="master-card-actions">
             <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
-              <mat-icon>edit</mat-icon>
+              <mat-icon>edit</mat-icon> Edit
             </button>
             <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
-              <mat-icon>delete</mat-icon>
+              <mat-icon>delete</mat-icon> Delete
             </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div *ngIf="list.length === 0" class="no-data">
       No {{ itemTypeName.toLowerCase() }}s found. Create one to get started.
     </div>

@@ -13,6 +13,9 @@ import { ActivityService, Activity } from '../../actions/view-actions/list-activ
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AuthService } from '../../auth/auth.service';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 export interface DiseaseControlSummary {
   name: string;
@@ -64,6 +67,28 @@ export class UpdateDiseaseControlInventoryComponent {
   selectedDiseaseControl: DiseaseControlSummary | null = null;
   searchQuery = '';
 
+  showGenerateReportView = false;
+  reportStartDate = '';
+  reportEndDate = '';
+  useDateFilter = false;
+  generatedReportData: any[] = [];
+  generatedReportLoading = false;
+  earliestGeneratedDate: Date | null = null;
+
+  get reportDisplayStartDate(): Date {
+    if (this.useDateFilter && this.reportStartDate) {
+      return new Date(this.reportStartDate);
+    }
+    return this.earliestGeneratedDate || new Date();
+  }
+
+  get reportDisplayEndDate(): Date {
+    if (this.useDateFilter && this.reportEndDate) {
+      return new Date(this.reportEndDate);
+    }
+    return new Date(); // Today's date
+  }
+
   get filteredDiseaseControlSummaries() {
     if (!this.searchQuery || !this.searchQuery.trim()) {
       return this.diseaseControlSummaries;
@@ -74,6 +99,7 @@ export class UpdateDiseaseControlInventoryComponent {
 
   get selectedFarmName() { return this.cropFarmSelector.selectedFarmName(); }
   get selectedFarmId() { return this.cropFarmSelector.selectedFarmId(); }
+  get selectedCropName() { return this.cropFarmSelector.selectedCropName(); }
 
   diseaseControlNames: string[] = [];
   
@@ -101,7 +127,7 @@ export class UpdateDiseaseControlInventoryComponent {
 
   loadCatalogNames() {
     this.svc.getInputCatalogNames('DISEASE_CONTROL').subscribe({
-      next: names => this.diseaseControlNames = names,
+      next: names => this.diseaseControlNames = (names || []).map(x => x.name),
       error: e => console.error(e)
     });
   }
@@ -122,6 +148,9 @@ export class UpdateDiseaseControlInventoryComponent {
         if (this.showReportView) {
           this.loadReportData();
         }
+        if (this.showGenerateReportView) {
+          this.generateReport();
+        }
       }, 
       error: e => console.error(e) 
     }); 
@@ -133,6 +162,7 @@ export class UpdateDiseaseControlInventoryComponent {
   }
 
   openCreateForm() {
+    this.showGenerateReportView = false;
     this.form.reset();
     this.form.setControl('diseaseControlItems', new FormArray([], [Validators.required, Validators.minLength(1)]));
     this.editingId = null;
@@ -238,10 +268,18 @@ export class UpdateDiseaseControlInventoryComponent {
   }
 
   toggleReportView() {
+    this.showGenerateReportView = false;
     this.showReportView = !this.showReportView;
     if (this.showReportView) {
       this.loadReportData();
     }
+  }
+
+  openGenerateReportView() {
+    this.showGenerateReportView = true;
+    this.showReportView = false;
+    this.isFormExpanded = false;
+    this.generatedReportData = [];
   }
 
   selectDiseaseControl(summary: DiseaseControlSummary) {
@@ -367,15 +405,17 @@ export class UpdateDiseaseControlInventoryComponent {
 
       const remaining = Math.max(0, totalSupplied - totalUsed);
 
-      summaries.push({
-        name,
-        totalSupplied,
-        totalUsed,
-        remaining,
-        metric,
-        supplies: suppliesList,
-        usages: usagesList
-      });
+      if (totalSupplied > 0) {
+        summaries.push({
+          name,
+          totalSupplied,
+          totalUsed,
+          remaining,
+          metric,
+          supplies: suppliesList,
+          usages: usagesList
+        });
+      }
     });
 
     this.diseaseControlSummaries = summaries.sort((a, b) => a.name.localeCompare(b.name));
@@ -388,5 +428,236 @@ export class UpdateDiseaseControlInventoryComponent {
     } else {
       this.selectedDiseaseControl = null;
     }
+  }
+
+  get generatedReportTotalSupplied(): number {
+    return this.generatedReportData.reduce((sum, item) => sum + (item.totalSupplied || 0), 0);
+  }
+
+  get generatedReportTotalUsed(): number {
+    return this.generatedReportData.reduce((sum, item) => sum + (item.totalUsed || 0), 0);
+  }
+
+  get generatedReportTotalRemaining(): number {
+    return this.generatedReportData.reduce((sum, item) => sum + (item.remaining || 0), 0);
+  }
+
+  generateReport() {
+    if (!this.selectedFarmId) {
+      this.generatedReportData = [];
+      return;
+    }
+
+    this.generatedReportLoading = true;
+    this.cropFarmSelector.getCropFarmForUser().subscribe({
+      next: allOptions => {
+        const farmCrops = allOptions.filter(opt => opt.farmId === this.selectedFarmId);
+        const cropMap: { [id: string]: string } = {};
+        farmCrops.forEach(c => cropMap[c.cropId] = c.cropName);
+        const cropIds = farmCrops.map(c => c.cropId).filter(id => id && id !== 'NA');
+
+        if (cropIds.length === 0) {
+          this.processGeneratedReportData([], cropMap);
+          this.generatedReportLoading = false;
+          return;
+        }
+
+        const activityRequests = cropIds.map(id => 
+          this.activityService.getByCrop(id).pipe(
+            catchError(err => {
+              console.error(`Error loading activities for crop ${id}:`, err);
+              return of([]);
+            })
+          )
+        );
+
+        forkJoin(activityRequests).subscribe({
+          next: (results: Activity[][]) => {
+            const flattenedActivities = results.reduce((acc, curr) => acc.concat(curr), []);
+            this.processGeneratedReportData(flattenedActivities, cropMap);
+            this.generatedReportLoading = false;
+          },
+          error: err => {
+            console.error('Error fetching activities:', err);
+            this.processGeneratedReportData([], cropMap);
+            this.generatedReportLoading = false;
+          }
+        });
+      },
+      error: err => {
+        console.error('Error fetching crops:', err);
+        this.generatedReportLoading = false;
+      }
+    });
+  }
+
+  private processGeneratedReportData(activities: Activity[], cropMap: { [id: string]: string }) {
+    const uniqueNames = new Set<string>();
+    
+    this.diseaseControlNames.forEach(name => {
+      if (name) uniqueNames.add(name);
+    });
+
+    this.list.forEach(inv => {
+      inv.diseaseControlItems?.forEach(item => {
+        if (item.diseaseControlName) {
+          uniqueNames.add(item.diseaseControlName);
+        }
+      });
+    });
+
+    const summaries: any[] = [];
+    
+    // Find the earliest date in records
+    let earliestMs = Infinity;
+    this.list.forEach(inv => {
+      if (inv.suppliedDate) {
+        const ms = new Date(inv.suppliedDate).getTime();
+        if (ms < earliestMs) earliestMs = ms;
+      }
+    });
+    activities.forEach(act => {
+      if (act.createdAt) {
+        const ms = new Date(act.createdAt).getTime();
+        if (ms < earliestMs) earliestMs = ms;
+      }
+    });
+    this.earliestGeneratedDate = earliestMs !== Infinity ? new Date(earliestMs) : null;
+
+    // Parse filter dates
+    let startMs = 0;
+    let endMs = Infinity;
+    if (this.useDateFilter) {
+      if (this.reportStartDate) {
+        startMs = new Date(this.reportStartDate).getTime();
+      }
+      if (this.reportEndDate) {
+        const d = new Date(this.reportEndDate);
+        d.setHours(23, 59, 59, 999);
+        endMs = d.getTime();
+      }
+    }
+
+    uniqueNames.forEach(name => {
+      let totalSupplied = 0;
+      let totalUsed = 0;
+      let metric = 'Packets';
+
+      this.list.forEach(inv => {
+        if (this.useDateFilter) {
+          const sDate = inv.suppliedDate ? new Date(inv.suppliedDate).getTime() : 0;
+          if (sDate < startMs || sDate > endMs) {
+            return;
+          }
+        }
+
+        inv.diseaseControlItems?.forEach(item => {
+          if (item.diseaseControlName && item.diseaseControlName.toLowerCase() === name.toLowerCase()) {
+            totalSupplied += item.quantitySupplied;
+            totalUsed += (item.quantityUsed || 0);
+            metric = item.quantityMetric || metric;
+          }
+        });
+      });
+
+      activities.forEach(act => {
+        if (this.useDateFilter) {
+          const actDate = act.createdAt ? new Date(act.createdAt).getTime() : 0;
+          if (actDate < startMs || actDate > endMs) {
+            return;
+          }
+        }
+
+        if (act.productName && act.productName.trim().toLowerCase() === name.trim().toLowerCase()) {
+          const qty = typeof act.quantity === 'number' ? act.quantity : parseFloat(act.quantity || '0');
+          totalUsed += qty;
+        }
+      });
+
+      const remaining = Math.max(0, totalSupplied - totalUsed);
+
+      if (totalSupplied > 0) {
+        summaries.push({
+          name,
+          totalSupplied,
+          totalUsed,
+          remaining,
+          metric
+        });
+      }
+    });
+
+    this.generatedReportData = summaries.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  exportExcel() {
+    if (this.generatedReportData.length === 0) return;
+
+    const data = this.generatedReportData.map(item => ({
+      'Disease Control Name': item.name,
+      'Total Supplied (Packets/Litres)': item.totalSupplied,
+      'Total Used (Packets/Litres)': item.totalUsed,
+      'Remaining Stock (Packets/Litres)': item.remaining
+    }));
+
+    data.push({
+      'Disease Control Name': 'Total',
+      'Total Supplied (Packets/Litres)': this.generatedReportTotalSupplied,
+      'Total Used (Packets/Litres)': this.generatedReportTotalUsed,
+      'Remaining Stock (Packets/Litres)': this.generatedReportTotalRemaining
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Disease Control Stock Report');
+
+    const farmName = (this.selectedFarmName || 'farm').replace(/\s+/g, '_');
+    XLSX.writeFile(workbook, `Disease_Control_Report_${farmName}.xlsx`);
+  }
+
+  exportPdf() {
+    if (this.generatedReportData.length === 0) return;
+
+    const doc = new jsPDF();
+    
+    doc.setFontSize(16);
+    doc.text('Disease Control Usage & Stock Report', 14, 20);
+    
+    doc.setFontSize(10);
+    doc.text(`Farm Name: ${this.selectedFarmName || '-'}`, 14, 28);
+    if (this.selectedCropName) {
+      doc.text(`Crop Name: ${this.selectedCropName}`, 14, 34);
+    }
+    
+    const start = this.reportDisplayStartDate ? new Date(this.reportDisplayStartDate).toLocaleDateString('en-GB') : 'All Time';
+    const end = this.reportDisplayEndDate ? new Date(this.reportDisplayEndDate).toLocaleDateString('en-GB') : 'All Time';
+    doc.text(`Date Range: ${start} to ${end}`, 14, 40);
+
+    const headers = [['Disease Control Name', 'Total Supplied (Packets/Litres)', 'Total Used (Packets/Litres)', 'Remaining Stock (Packets/Litres)']];
+    const body = this.generatedReportData.map(item => [
+      item.name,
+      item.totalSupplied,
+      item.totalUsed,
+      item.remaining
+    ]);
+
+    body.push([
+      'Total',
+      this.generatedReportTotalSupplied,
+      this.generatedReportTotalUsed,
+      this.generatedReportTotalRemaining
+    ]);
+
+    autoTable(doc, {
+      startY: 46,
+      head: headers,
+      body: body,
+      theme: 'striped',
+      headStyles: { fillColor: [0, 150, 136] },
+      styles: { fontSize: 9 }
+    });
+
+    const farmName = (this.selectedFarmName || 'farm').replace(/\s+/g, '_');
+    doc.save(`Disease_Control_Report_${farmName}.pdf`);
   }
 }
