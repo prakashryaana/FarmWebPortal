@@ -32,6 +32,7 @@ interface MenuItem {
 })
 export class SidebarComponent {
   isCollapsed = signal(false);
+  isMobileOpen = signal(false);
   expandedMenus = signal<string[]>([]);
   isLoading = signal(false);
   userProfile = signal<UserProfile | null>(null);
@@ -39,6 +40,14 @@ export class SidebarComponent {
   private authService = inject(AuthService);
 
   menuItems: MenuItem[] = [];
+
+  toggleMobileMenu() {
+    this.isMobileOpen.update(value => !value);
+  }
+
+  closeMobileMenu() {
+    this.isMobileOpen.set(false);
+  }
 
   constructor(private router: Router, private auth: AuthService) {
     this.loadUserProfile();

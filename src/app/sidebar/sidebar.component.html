@@ -1,90 +1,97 @@
-<nav class="sidebar" [class.collapsed]="isCollapsed()">
+<nav class="sidebar" [class.collapsed]="isCollapsed()" [class.mobile-open]="isMobileOpen()">
 
-  <!-- User Profile Section -->
-  <div class="user-profile-section">
-    @if (isLoading()) {
-    <div class="user-placeholder">
-      <mat-spinner diameter="24"></mat-spinner>
-    </div>
-    } @else if (userProfile()) {
-    <button mat-button class="user-profile-item" (click)="goToProfile()">
-      <div class="user-avatar">
-        <span class="avatar-initials">{{ (userProfile()!.name | slice:0:2).toUpperCase() }}</span>
+  <!-- Mobile Toggle Button (Three lines) -->
+  <button class="mobile-menu-toggle show-on-mobile" (click)="toggleMobileMenu()" aria-label="Toggle navigation menu">
+    <mat-icon>{{ isMobileOpen() ? 'close' : 'menu' }}</mat-icon>
+  </button>
+
+  <div class="sidebar-content-wrapper">
+    <!-- User Profile Section -->
+    <div class="user-profile-section">
+      @if (isLoading()) {
+      <div class="user-placeholder">
+        <mat-spinner diameter="24"></mat-spinner>
       </div>
-      @if (!isCollapsed()) {
-      <div class="user-info">
-        <span class="user-name">{{ userProfile()!.name }}</span>
-        <span class="user-email">{{ userProfile()!.email }}</span>
-      </div>
-
-      <mat-icon class="profile-arrow">arrow_forward_ios</mat-icon>
-      }
-    </button>
-    } @else {
-    <div class="user-placeholder">
-      <mat-icon>person</mat-icon>
-      @if (!isCollapsed()) {
-      <span>Guest User</span>
-      }
-    </div>
-    }
-  </div>
-
-  <div class="sidebar-header">
-    @if (!isCollapsed()) {
-    <h2 class="sidebar-title">{{'navigation.menu' | translate}}</h2>
-    }
-    <button class="toggle-btn" (click)="toggleSidebar()" [matTooltip]="isCollapsed() ? 'Expand' : 'Collapse'"
-      matTooltipPosition="right">
-      <mat-icon>{{ isCollapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
-    </button>
-  </div>
-
-  <div class="sidebar-menu">
-    @for (item of menuItems; track $index) {
-    <ng-container>
-      @if (!item.submenu) {
-      <!-- Regular menu item -->
-      <a [routerLink]="item.route" routerLinkActive="active" class="menu-item" [matTooltip]="item.label"
-        [matTooltipDisabled]="!isCollapsed()" matTooltipPosition="right">
-        <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
-        @if (!isCollapsed()) {
-        <span class="menu-label">{{ item.label | translate }}</span>
+      } @else if (userProfile()) {
+      <button mat-button class="user-profile-item" (click)="goToProfile(); closeMobileMenu()">
+        <div class="user-avatar">
+          <span class="avatar-initials">{{ (userProfile()!.name | slice:0:2).toUpperCase() }}</span>
+        </div>
+        @if (!isCollapsed() || isMobileOpen()) {
+        <div class="user-info">
+          <span class="user-name">{{ userProfile()!.name }}</span>
+          <span class="user-email">{{ userProfile()!.email }}</span>
+        </div>
+  
+        <mat-icon class="profile-arrow">arrow_forward_ios</mat-icon>
         }
-      </a>
+      </button>
       } @else {
-      <!-- Submenu item -->
-      <div class="submenu-container">
-        <button class="menu-item submenu-toggle" (click)="toggleSubmenu(item.label)" [matTooltip]="item.label"
-          [matTooltipDisabled]="!isCollapsed()" matTooltipPosition="right">
+      <div class="user-placeholder">
+        <mat-icon>person</mat-icon>
+        @if (!isCollapsed() || isMobileOpen()) {
+        <span>Guest User</span>
+        }
+      </div>
+      }
+    </div>
+  
+    <div class="sidebar-header">
+      @if (!isCollapsed()) {
+      <h2 class="sidebar-title">{{'navigation.menu' | translate}}</h2>
+      }
+      <button class="toggle-btn" (click)="toggleSidebar()" [matTooltip]="isCollapsed() ? 'Expand' : 'Collapse'"
+        matTooltipPosition="right">
+        <mat-icon>{{ isCollapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+      </button>
+    </div>
+  
+    <div class="sidebar-menu">
+      @for (item of menuItems; track $index) {
+      <ng-container>
+        @if (!item.submenu) {
+        <!-- Regular menu item -->
+        <a [routerLink]="item.route" routerLinkActive="active" class="menu-item" [matTooltip]="item.label"
+          [matTooltipDisabled]="!isCollapsed()" matTooltipPosition="right" (click)="closeMobileMenu()">
           <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
-          @if (!isCollapsed()) {
-          <span class="menu-label">{{ item.label }}</span>
-          <mat-icon class="submenu-arrow" [class.expanded]="isMenuExpanded(item.label)">expand_more</mat-icon>
+          @if (!isCollapsed() || isMobileOpen()) {
+          <span class="menu-label">{{ item.label | translate }}</span>
           }
-        </button>
-
-        @if (isMenuExpanded(item.label) && !isCollapsed()) {
-        <div class="submenu">
-          @for (subItem of item.submenu; track $index) {
-          <a [routerLink]="subItem.route" routerLinkActive="active" class="submenu-item">
-            <mat-icon class="submenu-icon">{{ subItem.icon }}</mat-icon>
-            <span>{{ subItem.label }}</span>
-          </a>
+        </a>
+        } @else {
+        <!-- Submenu item -->
+        <div class="submenu-container">
+          <button class="menu-item submenu-toggle" (click)="toggleSubmenu(item.label)" [matTooltip]="item.label"
+            [matTooltipDisabled]="!isCollapsed()" matTooltipPosition="right">
+            <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
+            @if (!isCollapsed() || isMobileOpen()) {
+            <span class="menu-label">{{ item.label }}</span>
+            <mat-icon class="submenu-arrow" [class.expanded]="isMenuExpanded(item.label)">expand_more</mat-icon>
+            }
+          </button>
+  
+          @if (isMenuExpanded(item.label) && (!isCollapsed() || isMobileOpen())) {
+          <div class="submenu">
+            @for (subItem of item.submenu; track $index) {
+            <a [routerLink]="subItem.route" routerLinkActive="active" class="submenu-item" (click)="closeMobileMenu()">
+              <mat-icon class="submenu-icon">{{ subItem.icon }}</mat-icon>
+              <span>{{ subItem.label }}</span>
+            </a>
+            }
+          </div>
           }
         </div>
         }
-      </div>
+      </ng-container>
       }
-    </ng-container>
-    }
-    <ng-container>
-      <button (click)="logout()" class="btn-logout" [matTooltip]="'navigation.logout' | translate"
-        [matTooltipDisabled]="!isCollapsed()" matTooltipPosition="right">
-        <mat-icon class="mt-logout">logout</mat-icon>
-        <span class="lbl-logout">{{'navigation.logout' | translate}}</span>
-      </button>
-    </ng-container>
-    <ng-container><app-language-switcher></app-language-switcher></ng-container>
+      <ng-container>
+        <button (click)="logout(); closeMobileMenu()" class="btn-logout" [matTooltip]="'navigation.logout' | translate"
+          [matTooltipDisabled]="!isCollapsed()" matTooltipPosition="right">
+          <mat-icon class="mt-logout">logout</mat-icon>
+          <span class="lbl-logout">{{'navigation.logout' | translate}}</span>
+        </button>
+      </ng-container>
+      <ng-container><app-language-switcher></app-language-switcher></ng-container>
+    </div>
   </div>
 </nav>
