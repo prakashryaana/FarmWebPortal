@@ -203,6 +203,7 @@
   .selection-item .value {
     font-size: 11px;
     padding: 3px 6px;
+    max-width: none !important;
   }
 
   .toolbar-actions {
@@ -256,14 +257,14 @@
   }
 
   .selection-item .label {
-    font-size: 0.9rem;
+    font-size: 11px !important;
     display: inline;
   }
 
   .selection-item .value {
-    font-size: 0.9rem;
-    /* max-width: 70px; */
-    /* padding: 2px 4px; */
+    font-size: 11px !important;
+    padding: 2px 5px !important;
+    max-width: none !important;
   }
 
   .toolbar-actions {
