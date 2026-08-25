@@ -233,8 +233,9 @@ export class UpdateDiseaseControlInventoryComponent {
       width: '400px',
       data: {
         title: 'Confirm Deletion',
-        message: `Are you sure you want to delete this disease control inventory entry?`,
-        action: 'Delete'
+        message: `Do you want to delete this entry?\nThis action cannot be undone!`,
+        action: 'Delete',
+        isRed: true
       }
     });
 
