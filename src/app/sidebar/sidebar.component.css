@@ -617,14 +617,9 @@
 @media (max-width: 480px) {
   .sidebar.mobile-open .sidebar-content-wrapper {
     top: 52px !important;
-    left: 4px !important;
-    right: auto !important;
-    width: calc(100vw - 8px) !important;
-  }
-  
-  .mobile-menu-toggle {
-    top: 4px !important;
-    left: 4px !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
   }
 }
 
