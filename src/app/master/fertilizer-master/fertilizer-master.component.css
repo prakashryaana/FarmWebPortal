@@ -198,6 +198,14 @@ mat-icon {
   background-color: #e3f2fd;
 }
 
+.btn-qr {
+  color: #9c27b0; /* Violet/purple color to distinguish QR actions */
+}
+
+.btn-qr:hover {
+  background-color: #f3e5f5;
+}
+
 /* Header With Back Button */
 .header-with-back {
   display: flex;

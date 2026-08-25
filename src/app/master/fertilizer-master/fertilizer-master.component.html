@@ -69,6 +69,9 @@
               <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
                 <mat-icon>delete</mat-icon>
               </button>
+              <button class="btn-icon btn-qr" (click)="downloadQRCode(item)" title="QR Code">
+                <mat-icon>qr_code</mat-icon>
+              </button>
             </td>
           </tr>
         </tbody>
@@ -86,10 +89,13 @@
           <p><strong>Quantity per Unit:</strong> {{ item.quantityPerUnit !== null && item.quantityPerUnit !== undefined ? item.quantityPerUnit : '-' }}</p>
           <div class="master-card-actions">
             <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
-              <mat-icon>edit</mat-icon> Edit
+              <mat-icon>edit</mat-icon>
             </button>
             <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
-              <mat-icon>delete</mat-icon> Delete
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button class="btn-icon btn-qr" (click)="downloadQRCode(item)" title="QR Code">
+              <mat-icon>qr_code</mat-icon>
             </button>
           </div>
         </div>
