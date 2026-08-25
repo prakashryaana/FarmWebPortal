@@ -161,10 +161,10 @@ export class AddActivityComponent implements AfterViewInit {
 
     if (type === 'fertilizerRefill') {
       const match = this.fertilizerCatalog.find(x => x.name.toLowerCase() === productName.toLowerCase());
-      return match?.unitType || '';
+      return match?.displayUnit || match?.unitType || '';
     } else if (type === 'spray') {
       const match = this.diseaseControlCatalog.find(x => x.name.toLowerCase() === productName.toLowerCase());
-      return match?.unitType || '';
+      return match?.displayUnit || match?.unitType || '';
     }
     return '';
   }

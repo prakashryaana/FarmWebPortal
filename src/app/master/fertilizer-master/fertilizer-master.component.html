@@ -34,6 +34,13 @@
               <label>Quantity per Unit</label>
               <input formControlName="quantityPerUnit" type="number" step="any" placeholder="Enter quantity per unit..." />
             </div>
+
+            <div class="form-group">
+              <label>Display Unit</label>
+              <select formControlName="displayUnit">
+                <option *ngFor="let u of displayUnits" [value]="u">{{ u }}</option>
+              </select>
+            </div>
           </div>
         </form>
       </mat-dialog-content>
@@ -54,6 +61,7 @@
             <th>{{ itemTypeName }} Name</th>
             <th>Unit Type</th>
             <th>Quantity per Unit</th>
+            <th>Display Unit</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -62,6 +70,7 @@
             <td>{{ item.name }}</td>
             <td>{{ item.unitType || '-' }}</td>
             <td>{{ item.quantityPerUnit !== null && item.quantityPerUnit !== undefined ? item.quantityPerUnit : '-' }}</td>
+            <td>{{ item.displayUnit || '-' }}</td>
             <td class="actions-cell">
               <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
                 <mat-icon>edit</mat-icon>
@@ -87,6 +96,7 @@
         <div class="master-card-body">
           <p><strong>Unit Type:</strong> {{ item.unitType || '-' }}</p>
           <p><strong>Quantity per Unit:</strong> {{ item.quantityPerUnit !== null && item.quantityPerUnit !== undefined ? item.quantityPerUnit : '-' }}</p>
+          <p><strong>Display Unit:</strong> {{ item.displayUnit || '-' }}</p>
           <div class="master-card-actions">
             <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
               <mat-icon>edit</mat-icon>

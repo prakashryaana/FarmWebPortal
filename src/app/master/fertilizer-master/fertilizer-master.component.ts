@@ -28,6 +28,7 @@ export class FertilizerMasterComponent implements OnInit {
   list: InputCatalogItem[] = [];
   editingName: string | null = null;
   unitTypes = ['packets', 'litres', 'mililitres', 'kg', 'grams'];
+  displayUnits = ['kg', 'grams', 'litres', 'mililitres', 'packets', 'bottles'];
 
   get itemTypeName(): string {
     return this.type === 'DISEASE_CONTROL' ? 'Disease Control' : 'Fertilizer';
@@ -36,7 +37,8 @@ export class FertilizerMasterComponent implements OnInit {
   form = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.maxLength(100)]),
     unitType: new FormControl('Packets', [Validators.required]),
-    quantityPerUnit: new FormControl<number | null>(null, [Validators.required, Validators.min(0.001)])
+    quantityPerUnit: new FormControl<number | null>(null, [Validators.required, Validators.min(0.001)]),
+    displayUnit: new FormControl('', [Validators.required])
   });
 
   ngOnInit() {
@@ -73,7 +75,8 @@ export class FertilizerMasterComponent implements OnInit {
     this.form.reset({
       name: '',
       unitType: 'Packets',
-      quantityPerUnit: null
+      quantityPerUnit: null,
+      displayUnit: ''
     });
     this.editingName = null;
     this.dialogRef = this.confirmDialog.open(this.dialogTemplate, {
@@ -94,7 +97,8 @@ export class FertilizerMasterComponent implements OnInit {
     this.form.patchValue({
       name: item.name,
       unitType: item.unitType || 'Packets',
-      quantityPerUnit: item.quantityPerUnit || null
+      quantityPerUnit: item.quantityPerUnit || null,
+      displayUnit: item.displayUnit || ''
     });
     this.editingName = item.name;
     this.dialogRef = this.confirmDialog.open(this.dialogTemplate, {
@@ -113,6 +117,7 @@ export class FertilizerMasterComponent implements OnInit {
     const trimmedName = nameValue.trim();
     const unitTypeValue = this.form.get('unitType')?.value || 'Packets';
     const quantityPerUnitValue = this.form.get('quantityPerUnit')?.value || 0;
+    const displayUnitValue = this.form.get('displayUnit')?.value || '';
 
     // Client-side duplicate check (case-insensitive)
     const isDuplicate = this.list.some(item => item.name.toLowerCase() === trimmedName.toLowerCase());
@@ -131,7 +136,8 @@ export class FertilizerMasterComponent implements OnInit {
         oldName: this.editingName,
         newName: trimmedName,
         unitType: unitTypeValue,
-        quantityPerUnit: quantityPerUnitValue
+        quantityPerUnit: quantityPerUnitValue,
+        displayUnit: displayUnitValue
       };
 
       this.service.updateInputCatalog(payload).subscribe({
@@ -168,7 +174,8 @@ export class FertilizerMasterComponent implements OnInit {
         type: this.type,
         name: trimmedName,
         unitType: unitTypeValue,
-        quantityPerUnit: quantityPerUnitValue
+        quantityPerUnit: quantityPerUnitValue,
+        displayUnit: displayUnitValue
       };
 
       this.service.createInputCatalog(payload).subscribe({

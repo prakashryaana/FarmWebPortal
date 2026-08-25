@@ -7,6 +7,7 @@ export interface InputCatalogItem {
   name: string;
   unitType?: string;
   quantityPerUnit?: number;
+  displayUnit?: string;
 }
 
 export interface FertilizerInventoryItem {
@@ -80,11 +81,11 @@ export class FertilizerInventoryService {
     return this.http.get<InputCatalogItem[]>(`${this.api}/GetInputCatalogNames/${type}`);
   }
 
-  createInputCatalog(catalog: { type: string, name: string, unitType?: string, quantityPerUnit?: number }): Observable<any> {
+  createInputCatalog(catalog: { type: string, name: string, unitType?: string, quantityPerUnit?: number, displayUnit?: string }): Observable<any> {
     return this.http.post(`${this.api}/CreateInputCatalog`, catalog);
   }
 
-  updateInputCatalog(catalog: { type: string, oldName: string, newName: string, unitType?: string, quantityPerUnit?: number }): Observable<any> {
+  updateInputCatalog(catalog: { type: string, oldName: string, newName: string, unitType?: string, quantityPerUnit?: number, displayUnit?: string }): Observable<any> {
     return this.http.put(`${this.api}/UpdateInputCatalog`, catalog);
   }
 
