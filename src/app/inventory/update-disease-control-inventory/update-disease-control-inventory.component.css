@@ -1212,6 +1212,19 @@ mat-icon {
     justify-content: center !important;
   }
 
+  /* If there are exactly 2 buttons in the header, display their names/text */
+  .actions-header button:first-child:nth-last-child(2) .btn-text,
+  .actions-header button:first-child:nth-last-child(2) ~ button .btn-text {
+    display: inline-block !important;
+  }
+
+  .actions-header button:first-child:nth-last-child(2),
+  .actions-header button:first-child:nth-last-child(2) ~ button {
+    padding: 8px 16px !important;
+    min-width: auto !important;
+    width: auto !important;
+  }
+
   .show-on-mobile {
     display: block !important;
   }
