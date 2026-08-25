@@ -121,6 +121,7 @@ export class AuthService {
   logout(): void {
   // Always clear local state first
   this.unSetUser();
+  sessionStorage.removeItem('selectedCropFarm');
   this.router.navigate(['/login']);
   
   // Fire API call but don't wait

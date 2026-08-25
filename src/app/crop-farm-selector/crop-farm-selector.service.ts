@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { switchMap, map, catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { of } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
 
 export interface CropOption {
   farmId: string;
@@ -61,9 +62,16 @@ export class CropFarmSelectorService {
     //searchResults$: Observable<CropOption[]> = this.searchResultsSubjectasObservable();
     searchResults$: Observable<CropOption[]> = this.searchResultsSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private authService: AuthService) {
     this.loadPersistedSelection();
     
+    // Clear selection state when user logs out
+    this.authService.currentUser$.subscribe(currentUser => {
+      if (!currentUser) {
+        this.clearSelection();
+      }
+    });
+
     // Keep signal and subject in sync
     effect(() => {
       const results = this.searchResultsSignal();
