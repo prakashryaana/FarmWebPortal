@@ -75,11 +75,11 @@
               }
             </mat-label>
             <input matInput id="quantity" type="number" formControlName="quantity" placeholder="Enter quantity" />
-            @if (unitSummaryDetails) {
+            <!-- @if (unitSummaryDetails) {
               <mat-hint class="unit-hint">
                 {{ 'activity.unitSummaryHint' | translate:{ quantity: unitSummaryDetails.quantity, unit: unitSummaryDetails.unit } }}
               </mat-hint>
-            }
+            } -->
             @if (activityForm.get('quantity')?.hasError('required') && (activityForm.get('quantity')?.touched || submitPressed)) {
               <mat-error>Quantity is required</mat-error>
             }
