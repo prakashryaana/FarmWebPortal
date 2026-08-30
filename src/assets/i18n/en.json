@@ -178,7 +178,14 @@
     "profileUpdateSuccessMessage": "Profile updated successfully!",
     "profileUpdateFailedMessage": "Unable to load profile. Please try again.",
     "saveChanges": "Save Changes",
-    "updating": "Updating..."
+    "updating": "Updating...",
+    "changePassword": "Change Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "passwordRequired": "Password is required",
+    "passwordConstraints": "Password must be at least 8 characters",
+    "passwordMismatch": "Passwords do not match",
+    "passwordUpdateSuccess": "Password changed successfully"
   },
   "common": {
     "crop": "Crop",

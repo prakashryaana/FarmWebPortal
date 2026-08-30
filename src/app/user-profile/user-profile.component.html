@@ -131,6 +131,46 @@
             </mat-form-field>
           </div>
 
+          <div class="change-password-section" style="margin: 1rem 0;">
+            <mat-checkbox formControlName="changePassword" color="primary">
+              {{ 'userProfile.changePassword' | translate }}
+            </mat-checkbox>
+          </div>
+
+          <div class="form-row password-fields-row" *ngIf="profileForm()!.get('changePassword')?.value" style="margin-bottom: 1.5rem;">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>{{ 'userProfile.newPassword' | translate }}</mat-label>
+              <input matInput [type]="showPassword() ? 'text' : 'password'" formControlName="password">
+              <mat-icon matPrefix>lock</mat-icon>
+              <button mat-icon-button matSuffix type="button" (click)="showPassword.set(!showPassword())" aria-label="Toggle password visibility">
+                <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (profileForm()!.get('password')?.invalid && profileForm()!.get('password')?.touched) {
+                <mat-error>
+                  @if (profileForm()!.get('password')?.errors?.['required']) {
+                    {{ 'userProfile.passwordRequired' | translate }}
+                  } @else if (profileForm()!.get('password')?.errors?.['minlength']) {
+                    {{ 'userProfile.passwordConstraints' | translate }}
+                  }
+                </mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>{{ 'userProfile.confirmPassword' | translate }}</mat-label>
+              <input matInput [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword">
+              <mat-icon matPrefix>lock</mat-icon>
+              <button mat-icon-button matSuffix type="button" (click)="showConfirmPassword.set(!showConfirmPassword())" aria-label="Toggle password visibility">
+                <mat-icon>{{ showConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (profileForm()!.hasError('passwordMismatch') && profileForm()!.get('confirmPassword')?.touched) {
+                <mat-error>
+                  {{ 'userProfile.passwordMismatch' | translate }}
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+
           <div class="form-actions">
             <button 
               mat-raised-button 
