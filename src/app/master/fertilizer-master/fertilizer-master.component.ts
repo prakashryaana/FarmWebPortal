@@ -233,7 +233,7 @@ export class FertilizerMasterComponent implements OnInit {
   downloadQRCode(item: InputCatalogItem) {
     const typeValue = this.type === 'DISEASE_CONTROL' ? 'Disease Control' : 'Fertilizer';
     const jsonText = JSON.stringify({ productName: item.name, type: typeValue });
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(jsonText)}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(jsonText)}`;
 
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -241,22 +241,22 @@ export class FertilizerMasterComponent implements OnInit {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
-        canvas.width = 250;
-        canvas.height = 290;
+        canvas.width = 400;
+        canvas.height = 470;
 
         // Draw white background
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Draw QR Code
-        ctx.drawImage(img, 0, 0, 250, 250);
+        ctx.drawImage(img, 0, 0, 400, 400);
 
-        // Draw centered product name text
+        // Draw centered product name text (further increased font size)
         ctx.fillStyle = '#000000';
-        ctx.font = 'bold 16px sans-serif';
+        ctx.font = 'bold 30px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(item.name, 125, 270);
+        ctx.fillText(item.name, 200, 435, 380);
 
         // Trigger download
         const link = document.createElement('a');
