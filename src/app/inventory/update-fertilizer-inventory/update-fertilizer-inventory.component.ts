@@ -104,7 +104,7 @@ export class UpdateFertilizerInventoryComponent {
   fertilizerCatalog: InputCatalogItem[] = [];
   fertilizerNames: string[] = [];
 
-  quantityMetrics = ['kg', 'grams', 'litres', 'mililitres', 'packets', 'bottles'];
+  quantityMetrics = ['kg', 'grams', 'litres', 'mililitres', 'packets', 'bottles', 'numbers'];
 
   form = new FormGroup({
     inventoryId: new FormControl(''),

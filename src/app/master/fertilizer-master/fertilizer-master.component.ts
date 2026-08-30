@@ -27,8 +27,8 @@ export class FertilizerMasterComponent implements OnInit {
   title = 'Fertilizer Master';
   list: InputCatalogItem[] = [];
   editingName: string | null = null;
-  unitTypes = ['packets', 'litres', 'mililitres', 'kg', 'grams'];
-  displayUnits = ['kg', 'grams', 'litres', 'mililitres', 'packets', 'bottles'];
+  unitTypes = ['packets', 'litres', 'mililitres', 'kg', 'grams', 'numbers'];
+  displayUnits = ['kg', 'grams', 'litres', 'mililitres', 'packets', 'bottles', 'numbers'];
 
   get itemTypeName(): string {
     return this.type === 'DISEASE_CONTROL' ? 'Disease Control' : 'Fertilizer';
