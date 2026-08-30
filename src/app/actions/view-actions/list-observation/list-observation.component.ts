@@ -40,7 +40,7 @@ export class ListObservationComponent {
   private readonly fileServerService = inject(FileServerService);
   private readonly sanitizer = inject(DomSanitizer);
 
-  displayedColumns: string[] = ['createdAt', 'observationType', 'message', 'attachments'];
+  displayedColumns: string[] = ['createdAt', 'observationType', 'message', 'attachments', 'expand'];
   dataSource = new MatTableDataSource<TableRow>([]);
   loading = false;
 

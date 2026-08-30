@@ -52,30 +52,25 @@ export class CropFarmSelectorToolbarComponent implements OnInit, OnDestroy {
   }
 
   loadCropFarmForLoggedInUser(): void {
-    let userId;
-    let mobile;
-    let roles: string[] = [];
-    this.authService.currentUser$.subscribe(
-      currentUser => {
-        if (currentUser) {
-          console.log('CurrentUser: ',currentUser.userId, currentUser.mobile, currentUser.roles);
-          userId = currentUser.userId;
-          mobile = currentUser.mobile;
-          roles = currentUser.roles;
-        } else {
-          console.log('No current user loaded.');
+    this.authService.currentUser$.subscribe(currentUser => {
+      if (currentUser && currentUser.userId) {
+        // Only select default if there is no current selection
+        if (!this.selectorService.selectedFarmId() || !this.selectorService.selectedCropId()) {
+          this.selectorService.getCropFarmForUser().subscribe({
+            next: (options) => {
+              if (options && options.length > 0) {
+                // If a farm has multiple crops, options[0] is the first crop of the first farm
+                this.selectorService.selectCropFarm(options[0]);
+                this.updateSelection();
+              }
+            },
+            error: (err) => {
+              console.error('Failed to load crop farm options for default selection', err);
+            }
+          });
         }
       }
-    );
-    
-    if (userId) {
-      //this.selectorService.getCropFarmForUser();
-      // this.selectorService.getSearchResults()
-      //     .subscribe(results => {
-      //       this.selectorService.selectCropFarm(results[0]);
-      //     });
-    }
-    
+    });
   }
 
   private updateSelection(): void {

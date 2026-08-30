@@ -51,8 +51,8 @@ export const routes: Routes = [
     , { path: 'add-actions', component: AddActionsComponent, canActivate: [authGuard] }
     , { path: 'view-actions', component: ViewActionsComponent, canActivate: [authGuard] }
     , { path: 'crop-master', component: UpdateCropMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
-    , { path: 'fertilizer-inventory', component: UpdateFertilizerInventoryComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
-    , { path: 'disease-control-inventory', component: UpdateDiseaseControlInventoryComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    , { path: 'fertilizer-inventory', component: UpdateFertilizerInventoryComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN', 'FARMOWNER'] } }
+    , { path: 'disease-control-inventory', component: UpdateDiseaseControlInventoryComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN', 'FARMOWNER'] } }
     , { path: 'fertilizer-master', component: FertilizerMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], type: 'FERTILIZER' } }
     , { path: 'disease-control-master', component: FertilizerMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], type: 'DISEASE_CONTROL' } }
     , { path: 'user-profile', component: UserProfileComponent, canActivate: [authGuard] }

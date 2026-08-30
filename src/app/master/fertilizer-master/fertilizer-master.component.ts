@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FertilizerInventoryService } from '../../inventory/update-fertilizer-inventory/fertilizer-inventory.service';
+import { FertilizerInventoryService, InputCatalogItem } from '../../inventory/update-fertilizer-inventory/fertilizer-inventory.service';
 import { ConfirmDialogComponent } from '../../users/confirm-dialog/confirm-dialog.component';
 
 @Component({
@@ -25,15 +25,20 @@ export class FertilizerMasterComponent implements OnInit {
 
   type: 'FERTILIZER' | 'DISEASE_CONTROL' = 'FERTILIZER';
   title = 'Fertilizer Master';
-  list: string[] = [];
+  list: InputCatalogItem[] = [];
   editingName: string | null = null;
+  unitTypes = ['packets', 'litres', 'mililitres', 'kg', 'grams', 'numbers'];
+  displayUnits = ['kg', 'grams', 'litres', 'mililitres', 'packets', 'bottles', 'numbers'];
 
   get itemTypeName(): string {
     return this.type === 'DISEASE_CONTROL' ? 'Disease Control' : 'Fertilizer';
   }
 
   form = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.maxLength(100)])
+    name: new FormControl('', [Validators.required, Validators.maxLength(100)]),
+    unitType: new FormControl('Packets', [Validators.required]),
+    quantityPerUnit: new FormControl<number | null>(null, [Validators.required, Validators.min(0.001)]),
+    displayUnit: new FormControl('', [Validators.required])
   });
 
   ngOnInit() {
@@ -54,7 +59,7 @@ export class FertilizerMasterComponent implements OnInit {
     this.service.getInputCatalogNames(this.type).subscribe({
       next: (res) => {
         // Sort alphabetically for clean user presentation
-        this.list = (res || []).sort((a, b) => a.localeCompare(b));
+        this.list = (res || []).sort((a, b) => a.name.localeCompare(b.name));
       },
       error: (err) => {
         console.error('Failed to load catalog list', err);
@@ -67,7 +72,12 @@ export class FertilizerMasterComponent implements OnInit {
   private dialogRef?: any;
 
   openCreateForm() {
-    this.form.reset();
+    this.form.reset({
+      name: '',
+      unitType: 'Packets',
+      quantityPerUnit: null,
+      displayUnit: ''
+    });
     this.editingName = null;
     this.dialogRef = this.confirmDialog.open(this.dialogTemplate, {
       width: '400px',
@@ -83,9 +93,14 @@ export class FertilizerMasterComponent implements OnInit {
     this.form.reset();
   }
 
-  selectForEdit(name: string) {
-    this.form.patchValue({ name });
-    this.editingName = name;
+  selectForEdit(item: InputCatalogItem) {
+    this.form.patchValue({
+      name: item.name,
+      unitType: item.unitType || 'Packets',
+      quantityPerUnit: item.quantityPerUnit || null,
+      displayUnit: item.displayUnit || ''
+    });
+    this.editingName = item.name;
     this.dialogRef = this.confirmDialog.open(this.dialogTemplate, {
       width: '400px',
       disableClose: true
@@ -94,15 +109,18 @@ export class FertilizerMasterComponent implements OnInit {
 
   submit() {
     if (!this.form.valid) {
-      this.snackBar.open('Please enter a name', 'Close', { duration: 3000 });
+      this.snackBar.open('Please fill in all required fields correctly', 'Close', { duration: 3000 });
       return;
     }
 
     const nameValue = this.form.get('name')?.value || '';
     const trimmedName = nameValue.trim();
-    
+    const unitTypeValue = this.form.get('unitType')?.value || 'Packets';
+    const quantityPerUnitValue = this.form.get('quantityPerUnit')?.value || 0;
+    const displayUnitValue = this.form.get('displayUnit')?.value || '';
+
     // Client-side duplicate check (case-insensitive)
-    const isDuplicate = this.list.some(item => item.toLowerCase() === trimmedName.toLowerCase());
+    const isDuplicate = this.list.some(item => item.name.toLowerCase() === trimmedName.toLowerCase());
 
     if (this.editingName) {
       if (isDuplicate && trimmedName.toLowerCase() !== this.editingName.toLowerCase()) {
@@ -113,7 +131,16 @@ export class FertilizerMasterComponent implements OnInit {
         return;
       }
 
-      this.service.updateInputCatalog({ type: this.type, oldName: this.editingName, newName: trimmedName }).subscribe({
+      const payload = {
+        type: this.type,
+        oldName: this.editingName,
+        newName: trimmedName,
+        unitType: unitTypeValue,
+        quantityPerUnit: quantityPerUnitValue,
+        displayUnit: displayUnitValue
+      };
+
+      this.service.updateInputCatalog(payload).subscribe({
         next: () => {
           this.snackBar.open('Updated successfully', 'Close', {
             duration: 3000,
@@ -143,7 +170,15 @@ export class FertilizerMasterComponent implements OnInit {
         return;
       }
 
-      this.service.createInputCatalog({ type: this.type, name: trimmedName }).subscribe({
+      const payload = {
+        type: this.type,
+        name: trimmedName,
+        unitType: unitTypeValue,
+        quantityPerUnit: quantityPerUnitValue,
+        displayUnit: displayUnitValue
+      };
+
+      this.service.createInputCatalog(payload).subscribe({
         next: () => {
           this.snackBar.open('Created successfully', 'Close', {
             duration: 3000,
@@ -167,19 +202,19 @@ export class FertilizerMasterComponent implements OnInit {
     }
   }
 
-  delete(name: string) {
+  delete(item: InputCatalogItem) {
     const dialogRef = this.confirmDialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
         title: 'Confirm Deletion',
-        message: `Are you sure you want to delete "${name}"?`,
+        message: `Are you sure you want to delete "${item.name}"?`,
         action: 'Delete'
       }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
       if (!confirmed) return;
-      this.service.deleteInputCatalog(this.type, name).subscribe({
+      this.service.deleteInputCatalog(this.type, item.name).subscribe({
         next: () => {
           this.snackBar.open(`${this.itemTypeName} deleted successfully`, 'Close', {
             duration: 3000,
@@ -193,6 +228,44 @@ export class FertilizerMasterComponent implements OnInit {
         }
       });
     });
+  }
+
+  downloadQRCode(item: InputCatalogItem) {
+    const typeValue = this.type === 'DISEASE_CONTROL' ? 'Disease Control' : 'Fertilizer';
+    const jsonText = JSON.stringify({ productName: item.name, type: typeValue });
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(jsonText)}`;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        canvas.width = 400;
+        canvas.height = 470;
+
+        // Draw white background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw QR Code
+        ctx.drawImage(img, 0, 0, 400, 400);
+
+        // Draw centered product name text (further increased font size)
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 30px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.name, 200, 435, 380);
+
+        // Trigger download
+        const link = document.createElement('a');
+        link.download = `${item.name.replace(/\s+/g, '_')}_QR.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
+      img.src = qrUrl;
+    }
   }
 
   goBack() {

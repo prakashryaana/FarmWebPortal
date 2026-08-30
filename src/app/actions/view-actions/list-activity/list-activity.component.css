@@ -143,6 +143,12 @@
   padding-left: 0.5rem !important;
 }
 
+.detail-row td.mat-column-expand {
+  width: 60px !important;
+  text-align: center;
+  padding-left: 0.5rem !important;
+}
+
 .detail-row td.mat-column-message {
   width: auto !important;
   flex: 1;
@@ -522,6 +528,34 @@
 
 .table-text-field::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+.mat-column-expand {
+  width: 60px !important;
+  text-align: center;
+  overflow: visible !important;
+}
+
+.expand-caret-icon {
+  display: inline-block;
+  color: #64748b;
+  vertical-align: middle;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.expand-caret-icon.expanded {
+  transform: rotate(-180deg);
+  color: #3498db;
+}
+
+.grouped-row:hover .expand-caret-icon {
+  color: #3498db;
+  transform: scale(1.15);
+}
+
+.grouped-row:hover .expand-caret-icon.expanded {
+  color: #3498db;
+  transform: rotate(-180deg) scale(1.15);
 }
 
 .mat-column-activityType {

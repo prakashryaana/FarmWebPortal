@@ -278,3 +278,9 @@
     /* height: 250px; */
   }
 }
+
+.unit-hint {
+  color: #27ae60 !important;
+  font-weight: 500;
+  font-size: 0.85rem;
+}

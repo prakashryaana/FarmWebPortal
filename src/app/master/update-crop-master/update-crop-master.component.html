@@ -116,35 +116,60 @@
   <!-- Table of existing items -->
   <div class="table-section">
     <h2>Existing Crops</h2>
-    <table class="data-table" *ngIf="list.length > 0">
-      <thead>
-        <tr>
-          <th>Crop Name</th>
-          <th>Duration (days)</th>
-          <th>Expected Yield</th>
-          <th>Sowing Method</th>
-          <th>Harvest Time</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of list">
-          <td>{{ item.cropName }}</td>
-          <td>{{ item.duration }}</td>
-          <td>{{ item.expectedYield }}</td>
-          <td>{{ item.sowingMethod }}</td>
-          <td>{{ item.harvestTime }}</td>
-          <td class="actions-cell">
+    <div class="table-wrapper hide-on-mobile" *ngIf="list.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Crop Name</th>
+            <th>Duration (days)</th>
+            <th>Expected Yield</th>
+            <th>Sowing Method</th>
+            <th>Harvest Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of list">
+            <td>{{ item.cropName }}</td>
+            <td>{{ item.duration }}</td>
+            <td>{{ item.expectedYield }}</td>
+            <td>{{ item.sowingMethod }}</td>
+            <td>{{ item.harvestTime }}</td>
+            <td class="actions-cell">
+              <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile Mat Cards View -->
+    <div class="mobile-master-cards show-on-mobile" *ngIf="list.length > 0">
+      <div class="master-card" *ngFor="let item of list">
+        <div class="master-card-header">
+          <span class="master-card-title">{{ item.cropName }}</span>
+        </div>
+        <div class="master-card-body">
+          <p><strong>Duration (days):</strong> {{ item.duration }}</p>
+          <p><strong>Expected Yield:</strong> {{ item.expectedYield }}</p>
+          <p><strong>Sowing Method:</strong> {{ item.sowingMethod }}</p>
+          <p><strong>Harvest Time:</strong> {{ item.harvestTime }}</p>
+          <div class="master-card-actions">
             <button class="btn-icon btn-edit" (click)="selectForEdit(item)" title="Edit">
-              <mat-icon>edit</mat-icon>
+              <mat-icon>edit</mat-icon> Edit
             </button>
             <button class="btn-icon btn-delete" (click)="delete(item)" title="Delete">
-              <mat-icon>delete</mat-icon>
+              <mat-icon>delete</mat-icon> Delete
             </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </div>
+        </div>
+      </div>
+    </div>
     <div *ngIf="list.length === 0" class="no-data">
       No crops found. Create one to get started.
     </div>

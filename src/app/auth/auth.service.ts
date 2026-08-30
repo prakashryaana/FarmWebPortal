@@ -25,6 +25,11 @@ export class AuthService {
   private baseUrl = `${environment.baseApiUrl}api/auth`;
   private _currentUser: CurrentUser | null = null;
 
+  // Inactivity limit of 1 week (7 days) in milliseconds
+  private readonly INACTIVITY_LIMIT = 7 * 24 * 60 * 60 * 1000;
+  private readonly LAST_ACTIVE_KEY = 'lastActivityTimestamp';
+  private cleanupTracking?: () => void;
+
   // Auth state
   private _isAuthenticated$ = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this._isAuthenticated$.asObservable();
@@ -33,7 +38,70 @@ export class AuthService {
   private readonly _currentUser$ = new BehaviorSubject<CurrentUser | null>(null);
   readonly currentUser$ = this._currentUser$.asObservable();
 
-  constructor(private http: HttpClient, private router:Router) {}
+  constructor(private http: HttpClient, private router: Router) {
+    this.isAuthenticated$.subscribe(isAuthenticated => {
+      if (isAuthenticated) {
+        if (this.cleanupTracking) {
+          this.cleanupTracking();
+        }
+        this.cleanupTracking = this.startInactivityTracking();
+      } else {
+        if (this.cleanupTracking) {
+          this.cleanupTracking();
+          this.cleanupTracking = undefined;
+        }
+        localStorage.removeItem(this.LAST_ACTIVE_KEY);
+      }
+    });
+  }
+
+  private isInactiveForAWeek(): boolean {
+    const lastActive = localStorage.getItem(this.LAST_ACTIVE_KEY);
+    if (!lastActive) return false;
+    return (Date.now() - Number(lastActive)) > this.INACTIVITY_LIMIT;
+  }
+
+  private startInactivityTracking(): () => void {
+    let lastSavedTime = Date.now();
+    localStorage.setItem(this.LAST_ACTIVE_KEY, lastSavedTime.toString());
+
+    const updateActivity = () => {
+      const now = Date.now();
+      const lastActive = localStorage.getItem(this.LAST_ACTIVE_KEY);
+
+      if (lastActive && (now - Number(lastActive) > this.INACTIVITY_LIMIT)) {
+        this.logout();
+        return;
+      }
+
+      // Throttle local storage writes to once every 10 seconds
+      if (now - lastSavedTime > 10000) {
+        lastSavedTime = now;
+        localStorage.setItem(this.LAST_ACTIVE_KEY, now.toString());
+      }
+    };
+
+    const events = ['click', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      window.addEventListener(event, updateActivity, { passive: true });
+    });
+
+    const intervalId = setInterval(() => {
+      const now = Date.now();
+      const lastActive = localStorage.getItem(this.LAST_ACTIVE_KEY);
+      if (lastActive && (now - Number(lastActive) > this.INACTIVITY_LIMIT)) {
+        clearInterval(intervalId);
+        this.logout();
+      }
+    }, 60000); // Check every minute
+
+    return () => {
+      events.forEach(event => {
+        window.removeEventListener(event, updateActivity);
+      });
+      clearInterval(intervalId);
+    };
+  }
 
   get currentUser() : CurrentUser | null  {
     return this._currentUser;
@@ -94,6 +162,10 @@ export class AuthService {
 
   // Called by guard or app init: sync cookie → Angular state
   validate(): Observable<boolean> {
+    if (this.isInactiveForAWeek()) {
+      this.logout();
+      return of(false);
+    }
     return this.http.get<{ isValid: boolean }>(`${this.baseUrl}/validate`, {
       withCredentials: true
     }).pipe(
@@ -121,6 +193,7 @@ export class AuthService {
   logout(): void {
   // Always clear local state first
   this.unSetUser();
+  sessionStorage.removeItem('selectedCropFarm');
   this.router.navigate(['/login']);
   
   // Fire API call but don't wait

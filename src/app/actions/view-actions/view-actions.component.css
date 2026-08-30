@@ -184,3 +184,287 @@
     font-size: 0.85rem;
   } */
 }
+
+/* Report Styles */
+.generate-report-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 1.5rem;
+}
+
+.report-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.report-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0.75rem;
+}
+
+.filters-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  background: #fcfcfc;
+  padding: 1.25rem;
+  border-radius: 6px;
+  border: 1px solid #eaeaea;
+}
+
+.filter-option {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+}
+
+.date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.date-field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.date-field input[type="date"] {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.generate-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  align-self: flex-end;
+}
+
+.generate-btn:hover {
+  background-color: #45a049;
+}
+
+.report-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 2rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.spin-icon {
+  animation: spin 2s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.report-results {
+  margin-top: 1rem;
+}
+
+.report-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.report-data-table th {
+  padding: 12px 16px;
+  text-align: left;
+  background-color: #f5f5f5;
+  border-bottom: 2px solid #ddd;
+  font-weight: 600;
+  color: #333;
+}
+
+.report-data-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+  color: #444;
+  text-align: left;
+}
+
+.report-data-table tbody tr:hover {
+  background-color: #fafafa;
+}
+
+.name-cell {
+  font-weight: 600;
+  color: #2196F3;
+}
+
+.no-report-results {
+  text-align: center;
+  padding: 3rem;
+  background: #fdfdfd;
+  border: 1px dashed #ddd;
+  border-radius: 6px;
+  color: #888;
+  font-style: italic;
+}
+
+.report-metadata-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  background-color: #f0f4f8;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  border-left: 4px solid #009688;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.metadata-item strong {
+  color: #555;
+  margin-right: 4px;
+}
+
+.export-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 1.5rem;
+}
+
+.export-btn-icon {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.export-btn-icon mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.pdf-btn {
+  color: #f44336;
+}
+
+.pdf-btn:hover {
+  background-color: #ffebee;
+  border-color: #f44336;
+  transform: translateY(-2px);
+}
+
+.excel-btn {
+  color: #4CAF50;
+}
+
+.excel-btn:hover {
+  background-color: #e8f5e9;
+  border-color: #4CAF50;
+  transform: translateY(-2px);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .generate-report-section {
+    padding: 1rem;
+  }
+
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .filter-option {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .date-inputs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .date-field {
+    width: 100%;
+  }
+
+  .date-field input[type="date"] {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .generate-btn {
+    align-self: stretch;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .report-metadata-bar {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .export-actions {
+    justify-content: center;
+    width: 100%;
+  }
+}

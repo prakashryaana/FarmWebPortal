@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { InputCatalogItem } from '../update-fertilizer-inventory/fertilizer-inventory.service';
 
 export interface DiseaseControlInventoryItem {
   diseaseControlName: string;
@@ -70,7 +71,7 @@ export class DiseaseControlInventoryService {
     return this.http.delete(`${this.api}/RemoveInventory/${inventoryId}`); 
   }
 
-  getInputCatalogNames(type: string): Observable<string[]> {
-    return this.http.get<string[]>(`${environment.baseApiUrl}api/fertilizerinventory/GetInputCatalogNames/${type}`);
+  getInputCatalogNames(type: string): Observable<InputCatalogItem[]> {
+    return this.http.get<InputCatalogItem[]>(`${environment.baseApiUrl}api/fertilizerinventory/GetInputCatalogNames/${type}`);
   }
 }

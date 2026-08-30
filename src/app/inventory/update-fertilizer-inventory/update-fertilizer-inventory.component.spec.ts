@@ -63,7 +63,10 @@ describe('UpdateFertilizerInventoryComponent', () => {
     }).compileComponents();
 
     mockService.list.and.returnValue(of({ success: true, data: mockData }));
-    mockService.getInputCatalogNames.and.returnValue(of(['NPK 10:26:26', 'Urea']));
+    mockService.getInputCatalogNames.and.returnValue(of([
+      { name: 'NPK 10:26:26' },
+      { name: 'Urea' }
+    ]));
     fixture = TestBed.createComponent(UpdateFertilizerInventoryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -93,6 +96,23 @@ describe('UpdateFertilizerInventoryComponent', () => {
       const initialLength = component.fertilizerItems.length;
       component.addFertilizerItem();
       expect(component.fertilizerItems.length).toBe(initialLength + 1);
+    });
+
+    it('should auto-select corresponding display unit when fertilizer name is selected', () => {
+      component.fertilizerCatalog = [
+        { name: 'NPK 10:26:26', displayUnit: 'kg' },
+        { name: 'Liquid Zinc', displayUnit: 'litres' }
+      ];
+      component.fertilizerNames = ['NPK 10:26:26', 'Liquid Zinc'];
+
+      component.openCreateForm();
+      const firstItem = component.fertilizerItems.at(0) as any;
+
+      firstItem.get('fertilizerName')?.setValue('NPK 10:26:26');
+      expect(firstItem.get('quantityMetric')?.value).toBe('kg');
+
+      firstItem.get('fertilizerName')?.setValue('Liquid Zinc');
+      expect(firstItem.get('quantityMetric')?.value).toBe('litres');
     });
 
     it('should submit create with valid form', () => {

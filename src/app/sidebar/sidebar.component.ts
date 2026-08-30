@@ -32,6 +32,7 @@ interface MenuItem {
 })
 export class SidebarComponent {
   isCollapsed = signal(false);
+  isMobileOpen = signal(false);
   expandedMenus = signal<string[]>([]);
   isLoading = signal(false);
   userProfile = signal<UserProfile | null>(null);
@@ -39,6 +40,14 @@ export class SidebarComponent {
   private authService = inject(AuthService);
 
   menuItems: MenuItem[] = [];
+
+  toggleMobileMenu() {
+    this.isMobileOpen.update(value => !value);
+  }
+
+  closeMobileMenu() {
+    this.isMobileOpen.set(false);
+  }
 
   constructor(private router: Router, private auth: AuthService) {
     this.loadUserProfile();
@@ -64,7 +73,9 @@ export class SidebarComponent {
       this.menuItems = [
         //{ label: 'navigation.setupCrop', route: '/crop-registration', icon: 'grass' },
         { label: 'actions.addAction', route: '/add-actions', icon: 'add_circle' },
-        { label: 'actions.viewActions', route: '/view-actions', icon: 'list' }
+        { label: 'actions.viewActions', route: '/view-actions', icon: 'list' },
+        { label: 'navigation.manageFertilizerInventory', route: '/fertilizer-inventory', icon: 'grain' },
+        { label: 'navigation.manageDiseaseControlInventory', route: '/disease-control-inventory', icon: 'medical_services' }
       ];
     } else if (this.authService.hasRole('FARMHELP')) {
       this.menuItems = [

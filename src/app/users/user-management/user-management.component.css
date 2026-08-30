@@ -70,3 +70,99 @@ mat-card {
 .empty { text-align:center; padding:24px; color: rgba(0,0,0,0.6); }
 .empty mat-icon { font-size:48px; opacity:0.6; }
 .empty .hint { margin-top:8px; font-size:0.95rem; }
+
+/* Responsive View Toggles */
+.show-on-mobile {
+  display: none;
+}
+
+.hide-on-mobile {
+  display: block;
+}
+
+.mobile-user-cards {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .show-on-mobile {
+    display: block !important;
+  }
+  
+  .hide-on-mobile {
+    display: none !important;
+  }
+  
+  .mobile-user-cards {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 1rem;
+  }
+  
+  .user-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    text-align: left;
+    margin-bottom: 12px;
+  }
+  
+  .user-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .user-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #4CAF50;
+  }
+  
+  .user-card-body p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+    color: #475569;
+  }
+  
+  .user-card-body strong {
+    color: #334155;
+  }
+  
+  .user-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 10px;
+  }
+
+  .active-status-badge {
+    background-color: #e8f5e9;
+    color: #4caf50;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.8rem;
+  }
+
+  .inactive-status-badge {
+    background-color: #fff3e0;
+    color: #ff9800;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.8rem;
+  }
+
+  .search {
+    width: 100% !important;
+  }
+}

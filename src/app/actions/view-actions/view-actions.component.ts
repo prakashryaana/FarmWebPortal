@@ -11,11 +11,12 @@ import { ActivityService } from './list-activity/activity.service';
 import { ObservationService } from '../add-actions/add-observation/observation.service';
 import { firstValueFrom } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-view-actions',
   standalone: true,
-  imports: [CommonModule, MatTabsModule, MatButtonModule, MatIconModule, MatCardModule, ListActivityComponent, ListObservationComponent, TranslateModule],
+  imports: [CommonModule, MatTabsModule, MatButtonModule, MatIconModule, MatCardModule, ListActivityComponent, ListObservationComponent, TranslateModule, FormsModule],
   templateUrl: './view-actions.component.html',
   styleUrls: ['./view-actions.component.css']
 })
@@ -26,6 +27,101 @@ export class ViewActionsComponent {
 
   get selectedCropName() { return this.cropFarmSelector.selectedCropName(); }
   get selectedFarmName() { return this.cropFarmSelector.selectedFarmName(); }
+
+  showNewReportView = false;
+  useDateFilter = false;
+  reportStartDate: string | null = null;
+  reportEndDate: string | null = null;
+  reportDisplayStartDate: Date | null = null;
+  reportDisplayEndDate: Date | null = null;
+  generatedReportLoading = false;
+  generatedReportRun = false;
+  generatedActivities: any[] = [];
+  generatedObservations: any[] = [];
+
+  toggleNewReportView() {
+    this.showNewReportView = !this.showNewReportView;
+    if (this.showNewReportView) {
+      this.generatedReportRun = false;
+      this.generatedActivities = [];
+      this.generatedObservations = [];
+    }
+  }
+
+  async generateNewReport(): Promise<void> {
+    const selection = this.cropFarmSelector.selectedCropFarm();
+    if (!selection) {
+      alert('Please select a farm and crop first.');
+      return;
+    }
+
+    const cropId = selection.cropId;
+    this.generatedReportLoading = true;
+    this.generatedReportRun = false;
+
+    try {
+      const activities = await firstValueFrom(this.activityService.getByCrop(cropId));
+      const observations = await firstValueFrom(this.observationService.getByCrop(cropId));
+
+      let filteredActivities = activities || [];
+      let filteredObservations = observations || [];
+
+      if (this.useDateFilter) {
+        if (this.reportStartDate) {
+          const start = new Date(this.reportStartDate).getTime();
+          filteredActivities = filteredActivities.filter(a => new Date(a.createdAt).getTime() >= start);
+          filteredObservations = filteredObservations.filter(o => new Date(o.createdAt).getTime() >= start);
+          this.reportDisplayStartDate = new Date(this.reportStartDate);
+        } else {
+          this.reportDisplayStartDate = null;
+        }
+
+        if (this.reportEndDate) {
+          const end = new Date(this.reportEndDate);
+          end.setHours(23, 59, 59, 999);
+          const endTime = end.getTime();
+          filteredActivities = filteredActivities.filter(a => new Date(a.createdAt).getTime() <= endTime);
+          filteredObservations = filteredObservations.filter(o => new Date(o.createdAt).getTime() <= endTime);
+          this.reportDisplayEndDate = new Date(this.reportEndDate);
+        } else {
+          this.reportDisplayEndDate = null;
+        }
+      } else {
+        this.reportDisplayStartDate = null;
+        this.reportDisplayEndDate = null;
+      }
+
+      this.generatedActivities = filteredActivities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      this.generatedObservations = filteredObservations.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      this.generatedReportRun = true;
+    } catch (e) {
+      console.error('Error generating report:', e);
+      alert('Failed to generate report.');
+    } finally {
+      this.generatedReportLoading = false;
+    }
+  }
+
+  exportNewReportPdf() {
+    const selection = this.cropFarmSelector.selectedCropFarm();
+    if (!selection) return;
+    const html = this.buildReportHtml(selection.farmName, selection.cropName, this.generatedActivities, this.generatedObservations);
+    const w = window.open('', '_blank');
+    if (w) {
+      w.document.write(html);
+      w.document.close();
+      w.focus();
+      setTimeout(() => w.print(), 500);
+    }
+  }
+
+  exportNewReportExcel() {
+    const selection = this.cropFarmSelector.selectedCropFarm();
+    if (!selection) return;
+    const html = this.buildReportHtml(selection.farmName, selection.cropName, this.generatedActivities, this.generatedObservations);
+    const excelBlob = new Blob([html], { type: 'application/vnd.ms-excel' });
+    this.triggerDownload(excelBlob, `${selection.farmName}_${selection.cropName}_report.xls`);
+  }
 
   async generateReport(): Promise<void> {
     const selection = this.cropFarmSelector.selectedCropFarm();
@@ -61,7 +157,7 @@ export class ViewActionsComponent {
     }
   }
 
-  private formatDate(isoString: string): string {
+  formatDate(isoString: string): string {
     if (!isoString) return '';
     const date = new Date(isoString);
     const day = String(date.getDate()).padStart(2, '0');

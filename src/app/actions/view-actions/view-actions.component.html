@@ -3,22 +3,21 @@
     <div class="form-header">
       <h1>View Activities & Observations</h1>
       <p class="subtitle">Review and manage your crop records</p>
-      <button mat-raised-button color="accent" (click)="generateReport()" class="btn-report">
-        <mat-icon>description</mat-icon>
-        {{ 'common.generateReport' | translate }}
-      </button>
+      <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+        <!-- <button mat-raised-button color="accent" (click)="generateReport()" class="btn-report">
+          <mat-icon>description</mat-icon>
+          {{ 'common.generateReport' | translate }}
+        </button> -->
+        <button mat-raised-button color="primary" (click)="toggleNewReportView()" class="btn-report btn-new-report"
+          style="background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%) !important; box-shadow: 0 4px 12px rgba(156, 39, 176, 0.25) !important;">
+          <mat-icon>analytics</mat-icon>
+          Generate Report
+        </button>
+      </div>
     </div>
 
-    <!-- Toolbar Section -->
-    <!-- <div class="toolbar-section">
-      <button mat-raised-button color="accent" (click)="generateReport()" class="btn-report">
-        <mat-icon>description</mat-icon>
-        {{ 'common.generateReport' | translate }}
-      </button>
-    </div> -->
-
     <!-- Tabs Section -->
-    <div class="tabs-container">
+    <div class="tabs-container" *ngIf="!showNewReportView">
       <mat-tab-group class="data-tabs">
         <!-- Activities Tab -->
         <mat-tab [label]="'activity.viewActivities' | translate">
@@ -42,6 +41,148 @@
           </div>
         </mat-tab>
       </mat-tab-group>
+    </div>
+
+    <!-- Generate Report View Section -->
+    <div class="generate-report-section" *ngIf="showNewReportView">
+      <div class="report-card">
+        <div class="report-header"
+          style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e0e0e0; padding-bottom: 0.75rem; margin-bottom: 1.5rem;">
+          <h2 style="margin: 0; color: #333; font-size: 1.5rem;">Generate Crop Activities & Observations Report</h2>
+          <button mat-icon-button (click)="showNewReportView = false" title="Close Report View">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Filters Row -->
+        <div class="filters-row">
+          <div class="filter-option">
+            <label class="radio-label">
+              <input type="radio" [value]="false" [(ngModel)]="useDateFilter" name="dateFilterOpt" />
+              Without Date Search (Get All)
+            </label>
+            <label class="radio-label">
+              <input type="radio" [value]="true" [(ngModel)]="useDateFilter" name="dateFilterOpt" />
+              With Date Search
+            </label>
+          </div>
+
+          <!-- Date Inputs -->
+          <div class="date-inputs" *ngIf="useDateFilter">
+            <div class="date-field">
+              <label>Start Date</label>
+              <input type="date" [(ngModel)]="reportStartDate" />
+            </div>
+            <div class="date-field">
+              <label>End Date</label>
+              <input type="date" [(ngModel)]="reportEndDate" />
+            </div>
+          </div>
+
+          <button class="generate-btn" (click)="generateNewReport()">
+            <mat-icon>analytics</mat-icon> Generate
+          </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="report-loading" *ngIf="generatedReportLoading">
+          <mat-icon class="spin-icon">sync</mat-icon> Generating report...
+        </div>
+
+        <!-- Results Tables -->
+        <div class="report-results" *ngIf="!generatedReportLoading && generatedReportRun">
+          <!-- Report Metadata Header -->
+          <div class="report-metadata-bar">
+            <div class="metadata-item">
+              <strong>Farm:</strong> {{ selectedFarmName || '-' }}
+            </div>
+            <div class="metadata-item" *ngIf="selectedCropName">
+              <strong>Crop:</strong> {{ selectedCropName }}
+            </div>
+            <div class="metadata-item">
+              <strong>Start Date:</strong> {{ useDateFilter && reportDisplayStartDate ? (reportDisplayStartDate |
+              date:'dd-MM-yyyy') : 'All Time' }}
+            </div>
+            <div class="metadata-item">
+              <strong>End Date:</strong> {{ useDateFilter && reportDisplayEndDate ? (reportDisplayEndDate |
+              date:'dd-MM-yyyy') : 'All Time' }}
+            </div>
+          </div>
+
+          <!-- Activities Section -->
+          <div class="report-section-block" style="margin-bottom: 2rem;">
+            <h3
+              style="color: #2c3e50; font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; text-align: left;">
+              Activities</h3>
+            <div class="table-wrapper" *ngIf="generatedActivities.length > 0">
+              <table class="report-data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 25%;">Date</th>
+                    <th style="width: 25%;">Activity Type</th>
+                    <th>Message / Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let act of generatedActivities">
+                    <td>{{ formatDate(act.createdAt) }}</td>
+                    <td class="name-cell">{{ act.activityType }}</td>
+                    <td>{{ act.message }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="no-section-results" *ngIf="generatedActivities.length === 0"
+              style="padding: 1.5rem; background: #fafafa; border: 1px dashed #ccc; border-radius: 4px; color: #7f8c8d; font-style: italic; text-align: center;">
+              No activities logged.
+            </div>
+          </div>
+
+          <!-- Observations Section -->
+          <div class="report-section-block" style="margin-bottom: 2rem;">
+            <h3
+              style="color: #2c3e50; font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; text-align: left;">
+              Observations</h3>
+            <div class="table-wrapper" *ngIf="generatedObservations.length > 0">
+              <table class="report-data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 25%;">Date</th>
+                    <th style="width: 25%;">Observation Type</th>
+                    <th>Message / Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let obs of generatedObservations">
+                    <td>{{ formatDate(obs.createdAt) }}</td>
+                    <td class="name-cell" style="color: #e67e22;">{{ obs.observationType }}</td>
+                    <td>{{ obs.message }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="no-section-results" *ngIf="generatedObservations.length === 0"
+              style="padding: 1.5rem; background: #fafafa; border: 1px dashed #ccc; border-radius: 4px; color: #7f8c8d; font-style: italic; text-align: center;">
+              No observations logged.
+            </div>
+          </div>
+
+          <!-- Export Actions -->
+          <div class="export-actions">
+            <button class="export-btn-icon pdf-btn" (click)="exportNewReportPdf()" title="Export to PDF">
+              <mat-icon>picture_as_pdf</mat-icon>
+            </button>
+            <button class="export-btn-icon excel-btn" (click)="exportNewReportExcel()" title="Export to Excel">
+              <mat-icon>description</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- No Results State -->
+        <div class="no-report-results" *ngIf="!generatedReportLoading && !generatedReportRun">
+          No report generated yet. Click "Generate" to fetch details.
+        </div>
+      </div>
     </div>
   </div>
 </div>

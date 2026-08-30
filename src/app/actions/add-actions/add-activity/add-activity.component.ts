@@ -24,6 +24,7 @@ import { UploadService } from '../../../file-upload/upload.service';
 import { lastValueFrom } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { FertilizerInventoryService, InputCatalogItem } from '../../../inventory/update-fertilizer-inventory/fertilizer-inventory.service';
 
 @Component({
   selector: 'app-add-activity',
@@ -31,7 +32,7 @@ import { HttpEvent, HttpEventType } from '@angular/common/http';
   imports: [
     CommonModule, ReactiveFormsModule,
     MatCardModule, MatButtonModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatRadioModule, 
+    MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatRadioModule,
     TranslateModule, MatIconModule, CameraControlComponent
   ],
   templateUrl: './add-activity.component.html',
@@ -42,6 +43,7 @@ export class AddActivityComponent implements AfterViewInit {
   @ViewChild(CameraControlComponent, { static: false }) cameraControl!: CameraControlComponent;
 
   private snackBar = inject(MatSnackBar);
+  private fertilizerSvc = inject(FertilizerInventoryService);
   //#region gets the global selected crop farm
   // inject the service
   private readonly cropFarmSelector = inject(CropFarmSelectorService);
@@ -52,10 +54,10 @@ export class AddActivityComponent implements AfterViewInit {
   }
 
   // If you want direct ids/names:
-  get selectedFarmId()  { return this.cropFarmSelector.selectedFarmId(); }
-  get selectedCropId()  { return this.cropFarmSelector.selectedCropId(); }
-  get selectedFarmName(){ return this.cropFarmSelector.selectedFarmName(); }
-  get selectedCropName(){ return this.cropFarmSelector.selectedCropName(); }
+  get selectedFarmId() { return this.cropFarmSelector.selectedFarmId(); }
+  get selectedCropId() { return this.cropFarmSelector.selectedCropId(); }
+  get selectedFarmName() { return this.cropFarmSelector.selectedFarmName(); }
+  get selectedCropName() { return this.cropFarmSelector.selectedCropName(); }
   //#endregion gets the global selected crop farm
 
   activityForm: FormGroup;
@@ -67,6 +69,10 @@ export class AddActivityComponent implements AfterViewInit {
   photoFileName: string = '';
   photoFile: File | null = null;
   submitPressed: boolean = false;
+  fertilizerNames: string[] = [];
+  diseaseControlNames: string[] = [];
+  fertilizerCatalog: InputCatalogItem[] = [];
+  diseaseControlCatalog: InputCatalogItem[] = [];
 
   productMappings = ['fertilizerRefill', 'spray'];
 
@@ -76,6 +82,7 @@ export class AddActivityComponent implements AfterViewInit {
     { value: 'deWeeding', label: 'activity.deWeeding' },
     //{ value: 'fertilizer', label: 'activity.fertilizer' },
     { value: 'spray', label: 'activity.spray' },
+    { value: 'seeding', label: 'activity.seeding' },
     { value: 'reSeeding', label: 'activity.reSeeding' },
     { value: 'growingMediaAddition', label: 'activity.growingMediaAddition' },
     { value: 'reWatering', label: 'activity.reWatering' },
@@ -93,32 +100,94 @@ export class AddActivityComponent implements AfterViewInit {
     });
 
     this.activityForm.get('type')?.valueChanges
-    .pipe(takeUntilDestroyed())
-    .subscribe(type => {
-      console.log(type);
-      const productNameControl = this.activityForm.get('productName');
-      const quantityControl = this.activityForm.get('quantity');
-      
-      if(this.productMappings.includes(type)) {
-        this.showAdditionalFields = true;
-        // Make productName mandatory for spray and fertilizerRefill
-        productNameControl?.setValidators([Validators.required, Validators.maxLength(100)]);
-        // Make quantity mandatory for spray and fertilizerRefill
-        quantityControl?.setValidators([Validators.required, Validators.min(0)]);
-      } else {
-        this.showAdditionalFields = false;
-        // Make productName optional for other types
-        productNameControl?.setValidators([Validators.maxLength(100)]);
-        // Make quantity optional for other types
-        quantityControl?.setValidators([Validators.min(0)]);
-      }
-      productNameControl?.updateValueAndValidity();
-      quantityControl?.updateValueAndValidity();
-    });
+      .pipe(takeUntilDestroyed())
+      .subscribe(type => {
+        console.log(type);
+        const productNameControl = this.activityForm.get('productName');
+        const quantityControl = this.activityForm.get('quantity');
+
+        if (this.productMappings.includes(type)) {
+          this.showAdditionalFields = true;
+          // Make productName mandatory for spray and fertilizerRefill
+          productNameControl?.setValidators([Validators.required, Validators.maxLength(100)]);
+          // Make quantity mandatory for spray and fertilizerRefill
+          quantityControl?.setValidators([Validators.required, Validators.min(0)]);
+        } else {
+          this.showAdditionalFields = false;
+          // Make productName optional for other types
+          productNameControl?.setValidators([Validators.maxLength(100)]);
+          // Make quantity optional for other types
+          quantityControl?.setValidators([Validators.min(0)]);
+        }
+        productNameControl?.updateValueAndValidity();
+        quantityControl?.updateValueAndValidity();
+      });
   }
 
   ngOnInit() {
     this.activityTypes.sort((a, b) => a.label.localeCompare(b.label));
+    this.loadFertilizerNames();
+    this.loadDiseaseControlNames();
+  }
+
+  loadFertilizerNames() {
+    this.fertilizerSvc.getInputCatalogNames('FERTILIZER').subscribe({
+      next: (items) => {
+        this.fertilizerCatalog = items || [];
+        this.fertilizerNames = this.fertilizerCatalog.map(x => x.name);
+      },
+      error: (err) => {
+        console.error('Error loading fertilizer catalog names:', err);
+      }
+    });
+  }
+
+  loadDiseaseControlNames() {
+    this.fertilizerSvc.getInputCatalogNames('DISEASE_CONTROL').subscribe({
+      next: (items) => {
+        this.diseaseControlCatalog = items || [];
+        this.diseaseControlNames = this.diseaseControlCatalog.map(x => x.name);
+      },
+      error: (err) => {
+        console.error('Error loading disease control catalog names:', err);
+      }
+    });
+  }
+
+  get selectedUnitType(): string {
+    const type = this.activityForm.get('type')?.value;
+    const productName = this.activityForm.get('productName')?.value;
+    if (!type || !productName) return '';
+
+    if (type === 'fertilizerRefill') {
+      const match = this.fertilizerCatalog.find(x => x.name.toLowerCase() === productName.toLowerCase());
+      return match?.displayUnit || match?.unitType || '';
+    } else if (type === 'spray') {
+      const match = this.diseaseControlCatalog.find(x => x.name.toLowerCase() === productName.toLowerCase());
+      return match?.displayUnit || match?.unitType || '';
+    }
+    return '';
+  }
+
+  get unitSummaryDetails() {
+    const type = this.activityForm.get('type')?.value;
+    const productName = this.activityForm.get('productName')?.value;
+    if (!type || !productName) return null;
+
+    let match: InputCatalogItem | undefined;
+    if (type === 'fertilizerRefill') {
+      match = this.fertilizerCatalog.find(x => x.name.toLowerCase() === productName.toLowerCase());
+    } else if (type === 'spray') {
+      match = this.diseaseControlCatalog.find(x => x.name.toLowerCase() === productName.toLowerCase());
+    }
+
+    if (match && match.quantityPerUnit !== undefined && match.quantityPerUnit !== null && match.unitType) {
+      return {
+        quantity: match.quantityPerUnit,
+        unit: match.unitType
+      };
+    }
+    return null;
   }
 
   ngAfterViewInit() {
@@ -167,6 +236,7 @@ export class AddActivityComponent implements AfterViewInit {
     if (!this.scanInProgress) {
       this.scanInProgress = true;
       this.qrResult = decodedText;
+      console.log(this.qrResult);
       try {
         const scannedData = JSON.parse(decodedText);
         console.log('Scanned Data:', scannedData);
@@ -186,8 +256,48 @@ export class AddActivityComponent implements AfterViewInit {
 
   private populateFormFromScan(scannedData: any) {
     const { productName, type } = scannedData;
-    if (productName) this.activityForm.patchValue({ productName });
-    if (type) this.activityForm.patchValue({ type });
+    let mappedType = type;
+    let matchedProductName = productName;
+    console.log('productName', productName);
+    console.log('type', type);
+    if (type) {
+      const normalizedType = type.toLowerCase().trim();
+      console.log('normalizedType', normalizedType);
+      if (normalizedType === 'disease control' || normalizedType === 'disease_control' || normalizedType === 'diseasecontrol') {
+        mappedType = 'spray';
+      } else if (normalizedType === 'fertilizer') {
+        mappedType = 'fertilizerRefill';
+      }
+    }
+
+    if (mappedType) {
+      this.activityForm.patchValue({ type: mappedType });
+
+      // Match the scanned product name case-insensitively with loaded dropdown names
+      if (productName) {
+        const normalizedProduct = productName.toLowerCase().trim();
+        if (mappedType === 'fertilizerRefill') {
+          const found = this.fertilizerNames.find(
+            name => name.toLowerCase().trim() === normalizedProduct
+          );
+          if (found) {
+            matchedProductName = found;
+          }
+        } else if (mappedType === 'spray') {
+          const found = this.diseaseControlNames.find(
+            name => name.toLowerCase().trim() === normalizedProduct
+          );
+          if (found) {
+            matchedProductName = found;
+          }
+        }
+      }
+    }
+
+    if (matchedProductName) {
+      this.activityForm.patchValue({ productName: matchedProductName });
+    }
+
     this.activityForm.patchValue({ message: `Scanned: Product - ${productName}, type - ${type}` });
   }
 
@@ -209,7 +319,7 @@ export class AddActivityComponent implements AfterViewInit {
     const activityType = this.activityForm.value.type;
     const productName = this.activityForm.value.productName;
     const quantity = this.activityForm.value.quantity;
-    
+
     if (this.productMappings.includes(activityType)) {
       if (!productName?.trim()) {
         this.snackBar.open('Product name is required for this activity type', 'Close', { duration: 3000 });

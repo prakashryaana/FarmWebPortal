@@ -3,11 +3,19 @@
 
   <!-- Actions Header with Buttons -->
   <div class="actions-header" *ngIf="!isFormExpanded && !isCatalogFormExpanded">
-    <button class="create-btn" (click)="openCreateForm()">
-      <mat-icon>add</mat-icon> Add Fertilizer Inventory
+    <button class="create-btn" (click)="openCreateForm()" *ngIf="isAdmin" title="Add Fertilizer Inventory">
+      <mat-icon>add</mat-icon> <span class="btn-text">Add Fertilizer Inventory</span>
     </button>
-    <button class="catalog-btn" (click)="openCatalogForm()">
+    <!-- <button class="catalog-btn" (click)="openCatalogForm()">
       <mat-icon>category</mat-icon> Input Catalog
+    </button> -->
+    <button class="report-btn" (click)="toggleReportView()"
+      [title]="showReportView ? 'Inward Log' : 'View Usage Report'">
+      <mat-icon>{{ showReportView ? 'view_list' : 'assessment' }}</mat-icon>
+      <span class="btn-text">{{ showReportView ? 'Inward Log' : 'View Usage Report' }}</span>
+    </button>
+    <button class="generate-report-btn" (click)="openGenerateReportView()" title="Generate Report">
+      <mat-icon>analytics</mat-icon> <span class="btn-text">Generate Report</span>
     </button>
   </div>
 
@@ -87,7 +95,7 @@
             <div class="item-content">
               <div class="form-group">
                 <label>Fertilizer Name <span class="required">*</span></label>
-                <select formControlName="fertilizerName">
+                <select formControlName="fertilizerName" (change)="onFertilizerNameChange(i)">
                   <option value="">Select fertilizer...</option>
                   @for (fertilizerName of fertilizerNames; track $index) {
                   <option [value]="fertilizerName">{{fertilizerName}}</option>
@@ -101,7 +109,7 @@
               </div>
 
               <div class="form-group">
-                <label>Quantity Metric <span class="required">*</span></label>
+                <label>Display Unit <span class="required">*</span></label>
                 <select formControlName="quantityMetric">
                   @for (metric of quantityMetrics; track $index) {
                   <option [value]="metric">{{metric}}</option>
@@ -109,8 +117,8 @@
                 </select>
               </div>
 
-              <button type="button" class="btn-remove-item" (click)="removeFertilizerItem(i)" 
-                      [disabled]="fertilizerItems.length === 1" title="Remove item">
+              <button type="button" class="btn-remove-item" (click)="removeFertilizerItem(i)"
+                [disabled]="fertilizerItems.length === 1" title="Remove item">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
@@ -130,9 +138,10 @@
   </div>
 
   <!-- Table of existing items -->
-  <div class="table-section">
+  <div class="table-section"
+    *ngIf="!showReportView && !showGenerateReportView && !isFormExpanded && !isCatalogFormExpanded">
     <h2>Existing Fertilizer Inventory</h2>
-    <div class="table-wrapper" *ngIf="list.length > 0">
+    <div class="table-wrapper hide-on-mobile" *ngIf="list.length > 0">
       <table class="data-table">
         <thead>
           <tr>
@@ -146,11 +155,10 @@
         </thead>
         <tbody>
           <ng-container *ngFor="let item of list">
-            <tr class="parent-row" [class.expanded]="expandedRowId === item.inventoryId" 
-                (click)="toggleExpand(item)">
+            <tr class="parent-row" [class.expanded]="expandedRowId === item.inventoryId" (click)="toggleExpand(item)">
               <td class="expand-col">
-                <button type="button" class="expand-btn" (click)="toggleExpand(item); $event.stopPropagation()" 
-                        title="Toggle details">
+                <button type="button" class="expand-btn" (click)="toggleExpand(item); $event.stopPropagation()"
+                  title="Toggle details">
                   <mat-icon>{{ expandedRowId === item.inventoryId ? 'expand_less' : 'expand_more' }}</mat-icon>
                 </button>
               </td>
@@ -186,9 +194,9 @@
                         <td>{{ childItem.quantitySupplied }}</td>
                         <td>{{ childItem.quantityMetric || '-' }}</td>
                         <td>{{ childItem.quantityUsed || '-' }}</td>
-                        <td>{{ (childItem.usedDate && !childItem.usedDate.startsWith('0001')) 
-     ? (childItem.usedDate | date: 'dd-MM-yyyy HH:mm') 
-     : '-' }}</td>
+                        <td>{{ (childItem.usedDate && !childItem.usedDate.startsWith('0001'))
+                          ? (childItem.usedDate | date: 'dd-MM-yyyy HH:mm')
+                          : '-' }}</td>
                       </tr>
                       <tr *ngIf="!item.fertilizerItems || item.fertilizerItems.length === 0" class="no-items-row">
                         <td colspan="5" class="no-data-cell">No items in this inventory</td>
@@ -202,8 +210,391 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Mobile Inward Logs Card List -->
+    <div class="mobile-inward-cards show-on-mobile" *ngIf="list.length > 0">
+      <div class="inward-card" *ngFor="let item of list">
+        <div class="inward-card-header" (click)="toggleExpand(item)">
+          <div class="inward-card-title">
+            <span class="invoice-badge">Inv: {{ item.invoiceNumber }}</span>
+            <span class="supplied-date">{{ item.suppliedDate ? (item.suppliedDate | date: 'dd-MM-yyyy HH:mm') : '-'
+              }}</span>
+          </div>
+          <button type="button" class="expand-btn-icon">
+            <mat-icon>{{ expandedRowId === item.inventoryId ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </button>
+        </div>
+
+        <div class="inward-card-body" (click)="toggleExpand(item)">
+          <p><strong>Supplier:</strong> {{ item.supplier }}</p>
+          <p><strong>Item Count:</strong> {{ item.fertilizerItems?.length || 0 }}</p>
+          <div class="inward-actions-row">
+            <button class="delete-inward-btn" (click)="delete(item); $event.stopPropagation()" title="Delete">
+              <mat-icon>delete</mat-icon> Delete Log
+            </button>
+          </div>
+        </div>
+
+        <!-- Expanded child items inside the mobile card -->
+        <div class="inward-card-details" *ngIf="expandedRowId === item.inventoryId">
+          <h5>Fertilizer Items</h5>
+          <div class="child-item-card" *ngFor="let childItem of item.fertilizerItems">
+            <p><strong>Name:</strong> {{ childItem.fertilizerName }}</p>
+            <p><strong>Quantity Supplied:</strong> {{ childItem.quantitySupplied }} {{ childItem.quantityMetric }}</p>
+            <p><strong>Quantity Used:</strong> {{ childItem.quantityUsed || 0 }}</p>
+            <p *ngIf="childItem.usedDate && !childItem.usedDate.startsWith('0001')">
+              <strong>Used Date:</strong> {{ childItem.usedDate | date: 'dd-MM-yyyy HH:mm' }}
+            </p>
+          </div>
+          <div *ngIf="!item.fertilizerItems || item.fertilizerItems.length === 0" class="no-child-items">
+            No items found.
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div *ngIf="list.length === 0" class="no-data">
       No fertilizer inventory found. Add one to get started.
+    </div>
+  </div>
+
+  <!-- Fertilizer Usage & Stock Report Section -->
+  <div class="report-section" *ngIf="showReportView && !isFormExpanded && !isCatalogFormExpanded">
+    <div class="report-header-container">
+      <!-- <button class="back-btn" (click)="toggleReportView()" title="Back to Inventory List">
+        <mat-icon>arrow_back</mat-icon>
+      </button> -->
+      <h2>Fertilizer Usage & Stock Report</h2>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="reportLoading">
+      <div class="spinner"></div>
+      <p>Loading report data, please wait...</p>
+    </div>
+
+    <!-- No Selected Farm -->
+    <div class="no-data" *ngIf="!selectedFarmId && !reportLoading">
+      Please select a farm to view the report.
+    </div>
+
+    <!-- Loaded Report Content -->
+    <div class="report-grid" *ngIf="selectedFarmId && !reportLoading">
+      <!-- Left Column: Fertilizer Summary List -->
+      <div class="summary-column">
+        <h3>Fertilizer Summaries</h3>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input type="text" [(ngModel)]="searchQuery" placeholder="Search by name..." class="search-input" />
+          <button *ngIf="searchQuery" (click)="searchQuery = ''" class="clear-search-btn" title="Clear Search">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="fertilizer-cards">
+          <div *ngFor="let summary of filteredFertilizerSummaries" class="fertilizer-card"
+            [class.active]="selectedFertilizer?.name === summary.name" (click)="selectFertilizer(summary)">
+            <div class="card-header">
+              <span class="fertilizer-title">{{ summary.name }}</span>
+              <span class="metric-badge">{{ summary.metric }}</span>
+            </div>
+
+            <div class="card-body">
+              <div class="card-metric">
+                <span class="label">Supplied</span>
+                <span class="value supplied-val">{{ summary.totalSupplied }}</span>
+              </div>
+              <div class="card-metric">
+                <span class="label">Used</span>
+                <span class="value used-val">{{ summary.totalUsed }}</span>
+              </div>
+              <div class="card-metric highlight">
+                <span class="label">Remaining</span>
+                <span class="value remaining-val" [class.low-stock]="summary.remaining === 0"
+                  [class.good-stock]="summary.remaining > 0">
+                  {{ summary.remaining }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="fertilizerSummaries.length === 0" class="no-fertilizers">
+            No fertilizers registered in the catalog or inventory.
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Details for Selected Fertilizer -->
+      <div class="details-column">
+        <div *ngIf="selectedFertilizer" class="selected-details">
+          <div class="details-header">
+            <h3>Details for: <strong>{{ selectedFertilizer.name }}</strong></h3>
+            <span class="stock-summary">
+              Available: <strong>{{ selectedFertilizer.remaining }} {{ selectedFertilizer.metric }}</strong>
+            </span>
+          </div>
+
+          <!-- Usage History Section -->
+          <div class="detail-section">
+            <h4>Usage History</h4>
+            <div class="table-wrapper hide-on-mobile">
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Crop</th>
+                    <th>Activity Type</th>
+                    <th>Quantity Used</th>
+                    <th>Message / Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let usage of selectedFertilizer.usages">
+                    <td>{{ usage.date ? (usage.date | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
+                    <td><span class="crop-badge">{{ usage.cropName }}</span></td>
+                    <td>{{ usage.activityType }}</td>
+                    <td>{{ usage.quantityUsed }} {{ selectedFertilizer.metric }}</td>
+                    <td>{{ usage.message }}</td>
+                  </tr>
+                  <tr *ngIf="selectedFertilizer.usages.length === 0">
+                    <td colspan="5" class="no-data-cell">No usage logs found. (Not yet consumed in crop activities)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="mobile-history-cards show-on-mobile">
+              <div class="history-card" *ngFor="let usage of selectedFertilizer.usages">
+                <div class="history-card-header">
+                  <span class="crop-badge">{{ usage.cropName }}</span>
+                  <span class="history-card-date">{{ usage.date ? (usage.date | date: 'dd-MM-yyyy HH:mm') : '-'
+                    }}</span>
+                </div>
+                <div class="history-card-body">
+                  <p><strong>Activity Type:</strong> {{ usage.activityType }}</p>
+                  <p><strong>Quantity Used:</strong> {{ usage.quantityUsed }} {{ selectedFertilizer.metric }}</p>
+                  <p class="history-card-message" *ngIf="usage.message">
+                    <strong>Message:</strong> {{ usage.message }}
+                  </p>
+                </div>
+              </div>
+              <div *ngIf="selectedFertilizer.usages.length === 0" class="no-data-card">
+                No usage logs found.
+              </div>
+            </div>
+          </div>
+
+          <!-- Supply History Section -->
+          <div class="detail-section">
+            <h4>Supply History</h4>
+            <div class="table-wrapper hide-on-mobile">
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Invoice Number</th>
+                    <th>Supplier</th>
+                    <th>Quantity Supplied</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let supply of selectedFertilizer.supplies">
+                    <td>{{ supply.date ? (supply.date | date: 'dd-MM-yyyy HH:mm') : '-' }}</td>
+                    <td>{{ supply.invoiceNumber }}</td>
+                    <td>{{ supply.supplier }}</td>
+                    <td>{{ supply.quantitySupplied }} {{ supply.quantityMetric }}</td>
+                  </tr>
+                  <tr *ngIf="selectedFertilizer.supplies.length === 0">
+                    <td colspan="4" class="no-data-cell">No supply logs found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="mobile-history-cards show-on-mobile">
+              <div class="history-card" *ngFor="let supply of selectedFertilizer.supplies">
+                <div class="history-card-header">
+                  <span class="invoice-number-badge">Inv: {{ supply.invoiceNumber }}</span>
+                  <span class="history-card-date">{{ supply.date ? (supply.date | date: 'dd-MM-yyyy HH:mm') : '-'
+                    }}</span>
+                </div>
+                <div class="history-card-body">
+                  <p><strong>Supplier:</strong> {{ supply.supplier }}</p>
+                  <p><strong>Quantity Supplied:</strong> {{ supply.quantitySupplied }} {{ supply.quantityMetric }}</p>
+                </div>
+              </div>
+              <div *ngIf="selectedFertilizer.supplies.length === 0" class="no-data-card">
+                No supply logs found.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div *ngIf="!selectedFertilizer" class="select-prompt">
+          <mat-icon>info</mat-icon> Select a fertilizer from the left column to view supply and consumption logs.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate Report View Section -->
+  <div class="generate-report-section" *ngIf="showGenerateReportView">
+    <div class="report-card">
+      <div class="report-header">
+        <h2>Generate Fertilizer Usage & Stock Report</h2>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="filters-row">
+        <div class="filter-option">
+          <label class="radio-label">
+            <input type="radio" [value]="false" [(ngModel)]="useDateFilter" name="dateFilterOpt" />
+            Without Date Search (Get All)
+          </label>
+          <label class="radio-label">
+            <input type="radio" [value]="true" [(ngModel)]="useDateFilter" name="dateFilterOpt" />
+            With Date Search
+          </label>
+        </div>
+
+        <!-- Date Inputs -->
+        <div class="date-inputs" *ngIf="useDateFilter">
+          <div class="date-field">
+            <label>Start Date</label>
+            <input type="date" [(ngModel)]="reportStartDate" />
+          </div>
+          <div class="date-field">
+            <label>End Date</label>
+            <input type="date" [(ngModel)]="reportEndDate" />
+          </div>
+        </div>
+
+        <button class="generate-btn" (click)="generateReport()">
+          <mat-icon>analytics</mat-icon> Generate
+        </button>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div class="report-loading" *ngIf="generatedReportLoading">
+        <mat-icon class="spin-icon">sync</mat-icon> Generating report...
+      </div>
+
+      <!-- Results Table -->
+      <div class="report-results" *ngIf="!generatedReportLoading && generatedReportData.length > 0">
+        <!-- Report Metadata Header -->
+        <div class="report-metadata-bar">
+          <div class="metadata-item">
+            <strong>Farm:</strong> {{ selectedFarmName || '-' }}
+          </div>
+          <div class="metadata-item" *ngIf="selectedCropName">
+            <strong>Crop:</strong> {{ selectedCropName }}
+          </div>
+          <div class="metadata-item">
+            <strong>Start Date:</strong> {{ reportDisplayStartDate | date:'dd-MM-yyyy' }}
+          </div>
+          <div class="metadata-item">
+            <strong>End Date:</strong> {{ reportDisplayEndDate | date:'dd-MM-yyyy' }}
+          </div>
+        </div>
+
+        <table class="report-data-table hide-on-mobile">
+          <thead>
+            <tr>
+              <th>Fertilizer Name</th>
+              <th>Total Supplied (Packets/Litres)</th>
+              <th>Total Used (Packets/Litres)</th>
+              <th>Remaining Stock (Packets/Litres)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let summary of generatedReportData">
+              <td class="name-cell">{{ summary.name }}</td>
+              <td>{{ summary.totalSupplied }}</td>
+              <td>{{ summary.totalUsed }}</td>
+              <td>
+                <span class="stock-badge" [class.low-stock]="summary.remaining === 0">
+                  {{ summary.remaining }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td class="total-cell">Total</td>
+              <td class="total-value">{{ generatedReportTotalSupplied }}</td>
+              <td class="total-value">{{ generatedReportTotalUsed }}</td>
+              <td class="total-value">
+                <span class="stock-badge" [class.low-stock]="generatedReportTotalRemaining === 0">
+                  {{ generatedReportTotalRemaining }}
+                </span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- Mobile Generated Report Cards -->
+        <div class="mobile-report-cards show-on-mobile">
+          <div class="report-card-item" *ngFor="let summary of generatedReportData">
+            <div class="report-card-title">{{ summary.name }}</div>
+            <div class="report-card-metrics">
+              <div class="metric-row">
+                <span>Total Supplied:</span>
+                <strong>{{ summary.totalSupplied }}</strong>
+              </div>
+              <div class="metric-row">
+                <span>Total Used:</span>
+                <strong>{{ summary.totalUsed }}</strong>
+              </div>
+              <div class="metric-row">
+                <span>Remaining Stock:</span>
+                <span class="stock-badge" [class.low-stock]="summary.remaining === 0">
+                  {{ summary.remaining }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- Subtotal row/card at the end of report items -->
+          <div class="report-card-item total-card-item">
+            <div class="report-card-title">Total Summary</div>
+            <div class="report-card-metrics">
+              <div class="metric-row">
+                <span>Grand Total Supplied:</span>
+                <strong>{{ generatedReportTotalSupplied }}</strong>
+              </div>
+              <div class="metric-row">
+                <span>Grand Total Used:</span>
+                <strong>{{ generatedReportTotalUsed }}</strong>
+              </div>
+              <div class="metric-row">
+                <span>Grand Total Remaining:</span>
+                <span class="stock-badge" [class.low-stock]="generatedReportTotalRemaining === 0">
+                  {{ generatedReportTotalRemaining }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Export Buttons Wrapper -->
+        <div class="export-actions">
+          <button class="export-btn-icon pdf-btn" (click)="exportPdf()" title="Export to PDF">
+            <mat-icon>picture_as_pdf</mat-icon>
+          </button>
+          <button class="export-btn-icon excel-btn" (click)="exportExcel()" title="Export to Excel">
+            <mat-icon>description</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- No Results State -->
+      <div class="no-report-results" *ngIf="!generatedReportLoading && generatedReportData.length === 0">
+        No report generated yet. Click "Generate" to fetch details.
+      </div>
     </div>
   </div>
 </div>

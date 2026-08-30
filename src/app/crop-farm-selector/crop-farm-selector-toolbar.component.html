@@ -1,13 +1,24 @@
 <div class="crop-farm-toolbar">
-    <div class="selection-item crop-item" (click)="openSelectorDialog()">
-        @if (!hasSelection){
+    @if (!hasSelection){
+    <div class="selection-item farm-item" (click)="openSelectorDialog()">
         <span class="placeholder-text">{{ 'crop.selector.emptyCropSelection' | translate }}</span>
-        }
-        @else {
-        <span class="label">{{ 'common.crop' | translate }}:</span>
-        <span class="value" [matTooltip]="'Crop ID: ' + selectedCropId" matTooltipPosition="below">
-            {{ selectedCropName }}
-        </span>
-        }
     </div>
+    }
+    @else {
+    <div class="selection-items" (click)="openSelectorDialog()">
+        <div class="selection-item farm-item">
+            <span class="label">{{ 'common.farm' | translate }}:</span>
+            <span class="value" [matTooltip]="'Farm ID: ' + selectedFarmId" matTooltipPosition="below">
+                {{ selectedFarmName }}
+            </span>
+        </div>
+        <span class="separator">|</span>
+        <div class="selection-item crop-item">
+            <span class="label">{{ 'common.crop' | translate }}:</span>
+            <span class="value" [matTooltip]="'Crop ID: ' + selectedCropId" matTooltipPosition="below">
+                {{ selectedCropName }}
+            </span>
+        </div>
+    </div>
+    }
 </div>
