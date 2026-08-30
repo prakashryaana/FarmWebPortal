@@ -20,6 +20,23 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # Never cache index.html
+    location = /index.html {
+        # 'no-store' is the most powerful directive; it tells the browser/CDN never to save it
+        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate" always;
+        expires -1; # Sets the 'Expires' header to the past, forcing immediate expiration
+    }
+
+    # Cache static assets for a long time
+    location ~* \.(?:css|js|jpg|jpeg|gif|png|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        # 'immutable' tells the browser the file will NEVER change, preventing unnecessary validation requests
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        access_log off;
+        log_not_found off; # Prevents spamming error logs for missing favicons/assets
+    }
+
+    # SPA Routing fallback
     location / {
         try_files \$uri \$uri/ /index.html;
     }
