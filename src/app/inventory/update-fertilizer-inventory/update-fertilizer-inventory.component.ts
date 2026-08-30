@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { FertilizerInventoryService, FertilizerInventory } from './fertilizer-inventory.service';
+import { FertilizerInventoryService, FertilizerInventory, InputCatalogItem } from './fertilizer-inventory.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
@@ -101,15 +101,16 @@ export class UpdateFertilizerInventoryComponent {
   get selectedFarmId() { return this.cropFarmSelector.selectedFarmId(); }
   get selectedCropName() { return this.cropFarmSelector.selectedCropName(); }
 
+  fertilizerCatalog: InputCatalogItem[] = [];
   fertilizerNames: string[] = [];
-  
-  quantityMetrics = ['Packets', 'Litres'];
+
+  quantityMetrics = ['kg', 'grams', 'litres', 'mililitres', 'packets', 'bottles'];
 
   form = new FormGroup({
     inventoryId: new FormControl(''),
     suppliedDate: new FormControl(null),
-    invoiceNumber: new FormControl('',[Validators.required]),
-    supplier: new FormControl('',[Validators.required]),
+    invoiceNumber: new FormControl('', [Validators.required]),
+    supplier: new FormControl('', [Validators.required]),
     fertilizerItems: new FormArray([], [Validators.required, Validators.minLength(1)])
   });
 
@@ -126,7 +127,7 @@ export class UpdateFertilizerInventoryComponent {
     name: new FormControl('', [Validators.required, Validators.maxLength(100)])
   });
 
-  constructor() { 
+  constructor() {
     effect(() => {
       this.load();
     });
@@ -135,7 +136,28 @@ export class UpdateFertilizerInventoryComponent {
 
   loadCatalogNames() {
     this.svc.getInputCatalogNames('FERTILIZER').subscribe({
-      next: names => this.fertilizerNames = (names || []).map(x => x.name),
+      next: (items: any) => {
+        const rawItems = items || [];
+        this.fertilizerCatalog = rawItems.map((x: any) => typeof x === 'string' ? { name: x } : x);
+        this.fertilizerNames = this.fertilizerCatalog.map(x => x.name);
+
+        // Ensure all displayUnit or unitType from catalog items are present in quantityMetrics
+        this.fertilizerCatalog.forEach(item => {
+          const unit = item.displayUnit || item.unitType;
+          if (unit && !this.quantityMetrics.some(m => m.toLowerCase() === unit.toLowerCase())) {
+            this.quantityMetrics.push(unit);
+          }
+        });
+
+        // Update metric for any items already in the form array
+        this.fertilizerItems.controls.forEach(ctrl => {
+          const itemForm = ctrl as FormGroup;
+          const fertName = itemForm.get('fertilizerName')?.value;
+          if (fertName) {
+            this.updateMetricForFertilizer(itemForm, fertName);
+          }
+        });
+      },
       error: e => console.error(e)
     });
   }
@@ -144,24 +166,24 @@ export class UpdateFertilizerInventoryComponent {
     return this.form.get('fertilizerItems') as FormArray;
   }
 
-  load() { 
-    if(this.selectedFarmId){
-      this.svc.list(this.selectedFarmId).subscribe({ 
-      next: r => {
-        this.list = (r.data || []).sort((a, b) => {
-          const dateA = a.suppliedDate ? new Date(a.suppliedDate).getTime() : 0;
-          const dateB = b.suppliedDate ? new Date(b.suppliedDate).getTime() : 0;
-          return dateB - dateA;
-        });
-        if (this.showReportView) {
-          this.loadReportData();
-        }
-        if (this.showGenerateReportView) {
-          this.generateReport();
-        }
-      }, 
-      error: e => console.error(e) 
-    }); 
+  load() {
+    if (this.selectedFarmId) {
+      this.svc.list(this.selectedFarmId).subscribe({
+        next: r => {
+          this.list = (r.data || []).sort((a, b) => {
+            const dateA = a.suppliedDate ? new Date(a.suppliedDate).getTime() : 0;
+            const dateB = b.suppliedDate ? new Date(b.suppliedDate).getTime() : 0;
+            return dateB - dateA;
+          });
+          if (this.showReportView) {
+            this.loadReportData();
+          }
+          if (this.showGenerateReportView) {
+            this.generateReport();
+          }
+        },
+        error: e => console.error(e)
+      });
     } else {
       this.list = [];
       this.fertilizerSummaries = [];
@@ -247,9 +269,40 @@ export class UpdateFertilizerInventoryComponent {
     const itemForm = new FormGroup({
       fertilizerName: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       quantitySupplied: new FormControl(0.0, [Validators.required]),
-      quantityMetric: new FormControl('Packets', [Validators.required])
+      quantityMetric: new FormControl({ value: 'Packets', disabled: true }, [Validators.required])
     });
+
+    itemForm.get('fertilizerName')?.valueChanges.subscribe(name => {
+      this.updateMetricForFertilizer(itemForm, name);
+    });
+
     this.fertilizerItems.push(itemForm);
+  }
+
+  onFertilizerNameChange(index: number) {
+    const itemForm = this.fertilizerItems.at(index) as FormGroup;
+    if (!itemForm) return;
+    const selectedName = itemForm.get('fertilizerName')?.value;
+    this.updateMetricForFertilizer(itemForm, selectedName);
+  }
+
+  updateMetricForFertilizer(itemForm: FormGroup, fertilizerName: string | null | undefined) {
+    if (!fertilizerName) return;
+    const match = this.fertilizerCatalog.find(
+      x => x.name?.trim().toLowerCase() === fertilizerName.trim().toLowerCase()
+    );
+    const targetUnit = match?.displayUnit || match?.unitType;
+    if (targetUnit) {
+      const exactMatch = this.quantityMetrics.find(m => m === targetUnit);
+      const matchedMetric = exactMatch || this.quantityMetrics.find(m => m.toLowerCase() === targetUnit.toLowerCase());
+
+      if (matchedMetric) {
+        itemForm.get('quantityMetric')?.setValue(matchedMetric);
+      } else {
+        this.quantityMetrics.push(targetUnit);
+        itemForm.get('quantityMetric')?.setValue(targetUnit);
+      }
+    }
   }
 
   removeFertilizerItem(index: number) {
@@ -271,7 +324,7 @@ export class UpdateFertilizerInventoryComponent {
     if (this.editingId) {
       this.svc.update(this.editingId, payload).subscribe({
         next: () => {
-          this.snackBar.open('Updated successfully', 'Close', { 
+          this.snackBar.open('Updated successfully', 'Close', {
             duration: 5000,
             panelClass: ['centered-success-snackbar']
           });
@@ -283,7 +336,7 @@ export class UpdateFertilizerInventoryComponent {
     } else {
       this.svc.create(payload).subscribe({
         next: () => {
-          this.snackBar.open('Created successfully', 'Close', { 
+          this.snackBar.open('Created successfully', 'Close', {
             duration: 5000,
             panelClass: ['centered-success-snackbar']
           });
@@ -310,7 +363,7 @@ export class UpdateFertilizerInventoryComponent {
       if (!confirmed) return;
       this.svc.delete(item.inventoryId || '').subscribe({
         next: () => {
-          this.snackBar.open('Deleted successfully', 'Close', { 
+          this.snackBar.open('Deleted successfully', 'Close', {
             duration: 5000,
             panelClass: ['centered-success-snackbar']
           });
@@ -331,7 +384,7 @@ export class UpdateFertilizerInventoryComponent {
       suppliedDate: this.form.get('suppliedDate')?.value,
       invoiceNumber: this.form.get('invoiceNumber')?.value,
       supplier: this.form.get('supplier')?.value,
-      fertilizerItems: this.fertilizerItems.value
+      fertilizerItems: this.fertilizerItems.getRawValue()
     };
   }
 
@@ -371,7 +424,7 @@ export class UpdateFertilizerInventoryComponent {
           return;
         }
 
-        const activityRequests = cropIds.map(id => 
+        const activityRequests = cropIds.map(id =>
           this.activityService.getByCrop(id).pipe(
             catchError(err => {
               console.error(`Error loading activities for crop ${id}:`, err);
@@ -402,7 +455,7 @@ export class UpdateFertilizerInventoryComponent {
 
   private processGeneratedReportData(activities: Activity[], cropMap: { [id: string]: string }) {
     const uniqueNames = new Set<string>();
-    
+
     this.fertilizerNames.forEach(name => {
       if (name) uniqueNames.add(name);
     });
@@ -416,7 +469,7 @@ export class UpdateFertilizerInventoryComponent {
     });
 
     const summaries: any[] = [];
-    
+
     // Find the earliest date in records
     let earliestMs = Infinity;
     this.list.forEach(inv => {
@@ -526,7 +579,7 @@ export class UpdateFertilizerInventoryComponent {
           return;
         }
 
-        const activityRequests = cropIds.map(id => 
+        const activityRequests = cropIds.map(id =>
           this.activityService.getByCrop(id).pipe(
             catchError(err => {
               console.error(`Error loading activities for crop ${id}:`, err);
@@ -557,7 +610,7 @@ export class UpdateFertilizerInventoryComponent {
 
   private processReportData(activities: Activity[], cropMap: { [id: string]: string }) {
     const uniqueNames = new Set<string>();
-    
+
     this.fertilizerNames.forEach(name => {
       if (name) uniqueNames.add(name);
     });
@@ -585,7 +638,7 @@ export class UpdateFertilizerInventoryComponent {
             totalSupplied += item.quantitySupplied;
             totalUsed += (item.quantityUsed || 0);
             metric = item.quantityMetric || metric;
-            
+
             suppliesList.push({
               date: inv.suppliedDate,
               invoiceNumber: inv.invoiceNumber,
@@ -690,16 +743,16 @@ export class UpdateFertilizerInventoryComponent {
     if (this.generatedReportData.length === 0) return;
 
     const doc = new jsPDF();
-    
+
     doc.setFontSize(16);
     doc.text('Fertilizer Usage & Stock Report', 14, 20);
-    
+
     doc.setFontSize(10);
     doc.text(`Farm Name: ${this.selectedFarmName || '-'}`, 14, 28);
     if (this.selectedCropName) {
       doc.text(`Crop Name: ${this.selectedCropName}`, 14, 34);
     }
-    
+
     const start = this.reportDisplayStartDate ? new Date(this.reportDisplayStartDate).toLocaleDateString('en-GB') : 'All Time';
     const end = this.reportDisplayEndDate ? new Date(this.reportDisplayEndDate).toLocaleDateString('en-GB') : 'All Time';
     doc.text(`Date Range: ${start} to ${end}`, 14, 40);

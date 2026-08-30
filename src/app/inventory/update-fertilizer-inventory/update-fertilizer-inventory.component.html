@@ -9,7 +9,8 @@
     <!-- <button class="catalog-btn" (click)="openCatalogForm()">
       <mat-icon>category</mat-icon> Input Catalog
     </button> -->
-    <button class="report-btn" (click)="toggleReportView()" [title]="showReportView ? 'Inward Log' : 'View Usage Report'">
+    <button class="report-btn" (click)="toggleReportView()"
+      [title]="showReportView ? 'Inward Log' : 'View Usage Report'">
       <mat-icon>{{ showReportView ? 'view_list' : 'assessment' }}</mat-icon>
       <span class="btn-text">{{ showReportView ? 'Inward Log' : 'View Usage Report' }}</span>
     </button>
@@ -94,7 +95,7 @@
             <div class="item-content">
               <div class="form-group">
                 <label>Fertilizer Name <span class="required">*</span></label>
-                <select formControlName="fertilizerName">
+                <select formControlName="fertilizerName" (change)="onFertilizerNameChange(i)">
                   <option value="">Select fertilizer...</option>
                   @for (fertilizerName of fertilizerNames; track $index) {
                   <option [value]="fertilizerName">{{fertilizerName}}</option>
@@ -108,7 +109,7 @@
               </div>
 
               <div class="form-group">
-                <label>Quantity Metric <span class="required">*</span></label>
+                <label>Display Unit <span class="required">*</span></label>
                 <select formControlName="quantityMetric">
                   @for (metric of quantityMetrics; track $index) {
                   <option [value]="metric">{{metric}}</option>
@@ -137,7 +138,8 @@
   </div>
 
   <!-- Table of existing items -->
-  <div class="table-section" *ngIf="!showReportView && !showGenerateReportView && !isFormExpanded && !isCatalogFormExpanded">
+  <div class="table-section"
+    *ngIf="!showReportView && !showGenerateReportView && !isFormExpanded && !isCatalogFormExpanded">
     <h2>Existing Fertilizer Inventory</h2>
     <div class="table-wrapper hide-on-mobile" *ngIf="list.length > 0">
       <table class="data-table">
@@ -215,13 +217,14 @@
         <div class="inward-card-header" (click)="toggleExpand(item)">
           <div class="inward-card-title">
             <span class="invoice-badge">Inv: {{ item.invoiceNumber }}</span>
-            <span class="supplied-date">{{ item.suppliedDate ? (item.suppliedDate | date: 'dd-MM-yyyy HH:mm') : '-' }}</span>
+            <span class="supplied-date">{{ item.suppliedDate ? (item.suppliedDate | date: 'dd-MM-yyyy HH:mm') : '-'
+              }}</span>
           </div>
           <button type="button" class="expand-btn-icon">
             <mat-icon>{{ expandedRowId === item.inventoryId ? 'expand_less' : 'expand_more' }}</mat-icon>
           </button>
         </div>
-        
+
         <div class="inward-card-body" (click)="toggleExpand(item)">
           <p><strong>Supplier:</strong> {{ item.supplier }}</p>
           <p><strong>Item Count:</strong> {{ item.fertilizerItems?.length || 0 }}</p>
@@ -367,7 +370,8 @@
               <div class="history-card" *ngFor="let usage of selectedFertilizer.usages">
                 <div class="history-card-header">
                   <span class="crop-badge">{{ usage.cropName }}</span>
-                  <span class="history-card-date">{{ usage.date ? (usage.date | date: 'dd-MM-yyyy HH:mm') : '-' }}</span>
+                  <span class="history-card-date">{{ usage.date ? (usage.date | date: 'dd-MM-yyyy HH:mm') : '-'
+                    }}</span>
                 </div>
                 <div class="history-card-body">
                   <p><strong>Activity Type:</strong> {{ usage.activityType }}</p>
@@ -415,7 +419,8 @@
               <div class="history-card" *ngFor="let supply of selectedFertilizer.supplies">
                 <div class="history-card-header">
                   <span class="invoice-number-badge">Inv: {{ supply.invoiceNumber }}</span>
-                  <span class="history-card-date">{{ supply.date ? (supply.date | date: 'dd-MM-yyyy HH:mm') : '-' }}</span>
+                  <span class="history-card-date">{{ supply.date ? (supply.date | date: 'dd-MM-yyyy HH:mm') : '-'
+                    }}</span>
                 </div>
                 <div class="history-card-body">
                   <p><strong>Supplier:</strong> {{ supply.supplier }}</p>

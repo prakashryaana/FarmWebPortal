@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DiseaseControlInventoryService, DiseaseControlInventory } from './disease-control-inventory.service';
+import { InputCatalogItem } from '../update-fertilizer-inventory/fertilizer-inventory.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
@@ -101,15 +102,16 @@ export class UpdateDiseaseControlInventoryComponent {
   get selectedFarmId() { return this.cropFarmSelector.selectedFarmId(); }
   get selectedCropName() { return this.cropFarmSelector.selectedCropName(); }
 
+  diseaseControlCatalog: InputCatalogItem[] = [];
   diseaseControlNames: string[] = [];
-  
-  quantityMetrics = ['Packets', 'Litres'];
+
+  quantityMetrics = ['kg', 'grams', 'litres', 'mililitres', 'packets', 'bottles'];
 
   form = new FormGroup({
     inventoryId: new FormControl(''),
     suppliedDate: new FormControl(null),
-    invoiceNumber: new FormControl('',[Validators.required]),
-    supplier: new FormControl('',[Validators.required]),
+    invoiceNumber: new FormControl('', [Validators.required]),
+    supplier: new FormControl('', [Validators.required]),
     diseaseControlItems: new FormArray([], [Validators.required, Validators.minLength(1)])
   });
 
@@ -118,7 +120,7 @@ export class UpdateDiseaseControlInventoryComponent {
   editingId: string | null = null;
   expandedRowId: string | null = null;
 
-  constructor() { 
+  constructor() {
     effect(() => {
       this.load();
     });
@@ -127,7 +129,28 @@ export class UpdateDiseaseControlInventoryComponent {
 
   loadCatalogNames() {
     this.svc.getInputCatalogNames('DISEASE_CONTROL').subscribe({
-      next: names => this.diseaseControlNames = (names || []).map(x => x.name),
+      next: (items: any) => {
+        const rawItems = items || [];
+        this.diseaseControlCatalog = rawItems.map((x: any) => typeof x === 'string' ? { name: x } : x);
+        this.diseaseControlNames = this.diseaseControlCatalog.map(x => x.name);
+
+        // Ensure all displayUnit or unitType from catalog items are present in quantityMetrics
+        this.diseaseControlCatalog.forEach(item => {
+          const unit = item.displayUnit || item.unitType;
+          if (unit && !this.quantityMetrics.some(m => m.toLowerCase() === unit.toLowerCase())) {
+            this.quantityMetrics.push(unit);
+          }
+        });
+
+        // Update metric for any items already in the form array
+        this.diseaseControlItems.controls.forEach(ctrl => {
+          const itemForm = ctrl as FormGroup;
+          const name = itemForm.get('diseaseControlName')?.value;
+          if (name) {
+            this.updateMetricForDiseaseControl(itemForm, name);
+          }
+        });
+      },
       error: e => console.error(e)
     });
   }
@@ -136,24 +159,24 @@ export class UpdateDiseaseControlInventoryComponent {
     return this.form.get('diseaseControlItems') as FormArray;
   }
 
-  load() { 
-    if(this.selectedFarmId){
-      this.svc.list(this.selectedFarmId).subscribe({ 
-      next: r => {
-        this.list = (r.data || []).sort((a, b) => {
-          const dateA = a.suppliedDate ? new Date(a.suppliedDate).getTime() : 0;
-          const dateB = b.suppliedDate ? new Date(b.suppliedDate).getTime() : 0;
-          return dateB - dateA;
-        });
-        if (this.showReportView) {
-          this.loadReportData();
-        }
-        if (this.showGenerateReportView) {
-          this.generateReport();
-        }
-      }, 
-      error: e => console.error(e) 
-    }); 
+  load() {
+    if (this.selectedFarmId) {
+      this.svc.list(this.selectedFarmId).subscribe({
+        next: r => {
+          this.list = (r.data || []).sort((a, b) => {
+            const dateA = a.suppliedDate ? new Date(a.suppliedDate).getTime() : 0;
+            const dateB = b.suppliedDate ? new Date(b.suppliedDate).getTime() : 0;
+            return dateB - dateA;
+          });
+          if (this.showReportView) {
+            this.loadReportData();
+          }
+          if (this.showGenerateReportView) {
+            this.generateReport();
+          }
+        },
+        error: e => console.error(e)
+      });
     } else {
       this.list = [];
       this.diseaseControlSummaries = [];
@@ -180,9 +203,40 @@ export class UpdateDiseaseControlInventoryComponent {
     const itemForm = new FormGroup({
       diseaseControlName: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       quantitySupplied: new FormControl(0.0, [Validators.required]),
-      quantityMetric: new FormControl('Packets', [Validators.required])
+      quantityMetric: new FormControl({ value: 'Packets', disabled: true }, [Validators.required])
     });
+
+    itemForm.get('diseaseControlName')?.valueChanges.subscribe(name => {
+      this.updateMetricForDiseaseControl(itemForm, name);
+    });
+
     this.diseaseControlItems.push(itemForm);
+  }
+
+  onDiseaseControlNameChange(index: number) {
+    const itemForm = this.diseaseControlItems.at(index) as FormGroup;
+    if (!itemForm) return;
+    const selectedName = itemForm.get('diseaseControlName')?.value;
+    this.updateMetricForDiseaseControl(itemForm, selectedName);
+  }
+
+  updateMetricForDiseaseControl(itemForm: FormGroup, diseaseControlName: string | null | undefined) {
+    if (!diseaseControlName) return;
+    const match = this.diseaseControlCatalog.find(
+      x => x.name?.trim().toLowerCase() === diseaseControlName.trim().toLowerCase()
+    );
+    const targetUnit = match?.displayUnit || match?.unitType;
+    if (targetUnit) {
+      const exactMatch = this.quantityMetrics.find(m => m === targetUnit);
+      const matchedMetric = exactMatch || this.quantityMetrics.find(m => m.toLowerCase() === targetUnit.toLowerCase());
+
+      if (matchedMetric) {
+        itemForm.get('quantityMetric')?.setValue(matchedMetric);
+      } else {
+        this.quantityMetrics.push(targetUnit);
+        itemForm.get('quantityMetric')?.setValue(targetUnit);
+      }
+    }
   }
 
   removeDiseaseControlItem(index: number) {
@@ -204,7 +258,7 @@ export class UpdateDiseaseControlInventoryComponent {
     if (this.editingId) {
       this.svc.update(this.editingId, payload).subscribe({
         next: () => {
-          this.snackBar.open('Updated successfully', 'Close', { 
+          this.snackBar.open('Updated successfully', 'Close', {
             duration: 5000,
             panelClass: ['centered-success-snackbar']
           });
@@ -216,7 +270,7 @@ export class UpdateDiseaseControlInventoryComponent {
     } else {
       this.svc.create(payload).subscribe({
         next: () => {
-          this.snackBar.open('Created successfully', 'Close', { 
+          this.snackBar.open('Created successfully', 'Close', {
             duration: 5000,
             panelClass: ['centered-success-snackbar']
           });
@@ -243,7 +297,7 @@ export class UpdateDiseaseControlInventoryComponent {
       if (!confirmed) return;
       this.svc.delete(item.inventoryId || '').subscribe({
         next: () => {
-          this.snackBar.open('Deleted successfully', 'Close', { 
+          this.snackBar.open('Deleted successfully', 'Close', {
             duration: 5000,
             panelClass: ['centered-success-snackbar']
           });
@@ -264,7 +318,7 @@ export class UpdateDiseaseControlInventoryComponent {
       suppliedDate: this.form.get('suppliedDate')?.value,
       invoiceNumber: this.form.get('invoiceNumber')?.value,
       supplier: this.form.get('supplier')?.value,
-      diseaseControlItems: this.diseaseControlItems.value
+      diseaseControlItems: this.diseaseControlItems.getRawValue()
     };
   }
 
@@ -308,7 +362,7 @@ export class UpdateDiseaseControlInventoryComponent {
           return;
         }
 
-        const activityRequests = cropIds.map(id => 
+        const activityRequests = cropIds.map(id =>
           this.activityService.getByCrop(id).pipe(
             catchError(err => {
               console.error(`Error loading activities for crop ${id}:`, err);
@@ -339,7 +393,7 @@ export class UpdateDiseaseControlInventoryComponent {
 
   private processReportData(activities: Activity[], cropMap: { [id: string]: string }) {
     const uniqueNames = new Set<string>();
-    
+
     this.diseaseControlNames.forEach(name => {
       if (name) uniqueNames.add(name);
     });
@@ -367,7 +421,7 @@ export class UpdateDiseaseControlInventoryComponent {
             totalSupplied += item.quantitySupplied;
             totalUsed += (item.quantityUsed || 0);
             metric = item.quantityMetric || metric;
-            
+
             suppliesList.push({
               date: inv.suppliedDate,
               invoiceNumber: inv.invoiceNumber,
@@ -463,7 +517,7 @@ export class UpdateDiseaseControlInventoryComponent {
           return;
         }
 
-        const activityRequests = cropIds.map(id => 
+        const activityRequests = cropIds.map(id =>
           this.activityService.getByCrop(id).pipe(
             catchError(err => {
               console.error(`Error loading activities for crop ${id}:`, err);
@@ -494,7 +548,7 @@ export class UpdateDiseaseControlInventoryComponent {
 
   private processGeneratedReportData(activities: Activity[], cropMap: { [id: string]: string }) {
     const uniqueNames = new Set<string>();
-    
+
     this.diseaseControlNames.forEach(name => {
       if (name) uniqueNames.add(name);
     });
@@ -508,7 +562,7 @@ export class UpdateDiseaseControlInventoryComponent {
     });
 
     const summaries: any[] = [];
-    
+
     // Find the earliest date in records
     let earliestMs = Infinity;
     this.list.forEach(inv => {
@@ -620,16 +674,16 @@ export class UpdateDiseaseControlInventoryComponent {
     if (this.generatedReportData.length === 0) return;
 
     const doc = new jsPDF();
-    
+
     doc.setFontSize(16);
     doc.text('Disease Control Usage & Stock Report', 14, 20);
-    
+
     doc.setFontSize(10);
     doc.text(`Farm Name: ${this.selectedFarmName || '-'}`, 14, 28);
     if (this.selectedCropName) {
       doc.text(`Crop Name: ${this.selectedCropName}`, 14, 34);
     }
-    
+
     const start = this.reportDisplayStartDate ? new Date(this.reportDisplayStartDate).toLocaleDateString('en-GB') : 'All Time';
     const end = this.reportDisplayEndDate ? new Date(this.reportDisplayEndDate).toLocaleDateString('en-GB') : 'All Time';
     doc.text(`Date Range: ${start} to ${end}`, 14, 40);

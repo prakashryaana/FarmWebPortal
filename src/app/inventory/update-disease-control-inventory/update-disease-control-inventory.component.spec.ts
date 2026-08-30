@@ -63,7 +63,10 @@ describe('UpdateDiseaseControlInventoryComponent', () => {
     }).compileComponents();
 
     mockService.list.and.returnValue(of({ success: true, data: mockData }));
-    mockService.getInputCatalogNames.and.returnValue(of(['BLITOX', 'SPINOSAD 45%']));
+    mockService.getInputCatalogNames.and.returnValue(of([
+      { name: 'BLITOX' },
+      { name: 'SPINOSAD 45%' }
+    ]));
     fixture = TestBed.createComponent(UpdateDiseaseControlInventoryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -93,6 +96,23 @@ describe('UpdateDiseaseControlInventoryComponent', () => {
       const initialLength = component.diseaseControlItems.length;
       component.addDiseaseControlItem();
       expect(component.diseaseControlItems.length).toBe(initialLength + 1);
+    });
+
+    it('should auto-select corresponding display unit when disease control name is selected', () => {
+      component.diseaseControlCatalog = [
+        { name: 'BLITOX', displayUnit: 'kg' },
+        { name: 'SPINOSAD 45%', displayUnit: 'litres' }
+      ];
+      component.diseaseControlNames = ['BLITOX', 'SPINOSAD 45%'];
+
+      component.openCreateForm();
+      const firstItem = component.diseaseControlItems.at(0) as any;
+
+      firstItem.get('diseaseControlName')?.setValue('BLITOX');
+      expect(firstItem.get('quantityMetric')?.value).toBe('kg');
+
+      firstItem.get('diseaseControlName')?.setValue('SPINOSAD 45%');
+      expect(firstItem.get('quantityMetric')?.value).toBe('litres');
     });
 
     it('should submit create with valid form', () => {
