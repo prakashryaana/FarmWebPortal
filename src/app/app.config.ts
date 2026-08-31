@@ -1,5 +1,6 @@
-import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { GlobalErrorHandler } from './global-error-handler.service';
 
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors, HttpClientModule } from '@angular/common/http';
@@ -25,8 +26,9 @@ export class CustomTranslateLoader implements TranslateLoader {
   constructor(private http: HttpClient) {}
   
   getTranslation(lang: string): Observable<any> {
-    console.log('Loading:', `/assets/i18n/${lang}.json`);
-    return this.http.get(`/assets/i18n/${lang}.json`);
+    const version = Date.now();
+    console.log('Loading:', `/assets/i18n/${lang}.json?v=${version}`);
+    return this.http.get(`/assets/i18n/${lang}.json?v=${version}`);
   }
 }
 
@@ -36,6 +38,7 @@ export function createCustomLoader(http: HttpClient) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
