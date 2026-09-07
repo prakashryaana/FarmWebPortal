@@ -29,10 +29,10 @@ import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 
 
 export const routes: Routes = [
-    { path: 'farm-registration', component: FarmRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
-    , { path: 'farm-owner-registration', component: FarmOwnerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    { path: 'farm-registration', component: FarmRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], hideCropFarmSelector: true } }
+    , { path: 'farm-owner-registration', component: FarmOwnerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], hideCropFarmSelector: true } }
     //,{ path: 'maintainer-registration/:farmId', component: MaintainerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
-    , { path: 'maintainer-registration', component: MaintainerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    , { path: 'maintainer-registration', component: MaintainerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], hideCropFarmSelector: true } }
     , { path: 'crop-registration', component: CropRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
     // { path: 'farm-lookup', component: FarmLookupComponent, canActivate: [authGuard] },
     // { path: 'location', component: LocationComponent, canActivate: [authGuard] },
@@ -47,14 +47,14 @@ export const routes: Routes = [
     // { path: 'auth/magic/callback', component: MagicCallbackComponent, canActivate: [authGuard] },
     // { path: '', redirectTo: 'login', pathMatch: 'full' },
     , { path: '', component: HomeDashboardComponent, canActivate: [authGuard] }
-    , { path: 'user-management', component: UserManagementComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    , { path: 'user-management', component: UserManagementComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], hideCropFarmSelector: true } }
     , { path: 'add-actions', component: AddActionsComponent, canActivate: [authGuard] }
     , { path: 'view-actions', component: ViewActionsComponent, canActivate: [authGuard] }
-    , { path: 'crop-master', component: UpdateCropMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
+    , { path: 'crop-master', component: UpdateCropMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], hideCropFarmSelector: true } }
     , { path: 'fertilizer-inventory', component: UpdateFertilizerInventoryComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN', 'FARMOWNER'] } }
     , { path: 'disease-control-inventory', component: UpdateDiseaseControlInventoryComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN', 'FARMOWNER'] } }
-    , { path: 'fertilizer-master', component: FertilizerMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], type: 'FERTILIZER' } }
-    , { path: 'disease-control-master', component: FertilizerMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], type: 'DISEASE_CONTROL' } }
+    , { path: 'fertilizer-master', component: FertilizerMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], type: 'FERTILIZER', hideCropFarmSelector: true } }
+    , { path: 'disease-control-master', component: FertilizerMasterComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], type: 'DISEASE_CONTROL', hideCropFarmSelector: true } }
     , { path: 'user-profile', component: UserProfileComponent, canActivate: [authGuard] }
     , { path: 'unauthorized', component: UnauthorizedComponent }
     // {

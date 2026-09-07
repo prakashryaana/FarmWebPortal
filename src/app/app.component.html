@@ -5,7 +5,9 @@
       <h1>
         <a href="/home-dashboard">EazyGrow</a>
       </h1>
-      <app-crop-farm-selector-toolbar class="toolbar-center"></app-crop-farm-selector-toolbar>
+      @if (showCropFarmSelector()) {
+        <app-crop-farm-selector-toolbar class="toolbar-center"></app-crop-farm-selector-toolbar>
+      }
     </header>
     <div class="layout">
     <app-sidebar class="sidebar-left"></app-sidebar>
