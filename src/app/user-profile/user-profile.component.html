@@ -137,38 +137,62 @@
             </mat-checkbox>
           </div>
 
-          <div class="form-row password-fields-row" *ngIf="profileForm()!.get('changePassword')?.value" style="margin-bottom: 1.5rem;">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>{{ 'userProfile.newPassword' | translate }}</mat-label>
-              <input matInput [type]="showPassword() ? 'text' : 'password'" formControlName="password">
-              <mat-icon matPrefix>lock</mat-icon>
-              <button mat-icon-button matSuffix type="button" (click)="showPassword.set(!showPassword())" aria-label="Toggle password visibility">
-                <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
-              </button>
-              @if (profileForm()!.get('password')?.invalid && profileForm()!.get('password')?.touched) {
-                <mat-error>
-                  @if (profileForm()!.get('password')?.errors?.['required']) {
-                    {{ 'userProfile.passwordRequired' | translate }}
-                  } @else if (profileForm()!.get('password')?.errors?.['minlength']) {
-                    {{ 'userProfile.passwordConstraints' | translate }}
-                  }
-                </mat-error>
-              }
-            </mat-form-field>
+          <div class="password-fields-container" *ngIf="profileForm()!.get('changePassword')?.value" style="margin-bottom: 1.5rem;">
+            <div class="form-row" style="margin-bottom: 1.25rem;">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>{{ 'userProfile.oldPassword' | translate }}</mat-label>
+                <input matInput [type]="showOldPassword() ? 'text' : 'password'" formControlName="oldPassword" required>
+                <mat-icon matPrefix>lock_outline</mat-icon>
+                <button mat-icon-button matSuffix type="button" (click)="showOldPassword.set(!showOldPassword())" aria-label="Toggle old password visibility">
+                  <mat-icon>{{ showOldPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                @if (profileForm()!.get('oldPassword')?.invalid && (profileForm()!.get('oldPassword')?.touched || profileForm()!.get('oldPassword')?.hasError('incorrect'))) {
+                  <mat-error>
+                    @if (profileForm()!.get('oldPassword')?.errors?.['required']) {
+                      {{ 'userProfile.oldPasswordRequired' | translate }}
+                    } @else if (profileForm()!.get('oldPassword')?.errors?.['incorrect']) {
+                      {{ 'userProfile.oldPasswordIncorrect' | translate }}
+                    }
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>{{ 'userProfile.confirmPassword' | translate }}</mat-label>
-              <input matInput [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword">
-              <mat-icon matPrefix>lock</mat-icon>
-              <button mat-icon-button matSuffix type="button" (click)="showConfirmPassword.set(!showConfirmPassword())" aria-label="Toggle password visibility">
-                <mat-icon>{{ showConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
-              </button>
-              @if (profileForm()!.hasError('passwordMismatch') && profileForm()!.get('confirmPassword')?.touched) {
-                <mat-error>
-                  {{ 'userProfile.passwordMismatch' | translate }}
-                </mat-error>
-              }
-            </mat-form-field>
+            <div class="form-row password-fields-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>{{ 'userProfile.newPassword' | translate }}</mat-label>
+                <input matInput [type]="showPassword() ? 'text' : 'password'" formControlName="password" required>
+                <mat-icon matPrefix>lock</mat-icon>
+                <button mat-icon-button matSuffix type="button" (click)="showPassword.set(!showPassword())" aria-label="Toggle password visibility">
+                  <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                @if ((profileForm()!.get('password')?.invalid && profileForm()!.get('password')?.touched) || profileForm()!.hasError('sameAsOldPassword')) {
+                  <mat-error>
+                    @if (profileForm()!.get('password')?.errors?.['required']) {
+                      {{ 'userProfile.passwordRequired' | translate }}
+                    } @else if (profileForm()!.get('password')?.errors?.['minlength']) {
+                      {{ 'userProfile.passwordConstraints' | translate }}
+                    } @else if (profileForm()!.hasError('sameAsOldPassword') && profileForm()!.get('password')?.touched) {
+                      {{ 'userProfile.sameAsOldPassword' | translate }}
+                    }
+                  </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>{{ 'userProfile.confirmPassword' | translate }}</mat-label>
+                <input matInput [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" required>
+                <mat-icon matPrefix>lock</mat-icon>
+                <button mat-icon-button matSuffix type="button" (click)="showConfirmPassword.set(!showConfirmPassword())" aria-label="Toggle password visibility">
+                  <mat-icon>{{ showConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                @if (profileForm()!.hasError('passwordMismatch') && profileForm()!.get('confirmPassword')?.touched) {
+                  <mat-error>
+                    {{ 'userProfile.passwordMismatch' | translate }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
           </div>
 
           <div class="form-actions">

@@ -14,6 +14,7 @@ import { of } from 'rxjs';
 import { UserProfileService } from './user-profile.service';
 import { UserProfile } from './user-profile.service';
 import { UserService } from '../users/user.service';
+import { AuthService } from '../auth/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -38,6 +39,7 @@ export class UserProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private userProfileService = inject(UserProfileService);
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private snackBar = inject(MatSnackBar);
 
   profileForm = signal<FormGroup | null>(null);
@@ -46,6 +48,7 @@ export class UserProfileComponent implements OnInit {
   isUpdating = signal(false);
   updateSuccess = signal(false);
 
+  showOldPassword = signal(false);
   showPassword = signal(false);
   showConfirmPassword = signal(false);
 
@@ -53,10 +56,21 @@ export class UserProfileComponent implements OnInit {
     const changePassword = form.get('changePassword')?.value;
     if (!changePassword) return null;
 
+    const oldPassword = form.get('oldPassword')?.value;
     const password = form.get('password')?.value;
     const confirmPassword = form.get('confirmPassword')?.value;
 
-    return password === confirmPassword ? null : { passwordMismatch: true };
+    const errors: ValidationErrors = {};
+
+    if (password && confirmPassword && password !== confirmPassword) {
+      errors['passwordMismatch'] = true;
+    }
+
+    if (oldPassword && password && oldPassword === password) {
+      errors['sameAsOldPassword'] = true;
+    }
+
+    return Object.keys(errors).length > 0 ? errors : null;
   };
 
   ngOnInit() {
@@ -65,6 +79,7 @@ export class UserProfileComponent implements OnInit {
       mobile: ['', [Validators.pattern(/^\+?[\d\s-()]+$/)]],
       email: [{ value: '', disabled: false }, [Validators.required, Validators.email]],
       changePassword: [false],
+      oldPassword: [''],
       password: [''],
       confirmPassword: ['']
     }, { validators: this.passwordMatchValidator });
@@ -72,21 +87,35 @@ export class UserProfileComponent implements OnInit {
     this.profileForm.set(form);
 
     form.get('changePassword')?.valueChanges.subscribe(checked => {
+      const oldPasswordCtrl = form.get('oldPassword');
       const passwordCtrl = form.get('password');
       const confirmPasswordCtrl = form.get('confirmPassword');
 
       if (checked) {
+        oldPasswordCtrl?.setValidators([Validators.required]);
         passwordCtrl?.setValidators([Validators.required, Validators.minLength(8)]);
         confirmPasswordCtrl?.setValidators([Validators.required]);
       } else {
+        oldPasswordCtrl?.clearValidators();
         passwordCtrl?.clearValidators();
         confirmPasswordCtrl?.clearValidators();
+        oldPasswordCtrl?.setValue('');
         passwordCtrl?.setValue('');
         confirmPasswordCtrl?.setValue('');
       }
 
+      oldPasswordCtrl?.updateValueAndValidity();
       passwordCtrl?.updateValueAndValidity();
       confirmPasswordCtrl?.updateValueAndValidity();
+    });
+
+    form.get('oldPassword')?.valueChanges.subscribe(() => {
+      const oldPasswordCtrl = form.get('oldPassword');
+      if (oldPasswordCtrl?.hasError('incorrect')) {
+        const errors = { ...oldPasswordCtrl.errors };
+        delete errors['incorrect'];
+        oldPasswordCtrl.setErrors(Object.keys(errors).length > 0 ? errors : null);
+      }
     });
 
     this.loadProfile();
@@ -124,45 +153,71 @@ export class UserProfileComponent implements OnInit {
       mobile: formValue.mobile
     };
 
-    this.userProfileService.updateMyProfile(profileData).pipe(
-      tap(() => {
-        this.userProfile.update(profile => 
-          profile ? { ...profile, ...profileData } : profile
-        );
-      }),
-      switchMap(() => {
-        if (formValue.changePassword) {
-          return this.userService.setTempPassword(this.userProfile()!.userId, formValue.password).pipe(
-            tap(() => {
-              this.profileForm()?.patchValue({
-                changePassword: false,
-                password: '',
-                confirmPassword: ''
-              });
-              this.snackBar.open('Profile and password updated successfully', 'Close', {
-                duration: 4000,
-                panelClass: ['centered-success-snackbar']
-              });
-            })
+    const currentMobile = this.userProfile()?.mobile || formValue.mobile;
+
+    if (formValue.changePassword) {
+      // Step 1: Validate old password with login API first
+      this.authService.loginWithPassword({
+        mobile: currentMobile,
+        password: formValue.oldPassword
+      }).pipe(
+        switchMap(() => {
+          // Old password verified! Update new password
+          return this.userService.setTempPassword(this.userProfile()!.userId, formValue.password);
+        }),
+        switchMap(() => {
+          // Update profile details
+          return this.userProfileService.updateMyProfile(profileData);
+        }),
+        tap(() => {
+          this.userProfile.update(profile => 
+            profile ? { ...profile, ...profileData } : profile
           );
-        } else {
+          this.profileForm()?.patchValue({
+            changePassword: false,
+            oldPassword: '',
+            password: '',
+            confirmPassword: ''
+          });
+          this.updateSuccess.set(true);
+          this.snackBar.open('Profile and password updated successfully', 'Close', {
+            duration: 4000,
+            panelClass: ['centered-success-snackbar']
+          });
+        }),
+        catchError(error => {
+          console.error('Update failed:', error);
+          if (error.status === 401 || error.status === 400) {
+            this.profileForm()?.get('oldPassword')?.setErrors({ incorrect: true });
+            this.profileForm()?.get('oldPassword')?.markAsTouched();
+            this.snackBar.open('Old password is incorrect. Please try again.', 'Close', { duration: 4000 });
+          } else {
+            this.snackBar.open(error.message || 'Update failed', 'Close', { duration: 4000 });
+          }
+          return of(null);
+        }),
+        finalize(() => this.isUpdating.set(false))
+      ).subscribe();
+    } else {
+      this.userProfileService.updateMyProfile(profileData).pipe(
+        tap(() => {
+          this.userProfile.update(profile => 
+            profile ? { ...profile, ...profileData } : profile
+          );
+          this.updateSuccess.set(true);
           this.snackBar.open('Profile updated successfully', 'Close', {
             duration: 4000,
             panelClass: ['centered-success-snackbar']
           });
+        }),
+        catchError(error => {
+          console.error('Update failed:', error);
+          this.snackBar.open(error.message || 'Update failed', 'Close', { duration: 4000 });
           return of(null);
-        }
-      }),
-      tap(() => {
-        this.updateSuccess.set(true);
-      }),
-      catchError(error => {
-        console.error('Update failed:', error);
-        this.snackBar.open(error.message || 'Update failed', 'Close', { duration: 4000 });
-        return of(null);
-      }),
-      finalize(() => this.isUpdating.set(false))
-    ).subscribe();
+        }),
+        finalize(() => this.isUpdating.set(false))
+      ).subscribe();
+    }
   }
 
   get saveButtonLabel(): string  {
