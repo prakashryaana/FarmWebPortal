@@ -1,24 +1,82 @@
 <div class="crop-farm-toolbar">
-    @if (!hasSelection){
+  @if (farmsList.length > 0) {
+    <!-- Farm Dropdown Group -->
+    <div class="toolbar-dropdown-group farm-group">
+      <label for="headerFarmSelect" class="selector-label">
+        <mat-icon class="label-icon">agriculture</mat-icon>
+        <span>{{ 'common.farm' | translate }}:</span>
+      </label>
+      <select
+        id="headerFarmSelect"
+        class="toolbar-select farm-select"
+        [ngModel]="selectedFarmId"
+        (ngModelChange)="onFarmChange($event)"
+        [matTooltip]="'Farm ID: ' + selectedFarmId"
+        matTooltipPosition="below"
+      >
+        @for (farm of farmsList; track farm.farmId) {
+          <option [value]="farm.farmId">{{ farm.farmName }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- If farm has multiple crops: show Crops Dropdown -->
+    @if (currentFarmCrops.length > 1) {
+      <span class="separator">|</span>
+      <div class="toolbar-dropdown-group crop-group">
+        <label for="headerCropSelect" class="selector-label">
+          <mat-icon class="label-icon">spa</mat-icon>
+          <span>{{ 'common.crop' | translate }}:</span>
+        </label>
+        <select
+          id="headerCropSelect"
+          class="toolbar-select crop-select"
+          [ngModel]="selectedCropId"
+          (ngModelChange)="onCropChange($event)"
+          [matTooltip]="'Crop ID: ' + selectedCropId"
+          matTooltipPosition="below"
+        >
+          @for (crop of currentFarmCrops; track crop.cropId) {
+            <option [value]="crop.cropId">{{ crop.cropName }}</option>
+          }
+        </select>
+      </div>
+    } @else if (currentFarmCrops.length === 1) {
+      <!-- Single crop: show static badge -->
+      <span class="separator">|</span>
+      <div class="toolbar-static-item crop-group">
+        <span class="selector-label">
+          <mat-icon class="label-icon">spa</mat-icon>
+          <span>{{ 'common.crop' | translate }}:</span>
+        </span>
+        <span class="single-crop-badge" [matTooltip]="'Crop ID: ' + selectedCropId" matTooltipPosition="below">
+          {{ selectedCropName }}
+        </span>
+      </div>
+    }
+  } @else if (isLoading) {
+    <div class="toolbar-loading">
+      <span class="loading-text">{{ 'common.loading' | translate }}...</span>
+    </div>
+  } @else if (!hasSelection) {
     <div class="selection-item farm-item" (click)="openSelectorDialog()">
-        <span class="placeholder-text">{{ 'crop.selector.emptyCropSelection' | translate }}</span>
+      <span class="placeholder-text">{{ 'crop.selector.emptyCropSelection' | translate }}</span>
     </div>
-    }
-    @else {
+  } @else {
     <div class="selection-items" (click)="openSelectorDialog()">
-        <div class="selection-item farm-item">
-            <span class="label">{{ 'common.farm' | translate }}:</span>
-            <span class="value" [matTooltip]="'Farm ID: ' + selectedFarmId" matTooltipPosition="below">
-                {{ selectedFarmName }}
-            </span>
-        </div>
-        <span class="separator">|</span>
-        <div class="selection-item crop-item">
-            <span class="label">{{ 'common.crop' | translate }}:</span>
-            <span class="value" [matTooltip]="'Crop ID: ' + selectedCropId" matTooltipPosition="below">
-                {{ selectedCropName }}
-            </span>
-        </div>
+      <div class="selection-item farm-item">
+        <span class="label">{{ 'common.farm' | translate }}:</span>
+        <span class="value" [matTooltip]="'Farm ID: ' + selectedFarmId" matTooltipPosition="below">
+          {{ selectedFarmName }}
+        </span>
+      </div>
+      <span class="separator">|</span>
+      <div class="selection-item crop-item">
+        <span class="label">{{ 'common.crop' | translate }}:</span>
+        <span class="value" [matTooltip]="'Crop ID: ' + selectedCropId" matTooltipPosition="below">
+          {{ selectedCropName }}
+        </span>
+      </div>
     </div>
-    }
+  }
 </div>

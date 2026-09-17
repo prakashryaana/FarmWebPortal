@@ -401,15 +401,15 @@
     align-items: center;
     justify-content: center;
     position: fixed !important;
-    top: 4px !important;
+    top: 5px !important;
     left: 8px !important;
-    width: 44px !important;
-    height: 44px !important;
+    width: 38px !important;
+    height: 38px !important;
     border-radius: 50% !important;
     background: #1f2933 !important;
     color: white !important;
     border: 1px solid rgba(255,255,255,0.15) !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
     cursor: pointer !important;
     z-index: 10002 !important;
     transition: all 0.2s ease !important;
@@ -421,9 +421,9 @@
   }
 
   .mobile-menu-toggle mat-icon {
-    font-size: 24px !important;
-    width: 24px !important;
-    height: 24px !important;
+    font-size: 22px !important;
+    width: 22px !important;
+    height: 22px !important;
   }
 
   .sidebar {

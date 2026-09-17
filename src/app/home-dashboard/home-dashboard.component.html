@@ -1,74 +1,762 @@
 <!-- home-dashboard.component.html -->
-<div class="dashboard-container" *ngIf="auth.hasRole('EASYGROWADMIN') && summary$ | async as summary; else loading">
-  <div class="cards">
-    <mat-card class="card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar color="primary">agriculture</mat-icon>
-        <mat-card-title>Total Farms</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="value">{{ summary.totalFarms }}</div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar color="primary">eco</mat-icon>
-        <mat-card-title>Total Crops</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="value">{{ summary.totalCrops }}</div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- <mat-card class="card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar color="primary">public</mat-icon>
-        <mat-card-title>Distinct States</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="value">{{ summary.distinctStates.length }}</div>
-        <mat-nav-list>
-          <a mat-list-item *ngFor="let s of summary.distinctStates">
-            {{ s }}
-          </a>
-        </mat-nav-list>
-      </mat-card-content>
-    </mat-card> -->
-
-    <mat-card class="card live-card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar color="warn">notifications_active</mat-icon>
-        <mat-card-title>Live Activities Today</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <ng-container *ngIf="liveActivitiesToday$ | async as liveCount; else liveLoading">
-          <div class="value live">{{ liveCount }}</div>
-          <div class="hint">Auto-refreshing every 15 seconds</div>
-        </ng-container>
-        <ng-template #liveLoading>
-          <mat-progress-spinner diameter="28"></mat-progress-spinner>
-        </ng-template>
-      </mat-card-content>
-    </mat-card>
+<div class="dashboard-page">
+  <!-- Top View Mode & Farm Switcher Bar -->
+  <div class="view-mode-bar">
+    <div class="mode-toggle-group">
+      <button type="button" class="mode-btn" [class.active]="viewMode === 'overview'" (click)="setViewMode('overview')">
+        <mat-icon class="mode-icon">dashboard_customize</mat-icon>
+        <span>Farm Overview</span>
+      </button>
+      <button type="button" class="mode-btn" [class.active]="viewMode === 'allFarms'" (click)="setViewMode('allFarms')">
+        <mat-icon class="mode-icon">view_agenda</mat-icon>
+        <span>View All Farms</span>
+      </button>
+    </div>
   </div>
-</div>
 
-<ng-template #loading>
-  <div class="loading">
-    <mat-progress-spinner diameter="40"></mat-progress-spinner>
+  <!-- Loading State -->
+  @if (isLoading) {
+  <div class="state-container">
+    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    <p class="state-text">Loading farm details, crops, activities, and observations...</p>
   </div>
-</ng-template>
+  }
 
-<!-- @if (user) {
-<div>
-  <p>Mobile: {{ user.mobile }}</p>
-  <p>Email: {{ user.email || 'none' }}</p>
-  <p>Roles: {{ user.roles.join(', ') }}</p>
-  <p>OwnerId: {{ user.ownerId }}</p>
-  @if (user.maintainerId) {<p>MaintainerId: {{ user.maintainerId }}</p>}
-  @if (isOwner) {<button>Owner settings</button>}
-  @if (isMaintainer || isOwner) {<button>Manage projects</button>}
-  <button (click)="logout()">Logout</button>
+  <!-- Empty State (No Farms Registered) -->
+  @if (!isLoading && farms.length === 0) {
+  <div class="state-container empty-state">
+    <div class="empty-icon-circle">
+      <mat-icon>agriculture</mat-icon>
+    </div>
+    <h2>No Farms Found</h2>
+    <p>There are no farms registered in the system yet.</p>
+  </div>
+  }
+
+  <!-- ==================== VIEW 1: FARM OVERVIEW (Landing Page Mockup) ==================== -->
+  @if (!isLoading && viewMode === 'overview' && farms.length > 0) {
+  <div class="overview-landing">
+    <!-- 2-Column Dashboard Grid -->
+    <div class="overview-grid">
+      <!-- Left Column: Crops on Farm, Gallery, Specs Card -->
+      <div class="overview-col-left">
+        <!-- Section: Crops on Farm -->
+        <section class="overview-section">
+          <h2 class="overview-section-title">Crops on Farm</h2>
+          <div class="overview-crops-row">
+            @for (crop of getOverviewCrops(); track crop.cropId) {
+            <div class="overview-crop-card">
+              <div class="crop-card-title">{{ crop.cropName }} - {{ crop.farmerName }}</div>
+              <div class="sown-progress-pill">
+                <div class="sown-label">Sown On : {{ crop.sownOnFormatted }}</div>
+                <div class="sown-progress-track">
+                  <div class="sown-progress-bar" [style.width.%]="crop.progressPercent"></div>
+                </div>
+              </div>
+              <div class="crop-details-list">
+                <div class="crop-detail-line">Est. Yeild: {{ crop.estYield }}</div>
+                <div class="crop-detail-line">Est. Harvest: {{ crop.estHarvestFormatted }}</div>
+              </div>
+            </div>
+            }
+          </div>
+        </section>
+
+        <!-- Photo Gallery (Farm Crop View Grid from Activities & Observations) -->
+        <section class="overview-gallery-section">
+          <div class="overview-gallery-card">
+            <!-- Backward Button (if > 3 images) -->
+            @if (getOverviewGalleryImages().length > 3) {
+            <button type="button" class="gallery-nav-btn prev-btn" [disabled]="isGalleryAtStart"
+              (click)="scrollGallery('left')" aria-label="Previous photos" title="Previous photos">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            }
+
+            <!-- Scrollable Track Container -->
+            <div class="gallery-scroll-container" #galleryScrollContainer (scroll)="updateGalleryScrollState()">
+              <div class="gallery-track">
+                @for (img of getOverviewGalleryImages(); track $index) {
+                <div class="gallery-card" (click)="openImagePopup(img.url)" title="Click to enlarge image">
+                  <img [src]="img.url" alt="Farm crop view" class="gallery-img"
+                    (error)="onGalleryImageError($event, $index)" />
+                  @if (img.tag) {
+                  <div class="gallery-img-tag">{{ img.tag }}</div>
+                  }
+                </div>
+                }
+              </div>
+            </div>
+
+            <!-- Forward Button (if > 3 images) -->
+            @if (getOverviewGalleryImages().length > 3) {
+            <button type="button" class="gallery-nav-btn next-btn" [disabled]="isGalleryAtEnd"
+              (click)="scrollGallery('right')" aria-label="Next photos" title="Next photos">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+            }
+          </div>
+        </section>
+
+
+      </div>
+
+      <!-- Right Column: Recent Activities, Notes -->
+      <div class="overview-col-right">
+        <!-- Recent Activities Section -->
+        <section class="overview-activities-section">
+          <div class="overview-section-header-row">
+            <h2 class="overview-section-title">Recent Activities</h2>
+            @if (getOverviewActivities().length > 3) {
+            <span class="activities-count-badge">
+              <mat-icon class="count-badge-icon">unfold_more</mat-icon>
+              {{ getOverviewActivities().length }} items
+            </span>
+            }
+          </div>
+
+          <div class="overview-activities-container">
+            <div class="activities-cards-stack" #activitiesCardsStack (scroll)="updateActivitiesScrollState()">
+              @for (act of getOverviewActivities(); track $index) {
+              <div class="overview-activity-box" [class.is-clickable]="act.isGroup"
+                (click)="toggleOverviewActivity(act)">
+                <div class="act-box-header">
+                  <span class="act-box-date">{{ act.header }}</span>
+                  @if (act.isGroup) {
+                  <mat-icon class="act-box-chevron" [class.rotated]="act.expanded">expand_more</mat-icon>
+                  }
+                </div>
+                <div class="act-badge-container">
+                  <span class="act-badge-pill">{{ act.badge }}</span>
+                </div>
+                <div class="act-box-message">{{ act.message }}</div>
+
+                <!-- Expandable items if grouped -->
+                @if (act.isGroup && act.expanded) {
+                <div class="act-nested-list" (click)="$event.stopPropagation()">
+                  @for (sub of act.items; track $index) {
+                  <div class="act-nested-item">
+                    <span class="act-badge-pill nested">{{ sub.activityType }}</span>
+                    <span class="nested-msg">{{ sub.message }}</span>
+                  </div>
+                  }
+                </div>
+                }
+              </div>
+              }
+            </div>
+
+            <!-- Bottom Scroll Indicator (visible when more items below) -->
+            @if (hasMoreActivitiesBelow) {
+            <div class="activities-scroll-indicator" (click)="scrollActivitiesDown()" title="Click to scroll down">
+              <div class="indicator-pill">
+                <span class="indicator-text">Scroll for more</span>
+                <mat-icon class="indicator-arrow">keyboard_arrow_down</mat-icon>
+              </div>
+            </div>
+            }
+          </div>
+        </section>
+
+        <!-- Notes Card -->
+        <section class="overview-notes-section">
+          <div class="overview-notes-card">
+            <h3 class="notes-card-title">Notes:</h3>
+            <ul class="notes-bullet-list">
+              @for (note of getOverviewNotes(); track $index) {
+              <li>{{ note }}</li>
+              }
+            </ul>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- ==================== VIEW 2: VIEW ALL FARMS (Comprehensive Multi-Farm View) ==================== -->
+  @if (!isLoading && viewMode === 'allFarms' && farms.length > 0) {
+  <!-- Top Header Banner -->
+  <header class="dashboard-hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <mat-icon class="hero-icon">dashboard</mat-icon>
+          Farm Operations Dashboard
+        </h1>
+        <p class="hero-subtitle">
+          Real-time view of all farms, active crops, logged activities, and field observations.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <button mat-stroked-button class="refresh-btn" (click)="refreshDashboard()" [disabled]="isRefreshing"
+          [matTooltip]="'Refresh data'">
+          <mat-icon [class.spinning]="isRefreshing">refresh</mat-icon>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Metric Summary Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon-wrapper bg-emerald">
+          <mat-icon>agriculture</mat-icon>
+        </div>
+        <div class="metric-data">
+          <span class="metric-label">Total Farms</span>
+          <span class="metric-val">{{ totalFarmsCount }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-wrapper bg-green">
+          <mat-icon>eco</mat-icon>
+        </div>
+        <div class="metric-data">
+          <span class="metric-label">Total Crops</span>
+          <span class="metric-val">{{ totalCropsCount }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-wrapper bg-blue">
+          <mat-icon>task_alt</mat-icon>
+        </div>
+        <div class="metric-data">
+          <span class="metric-label">Activities Done</span>
+          <span class="metric-val">{{ totalActivitiesCount }}</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-wrapper bg-amber">
+          <mat-icon>visibility</mat-icon>
+        </div>
+        <div class="metric-data">
+          <span class="metric-label">Observations</span>
+          <span class="metric-val">{{ totalObservationsCount }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="filters-toolbar">
+      <div class="search-box">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input type="text" class="search-input" placeholder="Search by farm name, crop, activity, or observation..."
+          [(ngModel)]="searchQuery" />
+        @if (searchQuery) {
+        <button mat-icon-button class="clear-btn" (click)="clearSearch()" title="Clear search">
+          <mat-icon>close</mat-icon>
+        </button>
+        }
+      </div>
+
+      <div class="farm-filter" *ngIf="farms.length > 1">
+        <label class="filter-label">Farm:</label>
+        <select class="farm-select" [(ngModel)]="selectedFarmFilter">
+          <option value="ALL">All Farms ({{ farms.length }})</option>
+          @for (f of farms; track f.farmId) {
+          <option [value]="f.farmId">{{ f.farmName }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Empty State for Search Filter -->
+  @if (filteredFarms.length === 0) {
+  <div class="state-container empty-state">
+    <div class="empty-icon-circle">
+      <mat-icon>agriculture</mat-icon>
+    </div>
+    <h2>No Farms Found</h2>
+    <p>
+      @if (searchQuery || selectedFarmFilter !== 'ALL') {
+      No farms match your current search criteria. Try clearing the search or filter.
+      } @else {
+      There are no farms registered in the system yet.
+      }
+    </p>
+    @if (searchQuery || selectedFarmFilter !== 'ALL') {
+    <button mat-flat-button color="primary" (click)="searchQuery = ''; selectedFarmFilter = 'ALL'">
+      Reset Filters
+    </button>
+    }
+  </div>
+  }
+
+  <!-- Farms List -->
+  @if (filteredFarms.length > 0) {
+  <div class="farms-container">
+    @for (farm of filteredFarms; track farm.farmId) {
+    <section class="farm-card">
+      <!-- Farm Header -->
+      <div class="farm-header" (click)="toggleFarmExpand(farm)">
+        <div class="farm-header-left">
+          <div class="farm-badge-icon">
+            <mat-icon>agriculture</mat-icon>
+          </div>
+          <div class="farm-title-group">
+            <div class="farm-name-row">
+              <h2 class="farm-name">{{ farm.farmName }}</h2>
+              <span class="farm-id-pill" [matTooltip]="'Farm ID'">ID: {{ farm.farmId }}</span>
+            </div>
+            <div class="farm-meta-row">
+              <span class="meta-tag">
+                <mat-icon class="meta-icon">eco</mat-icon>
+                {{ farm.crops.length }} {{ farm.crops.length === 1 ? 'Crop' : 'Crops' }} Registered
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="farm-header-right">
+          <button type="button" class="collapse-toggle-btn"
+            [attr.aria-label]="farm.expanded ? 'Collapse farm' : 'Expand farm'"
+            [matTooltip]="farm.expanded ? 'Hide details' : 'Show details'"
+            (click)="toggleFarmExpand(farm); $event.stopPropagation()"><mat-icon class="chevron-icon">{{ farm.expanded ?
+              'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon></button>
+        </div>
+      </div>
+
+      <!-- Farm Content Body -->
+      @if (farm.expanded) {
+      <div class="farm-body">
+        <!-- If Farm has NO Crops -->
+        @if (farm.crops.length === 0) {
+        <div class="no-crops-box">
+          <mat-icon class="no-crops-icon">spa</mat-icon>
+          <p class="no-crops-title">No Crops Registered</p>
+          <p class="no-crops-desc">This farm currently does not have any crops assigned to it.</p>
+        </div>
+        }
+
+        <!-- If Farm HAS Crops -->
+        @if (farm.crops.length > 0) {
+        <!-- Crop Selector Pills (when multiple crops) -->
+        @if (farm.crops.length > 1) {
+        <div class="crop-pill-bar">
+          <span class="crop-bar-label">Crops:</span>
+          <button type="button" class="crop-pill" [class.active]="farm.selectedCropId === 'ALL'"
+            (click)="selectCrop(farm, 'ALL')">
+            <mat-icon class="pill-icon">grid_view</mat-icon>
+            <span>All Crops ({{ farm.crops.length }})</span>
+          </button>
+
+          @for (crop of farm.crops; track crop.cropId) {
+          <button type="button" class="crop-pill" [class.active]="farm.selectedCropId === crop.cropId"
+            (click)="selectCrop(farm, crop.cropId)">
+            <mat-icon class="pill-icon">local_florist</mat-icon>
+            <span class="crop-pill-name">{{ crop.cropName }}</span>
+            <span class="pill-badge" title="Activities / Observations">
+              {{ crop.activities.length }}/{{ crop.observations.length }}
+            </span>
+          </button>
+          }
+        </div>
+        }
+
+        <!-- Crops Cards Loop -->
+        <div class="crops-grid">
+          @for (crop of getCropsForDisplay(farm); track crop.cropId) {
+          <article class="crop-card">
+            <!-- Crop Header -->
+            <div class="crop-card-header">
+              <div class="crop-card-title-group">
+                <mat-icon class="crop-icon">local_florist</mat-icon>
+                <div class="crop-text">
+                  <h3 class="crop-name">{{ crop.cropName }}</h3>
+                  <span class="crop-id-label">Crop ID: {{ crop.cropId }}</span>
+                </div>
+              </div>
+
+              <!-- Segmented Switcher for Activities vs Observations -->
+              <div class="tab-switcher">
+                <button type="button" class="tab-btn" [class.active]="crop.activeTab === 'activities'"
+                  (click)="setCropTab(crop, 'activities')">
+                  <mat-icon class="tab-icon">assignment</mat-icon>
+                  <span>Activities</span>
+                  <span class="tab-badge" [class.badge-active]="crop.activeTab === 'activities'">
+                    {{ crop.activities.length }}
+                  </span>
+                </button>
+
+                <button type="button" class="tab-btn" [class.active]="crop.activeTab === 'observations'"
+                  (click)="setCropTab(crop, 'observations')">
+                  <mat-icon class="tab-icon">visibility</mat-icon>
+                  <span>Observations</span>
+                  <span class="tab-badge" [class.badge-active]="crop.activeTab === 'observations'">
+                    {{ crop.observations.length }}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Crop Card Body -->
+            <div class="crop-card-body">
+              <!-- ================= ACTIVITIES VIEW (GROUPED BY DATE) ================= -->
+              @if (crop.activeTab === 'activities') {
+              @if (crop.loadingActivities) {
+              <div class="tab-loading">
+                <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+                <span>Loading activities...</span>
+              </div>
+              } @else if (crop.groupedActivities.length === 0) {
+              <div class="empty-list-box">
+                <mat-icon class="empty-list-icon">pending_actions</mat-icon>
+                <p class="empty-list-title">No Activities Logged</p>
+                <p class="empty-list-sub">No field activities recorded for this crop yet.</p>
+              </div>
+              } @else {
+              <div class="grouped-items-list">
+                @for (group of crop.groupedActivities; track group.date) {
+                <!-- Case 1: Single activity record for this date -->
+                @if (group.originalRecords.length === 1) {
+                <div class="single-item-wrap">
+                  <div class="item-card activity-item">
+                    <div class="item-header">
+                      <div class="item-badge-wrap">
+                        <span class="type-badge"
+                          [ngClass]="getActivityBadgeClass(group.originalRecords[0].activityType)">
+                          <mat-icon class="badge-icon">{{ getActivityIcon(group.originalRecords[0].activityType)
+                            }}</mat-icon>
+                          {{ group.originalRecords[0].activityType }}
+                        </span>
+
+                        @if (group.originalRecords[0].productName) {
+                        <span class="product-badge">
+                          <mat-icon class="badge-icon">inventory_2</mat-icon>
+                          {{ group.originalRecords[0].productName }}
+                          @if (group.originalRecords[0].quantity != null) {
+                          <strong class="qty-highlight">({{ group.originalRecords[0].quantity }})</strong>
+                          }
+                        </span>
+                        }
+                      </div>
+
+                      <time class="item-date">
+                        <mat-icon class="date-icon">schedule</mat-icon>
+                        {{ group.originalRecords[0].createdAt | date: 'dd/MM/yyyy, h:mm a' }}
+                      </time>
+                    </div>
+
+                    @if (group.originalRecords[0].message) {
+                    <div class="item-message">
+                      {{ formatActivityMessage(group.originalRecords[0]) }}
+                    </div>
+                    }
+
+                    @if (hasImage(group.originalRecords[0].imageUrl)) {
+                    <div class="item-attachments">
+                      <button type="button" class="img-thumb-btn"
+                        (click)="openImagePopup(group.originalRecords[0].imageUrl)" title="Click to view photo">
+                        <mat-icon class="thumb-icon">image</mat-icon>
+                        <span>View Photo</span>
+                      </button>
+                    </div>
+                    }
+                  </div>
+                </div>
+                }
+
+                <!-- Case 2: Multiple activity records for this date (Grouped with accordion) -->
+                @if (group.originalRecords.length > 1) {
+                <div class="date-group-card">
+                  <!-- Group Header -->
+                  <div class="date-group-header" (click)="toggleActivityGroup(group)"
+                    [class.expanded]="group.isExpanded">
+                    <div class="date-group-header-left">
+                      <div class="date-badge">
+                        <mat-icon class="cal-icon">calendar_today</mat-icon>
+                        <span class="group-date-text">{{ group.date }}</span>
+                      </div>
+                      <span class="group-count-pill">{{ group.originalRecords.length }} activities</span>
+
+                      <div class="group-types-chips">
+                        @for (type of group.uniqueTypes; track type) {
+                        <span class="type-mini-badge" [ngClass]="getActivityBadgeClass(type)">
+                          {{ type }}
+                        </span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="date-group-header-right">
+                      @if (getActivityGroupImageCount(group) > 0) {
+                      <span class="attachment-pill" title="Photos attached">
+                        <mat-icon class="pill-attach-icon">image</mat-icon>
+                        {{ getActivityGroupImageCount(group) }}
+                      </span>
+                      }
+
+                      <button type="button" class="group-chevron-btn"
+                        [attr.aria-label]="group.isExpanded ? 'Collapse date group' : 'Expand date group'"><mat-icon
+                          class="chevron-sm">{{ group.isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'
+                          }}</mat-icon></button>
+                    </div>
+                  </div>
+
+                  <!-- Summary preview when collapsed -->
+                  @if (!group.isExpanded && group.messages) {
+                  <div class="group-summary-preview" (click)="toggleActivityGroup(group)">
+                    <span class="summary-text">{{ getDisplayMessage(group.messages, group.originalRecords.length)
+                      }}</span>
+                  </div>
+                  }
+
+                  <!-- Detailed records when expanded -->
+                  @if (group.isExpanded) {
+                  <div class="date-group-details">
+                    @for (act of group.originalRecords; track act.activityId || act.id || $index) {
+                    <div class="detail-record-item activity-detail">
+                      <div class="item-header">
+                        <div class="item-badge-wrap">
+                          <span class="type-badge" [ngClass]="getActivityBadgeClass(act.activityType)">
+                            <mat-icon class="badge-icon">{{ getActivityIcon(act.activityType) }}</mat-icon>
+                            {{ act.activityType }}
+                          </span>
+
+                          @if (act.productName) {
+                          <span class="product-badge">
+                            <mat-icon class="badge-icon">inventory_2</mat-icon>
+                            {{ act.productName }}
+                            @if (act.quantity != null) {
+                            <strong class="qty-highlight">({{ act.quantity }})</strong>
+                            }
+                          </span>
+                          }
+                        </div>
+
+                        <time class="item-date">
+                          <mat-icon class="date-icon">schedule</mat-icon>
+                          {{ act.createdAt | date: 'h:mm a' }}
+                        </time>
+                      </div>
+
+                      @if (act.message) {
+                      <div class="item-message">
+                        {{ formatActivityMessage(act) }}
+                      </div>
+                      }
+
+                      @if (hasImage(act)) {
+                      <div class="item-attachments">
+                        <button type="button" class="img-thumb-btn" (click)="openImagePopup(getImagePath(act))"
+                          title="Click to view photo">
+                          <mat-icon class="thumb-icon">image</mat-icon>
+                          <span>View Photo</span>
+                        </button>
+                      </div>
+                      }
+                    </div>
+                    }
+                  </div>
+                  }
+                </div>
+                }
+                }
+              </div>
+              }
+              }
+
+              <!-- ================= OBSERVATIONS VIEW (GROUPED BY DATE) ================= -->
+              @if (crop.activeTab === 'observations') {
+              @if (crop.loadingObservations) {
+              <div class="tab-loading">
+                <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+                <span>Loading observations...</span>
+              </div>
+              } @else if (crop.groupedObservations.length === 0) {
+              <div class="empty-list-box">
+                <mat-icon class="empty-list-icon">visibility_off</mat-icon>
+                <p class="empty-list-title">No Observations Logged</p>
+                <p class="empty-list-sub">No field observations recorded for this crop yet.</p>
+              </div>
+              } @else {
+              <div class="grouped-items-list">
+                @for (group of crop.groupedObservations; track group.date) {
+                <!-- Case 1: Single observation record for this date -->
+                @if (group.originalRecords.length === 1) {
+                <div class="single-item-wrap">
+                  <div class="item-card observation-item">
+                    <div class="item-header">
+                      <div class="item-badge-wrap">
+                        <span class="type-badge"
+                          [ngClass]="getObservationBadgeClass(group.originalRecords[0].observationType)">
+                          <mat-icon class="badge-icon">{{ getObservationIcon(group.originalRecords[0].observationType)
+                            }}</mat-icon>
+                          {{ group.originalRecords[0].observationType }}
+                        </span>
+                      </div>
+
+                      <time class="item-date">
+                        <mat-icon class="date-icon">schedule</mat-icon>
+                        {{ group.originalRecords[0].createdAt | date: 'dd/MM/yyyy, h:mm a' }}
+                      </time>
+                    </div>
+
+                    @if (group.originalRecords[0].message) {
+                    <div class="item-message">
+                      {{ group.originalRecords[0].message }}
+                    </div>
+                    }
+
+                    <!-- Attachments (Photo & Voice Note) -->
+                    <div class="attachments-row"
+                      *ngIf="hasImage(group.originalRecords[0].imageUrl) || hasAudio(group.originalRecords[0].voiceNoteUrl)">
+                      @if (hasImage(group.originalRecords[0].imageUrl)) {
+                      <button type="button" class="img-thumb-btn"
+                        (click)="openImagePopup(group.originalRecords[0].imageUrl)" title="Click to view photo">
+                        <mat-icon class="thumb-icon">image</mat-icon>
+                        <span>View Photo</span>
+                      </button>
+                      }
+
+                      @if (hasAudio(group.originalRecords[0].voiceNoteUrl)) {
+                      <div class="voice-player-wrap">
+                        <mat-icon class="audio-icon">audiotrack</mat-icon>
+                        <audio controls class="audio-element"
+                          [src]="resolveAudioUrl(group.originalRecords[0].voiceNoteUrl)" preload="none">
+                          Your browser does not support audio element.
+                        </audio>
+                      </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+                }
+
+                <!-- Case 2: Multiple observation records for this date (Grouped with accordion) -->
+                @if (group.originalRecords.length > 1) {
+                <div class="date-group-card">
+                  <!-- Group Header -->
+                  <div class="date-group-header" (click)="toggleObservationGroup(group)"
+                    [class.expanded]="group.isExpanded">
+                    <div class="date-group-header-left">
+                      <div class="date-badge">
+                        <mat-icon class="cal-icon">calendar_today</mat-icon>
+                        <span class="group-date-text">{{ group.date }}</span>
+                      </div>
+                      <span class="group-count-pill">{{ group.originalRecords.length }} observations</span>
+
+                      <div class="group-types-chips">
+                        @for (type of group.uniqueTypes; track type) {
+                        <span class="type-mini-badge" [ngClass]="getObservationBadgeClass(type)">
+                          {{ type }}
+                        </span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="date-group-header-right">
+                      @if (getObservationGroupImageCount(group) > 0) {
+                      <span class="attachment-pill" title="Photos attached">
+                        <mat-icon class="pill-attach-icon">image</mat-icon>
+                        {{ getObservationGroupImageCount(group) }}
+                      </span>
+                      }
+                      @if (getObservationGroupAudioCount(group) > 0) {
+                      <span class="attachment-pill audio-pill" title="Voice notes attached">
+                        <mat-icon class="pill-attach-icon">audiotrack</mat-icon>
+                        {{ getObservationGroupAudioCount(group) }}
+                      </span>
+                      }
+
+                      <button type="button" class="group-chevron-btn"
+                        [attr.aria-label]="group.isExpanded ? 'Collapse date group' : 'Expand date group'"><mat-icon
+                          class="chevron-sm">{{ group.isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'
+                          }}</mat-icon></button>
+                    </div>
+                  </div>
+
+                  <!-- Summary preview when collapsed -->
+                  @if (!group.isExpanded && group.messages) {
+                  <div class="group-summary-preview" (click)="toggleObservationGroup(group)">
+                    <span class="summary-text">{{ getDisplayMessage(group.messages, group.originalRecords.length)
+                      }}</span>
+                  </div>
+                  }
+
+                  <!-- Detailed records when expanded -->
+                  @if (group.isExpanded) {
+                  <div class="date-group-details">
+                    @for (obs of group.originalRecords; track obs.observationId || obs.id || $index) {
+                    <div class="detail-record-item observation-detail">
+                      <div class="item-header">
+                        <div class="item-badge-wrap">
+                          <span class="type-badge" [ngClass]="getObservationBadgeClass(obs.observationType)">
+                            <mat-icon class="badge-icon">{{ getObservationIcon(obs.observationType) }}</mat-icon>
+                            {{ obs.observationType }}
+                          </span>
+                        </div>
+
+                        <time class="item-date">
+                          <mat-icon class="date-icon">schedule</mat-icon>
+                          {{ obs.createdAt | date: 'h:mm a' }}
+                        </time>
+                      </div>
+
+                      @if (obs.message) {
+                      <div class="item-message">
+                        {{ obs.message }}
+                      </div>
+                      }
+
+                      <!-- Attachments (Photo & Voice Note) -->
+                      <div class="attachments-row" *ngIf="hasImage(obs) || hasAudio(obs.voiceNoteUrl)">
+                        @if (hasImage(obs)) {
+                        <button type="button" class="img-thumb-btn" (click)="openImagePopup(getImagePath(obs))"
+                          title="Click to view photo">
+                          <mat-icon class="thumb-icon">image</mat-icon>
+                          <span>View Photo</span>
+                        </button>
+                        }
+
+                        @if (hasAudio(obs.voiceNoteUrl)) {
+                        <div class="voice-player-wrap">
+                          <mat-icon class="audio-icon">audiotrack</mat-icon>
+                          <audio controls class="audio-element" [src]="resolveAudioUrl(obs.voiceNoteUrl)"
+                            preload="none">
+                            Your browser does not support audio element.
+                          </audio>
+                        </div>
+                        }
+                      </div>
+                    </div>
+                    }
+                  </div>
+                  }
+                </div>
+                }
+                }
+              </div>
+              }
+              }
+            </div>
+          </article>
+          }
+        </div>
+        }
+      </div>
+      }
+    </section>
+    }
+  </div>
+  }
+  }
+
+  <!-- Image Lightbox Modal -->
+  @if (showImagePopup && selectedImage) {
+  <div class="lightbox-overlay" (click)="closeImagePopup()">
+    <div class="lightbox-modal" (click)="$event.stopPropagation()">
+      <button type="button" class="lightbox-close-btn" (click)="closeImagePopup()" aria-label="Close image popup">
+        <mat-icon>close</mat-icon>
+      </button>
+      <img [src]="selectedImage" alt="Attachment enlarged view" class="lightbox-img" />
+    </div>
+  </div>
+  }
 </div>
-} -->

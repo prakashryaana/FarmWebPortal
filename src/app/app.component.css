@@ -44,7 +44,7 @@ header.brand-name h1 {
   font-size: 22px;
   font-weight: 600;
   color: #1f2933;
-  flex: 1;
+  flex: 0 0 auto;
   min-width: 0;
 }
 
@@ -70,7 +70,8 @@ header.brand-name h1 a:hover {
 .toolbar-center {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  margin-left: auto;
   flex: 1;
   max-width: 100%;
 }
@@ -178,7 +179,8 @@ header button:hover {
 .toolbar-center {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  margin-left: auto;
   flex: 1;
   max-width: 100%;
 }
@@ -208,14 +210,19 @@ header button:hover {
 @media (max-width: 768px) {
   /* Mobile layout: stack sidebar horizontally below header */
   header.brand-name {
-    padding: 0 0.75rem;
-    height: 52px;
-    gap: 0.5rem;
+    padding: 0 0.5rem;
+    height: 50px;
+    gap: 0.4rem;
+    overflow: hidden;
   }
 
   header.brand-name h1 {
-    font-size: 18px;
-    margin-left: 48px;
+    font-size: 16px;
+    margin-left: 54px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
   }
 
   header button {
@@ -256,9 +263,11 @@ header button:hover {
   .toolbar-center {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end;
+    margin-left: auto;
     flex: 1;
-    max-width: 100%;
+    min-width: 0;
+    max-width: calc(100% - 120px);
   }
 
   .content {
@@ -278,13 +287,29 @@ header button:hover {
 
 @media (max-width: 480px) {
   header.brand-name {
-    padding: 0 0.5rem;
+    padding: 0 0.4rem;
     height: 48px;
+    gap: 0.35rem;
+    overflow: hidden;
   }
 
   header.brand-name h1 {
-    font-size: 1.5rem;
-    margin-left: 48px;
+    font-size: 14px;
+    margin-left: 50px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+  }
+
+  .toolbar-center {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
+    flex: 1;
+    min-width: 0;
+    max-width: calc(100% - 100px);
   }
 
   .btn-logout .lbl-logout {

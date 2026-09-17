@@ -28,6 +28,10 @@ export class DashboardService {
     return this.http.get<number>(`${this.apiUrl}/Dashboard/Activity/Today/Count`);
   }
 
+  getAllFarmCrops(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/Farm/GetAllFarmCropByUser`);
+  }
+
   pollTodayLiveActivitiesCount(seconds = 10): Observable<number> {
     return interval(seconds * 1000).pipe(
       startWith(0),
