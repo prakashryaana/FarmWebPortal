@@ -161,12 +161,71 @@
         <!-- Notes Card -->
         <section class="overview-notes-section">
           <div class="overview-notes-card">
-            <h3 class="notes-card-title">Notes:</h3>
+            <div class="notes-card-header">
+              <div class="notes-card-title-wrap">
+                <div class="notes-title-group">
+                  <mat-icon class="notes-title-icon">edit_note</mat-icon>
+                  <h3 class="notes-card-title">Notes:</h3>
+                </div>
+                @if (notesSavedSuccess) {
+                <span class="notes-saved-badge">
+                  <mat-icon class="badge-icon">check_circle</mat-icon> Saved
+                </span>
+                }
+              </div>
+
+              <div class="notes-header-actions">
+                <button type="button" class="btn-notes-action btn-notes-add" (click)="openAddNoteModal()"
+                  title="Add new note">
+                  <mat-icon class="btn-icon">add</mat-icon>
+                  <span>Add Note</span>
+                </button>
+                <button type="button" class="btn-notes-action btn-notes-edit" [disabled]="!selectedNote" (click)="openEditNoteModal()"
+                  [title]="selectedNote ? 'Edit selected note' : 'Select a note to edit'">
+                  <mat-icon class="btn-icon">edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button type="button" class="btn-notes-action btn-notes-delete" [disabled]="!selectedNote" (click)="openDeleteNoteModal()"
+                  [title]="selectedNote ? 'Delete selected note' : 'Select a note to delete'">
+                  <mat-icon class="btn-icon">delete_outline</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+
+            @if (notesSaveError) {
+            <div class="notes-error-banner">
+              <mat-icon class="err-icon">error_outline</mat-icon>
+              <span>{{ notesSaveError }}</span>
+            </div>
+            }
+
+            <!-- NOTES LIST -->
+            @if (getOverviewNotes().length > 0) {
             <ul class="notes-bullet-list">
-              @for (note of getOverviewNotes(); track $index) {
-              <li>{{ note }}</li>
+              @for (item of getOverviewNotes(); track item.noteId || item.id || $index) {
+              <li
+                class="note-bullet-item"
+                [class.is-selected]="selectedNote && ((selectedNote.noteId && selectedNote.noteId === item.noteId) || (selectedNote.id && selectedNote.id === item.id))"
+                (click)="toggleSelectNote(item)"
+                [title]="(selectedNote && ((selectedNote.noteId && selectedNote.noteId === item.noteId) || (selectedNote.id && selectedNote.id === item.id))) ? 'Selected. Click to deselect' : 'Click to select note'"
+              >
+                <span class="note-select-indicator">
+                  <mat-icon class="indicator-icon">{{ (selectedNote && ((selectedNote.noteId && selectedNote.noteId === item.noteId) || (selectedNote.id && selectedNote.id === item.id))) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                </span>
+                <span class="note-text-content">{{ item.note }}</span>
+              </li>
               }
             </ul>
+            } @else {
+            <div class="notes-empty-state">
+              <p class="empty-notes-text">No notes recorded for this farm yet.</p>
+              <button type="button" class="btn-notes-add-first" (click)="openAddNoteModal()">
+                <mat-icon>add</mat-icon>
+                <span>Add Note</span>
+              </button>
+            </div>
+            }
           </div>
         </section>
       </div>
@@ -756,6 +815,238 @@
         <mat-icon>close</mat-icon>
       </button>
       <img [src]="selectedImage" alt="Attachment enlarged view" class="lightbox-img" />
+    </div>
+  </div>
+  }
+
+  <!-- Add Note Popup Modal -->
+  @if (showAddNoteModal) {
+  <div class="note-modal-overlay" (click)="closeAddNoteModal()">
+    <div class="note-modal-card" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="note-modal-header">
+        <div class="note-modal-title-wrap">
+          <div class="note-modal-icon-badge">
+            <mat-icon>note_add</mat-icon>
+          </div>
+          <div>
+            <h3 class="note-modal-title">Add Farm Note</h3>
+            <p class="note-modal-subtitle">
+              {{ selectedOverviewFarm?.farmName ? 'Farm: ' + selectedOverviewFarm?.farmName : 'New note for current farm' }}
+            </p>
+          </div>
+        </div>
+        <button type="button" class="note-modal-close-btn" (click)="closeAddNoteModal()" [disabled]="isSavingModalNote" aria-label="Close modal">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="note-modal-body">
+        @if (modalNoteError) {
+        <div class="note-modal-error-banner">
+          <mat-icon class="err-icon">error_outline</mat-icon>
+          <span>{{ modalNoteError }}</span>
+        </div>
+        }
+
+        <label class="note-modal-label">Note(s):</label>
+        <div class="note-modal-inputs-stack">
+          @for (item of modalNotesList; track $index) {
+          <div class="note-modal-input-row">
+            <span class="note-modal-bullet">&bull;</span>
+            <input
+              type="text"
+              class="note-modal-input"
+              [(ngModel)]="item.note"
+              placeholder="Enter note details..."
+              (keydown.enter)="addModalNoteRow()"
+            />
+            @if (modalNotesList.length > 1) {
+            <button
+              type="button"
+              class="btn-note-modal-remove"
+              (click)="removeModalNoteRow($index)"
+              title="Remove note line"
+            >
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+            }
+          </div>
+          }
+        </div>
+
+        <button type="button" class="btn-note-modal-add-row" (click)="addModalNoteRow()">
+          <mat-icon>add</mat-icon>
+          <span>Add another line</span>
+        </button>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="note-modal-footer">
+        <button
+          type="button"
+          class="btn-note-modal-cancel"
+          (click)="closeAddNoteModal()"
+          [disabled]="isSavingModalNote"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-note-modal-save"
+          (click)="saveModalNotes()"
+          [disabled]="isSavingModalNote"
+        >
+          @if (isSavingModalNote) {
+          <mat-icon class="btn-icon spin">sync</mat-icon>
+          <span>Saving...</span>
+          } @else {
+          <mat-icon class="btn-icon">save</mat-icon>
+          <span>Save Note</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Edit Note Popup Modal -->
+  @if (showEditNoteModal && selectedNote) {
+  <div class="note-modal-overlay" (click)="closeEditNoteModal()">
+    <div class="note-modal-card" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="note-modal-header">
+        <div class="note-modal-title-wrap">
+          <div class="note-modal-icon-badge edit-badge">
+            <mat-icon>edit_note</mat-icon>
+          </div>
+          <div>
+            <h3 class="note-modal-title">Edit Farm Note</h3>
+            <p class="note-modal-subtitle">
+              {{ selectedOverviewFarm?.farmName ? 'Farm: ' + selectedOverviewFarm?.farmName : 'Current Farm' }}
+            </p>
+          </div>
+        </div>
+        <button type="button" class="note-modal-close-btn" (click)="closeEditNoteModal()" [disabled]="isSavingEditNote" aria-label="Close modal">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="note-modal-body">
+        @if (editNoteError) {
+        <div class="note-modal-error-banner">
+          <mat-icon class="err-icon">error_outline</mat-icon>
+          <span>{{ editNoteError }}</span>
+        </div>
+        }
+
+        <label class="note-modal-label">Note Content:</label>
+        <textarea
+          class="note-modal-textarea"
+          [(ngModel)]="editNoteText"
+          rows="4"
+          placeholder="Update your note..."
+        ></textarea>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="note-modal-footer">
+        <button
+          type="button"
+          class="btn-note-modal-cancel"
+          (click)="closeEditNoteModal()"
+          [disabled]="isSavingEditNote"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-note-modal-save"
+          (click)="saveEditNote()"
+          [disabled]="isSavingEditNote || !editNoteText.trim()"
+        >
+          @if (isSavingEditNote) {
+          <mat-icon class="btn-icon spin">sync</mat-icon>
+          <span>Saving...</span>
+          } @else {
+          <mat-icon class="btn-icon">save</mat-icon>
+          <span>Save Changes</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Delete Note Confirmation Modal -->
+  @if (showDeleteNoteModal && selectedNote) {
+  <div class="note-modal-overlay" (click)="closeDeleteNoteModal()">
+    <div class="note-modal-card" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="note-modal-header">
+        <div class="note-modal-title-wrap">
+          <div class="note-modal-icon-badge delete-badge">
+            <mat-icon>delete_forever</mat-icon>
+          </div>
+          <div>
+            <h3 class="note-modal-title">Delete Note</h3>
+            <p class="note-modal-subtitle">
+              {{ selectedOverviewFarm?.farmName ? 'Farm: ' + selectedOverviewFarm?.farmName : 'Current Farm' }}
+            </p>
+          </div>
+        </div>
+        <button type="button" class="note-modal-close-btn" (click)="closeDeleteNoteModal()" [disabled]="isDeletingNote" aria-label="Close modal">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="note-modal-body">
+        @if (deleteNoteError) {
+        <div class="note-modal-error-banner">
+          <mat-icon class="err-icon">error_outline</mat-icon>
+          <span>{{ deleteNoteError }}</span>
+        </div>
+        }
+
+        <p class="delete-modal-prompt">Are you sure you want to delete this farm note?</p>
+        <div class="delete-note-preview">
+          <mat-icon class="preview-quote-icon">format_quote</mat-icon>
+          <p class="preview-text">{{ selectedNote.note }}</p>
+        </div>
+        <p class="delete-modal-warning">
+          <mat-icon class="warn-icon">info</mat-icon>
+          <span>This note will be permanently removed from this farm.</span>
+        </p>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="note-modal-footer">
+        <button
+          type="button"
+          class="btn-note-modal-cancel"
+          (click)="closeDeleteNoteModal()"
+          [disabled]="isDeletingNote"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-note-modal-delete"
+          (click)="confirmDeleteNote()"
+          [disabled]="isDeletingNote"
+        >
+          @if (isDeletingNote) {
+          <mat-icon class="btn-icon spin">sync</mat-icon>
+          <span>Deleting...</span>
+          } @else {
+          <mat-icon class="btn-icon">delete</mat-icon>
+          <span>Delete Note</span>
+          }
+        </button>
+      </div>
     </div>
   </div>
   }

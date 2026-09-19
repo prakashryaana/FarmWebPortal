@@ -12,12 +12,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
 import { DashboardService } from './dashboard.service';
 import { ActivityService, Activity } from '../actions/view-actions/list-activity/activity.service';
 import { ObservationService, Observation } from '../actions/add-actions/add-observation/observation.service';
 import { FileServerService } from '../file-upload/file-server.service';
 import { AuthService } from '../auth/auth.service';
 import { FarmService } from '../farm-lookup/farm-service';
+import { FarmNote } from '../farm-note/farm-note';
+import { FarmNoteService } from '../farm-note/farm-note.service';
 import { CropFarmSelectorService } from '../crop-farm-selector/crop-farm-selector.service';
 import { UserService } from '../users/user.service';
 import { UserProfileService } from '../user-profile/user-profile.service';
@@ -95,6 +98,7 @@ export class HomeDashboardComponent implements OnInit, AfterViewInit {
   private sanitizer = inject(DomSanitizer);
   public auth = inject(AuthService);
   private farmService = inject(FarmService);
+  private farmNoteService = inject(FarmNoteService);
   private cropFarmSelector = inject(CropFarmSelectorService);
   private userService = inject(UserService);
   private userProfileService = inject(UserProfileService);
@@ -125,6 +129,34 @@ export class HomeDashboardComponent implements OnInit, AfterViewInit {
   isRefreshing = false;
   searchQuery = '';
   selectedFarmFilter = 'ALL';
+
+  // Farm Notes editing & FarmNoteController persistence state
+  farmNotesMap = new Map<string, FarmNote[]>();
+  isEditingNotes = false;
+  editingNotesList: { noteId?: string; note: string }[] = [];
+  isSavingNotes = false;
+  notesSavedSuccess = false;
+  notesSaveError: string | null = null;
+
+  // Add Note Modal popup state
+  showAddNoteModal = false;
+  modalNotesList: { note: string }[] = [{ note: '' }];
+  isSavingModalNote = false;
+  modalNoteError: string | null = null;
+
+  // Selected note inside grid for Edit and Delete operations
+  selectedNote: FarmNote | null = null;
+
+  // Edit Note Modal popup state
+  showEditNoteModal = false;
+  editNoteText = '';
+  isSavingEditNote = false;
+  editNoteError: string | null = null;
+
+  // Delete Note Confirmation Modal state
+  showDeleteNoteModal = false;
+  isDeletingNote = false;
+  deleteNoteError: string | null = null;
 
   // Image popup state
   selectedImage: SafeUrl | string | null = null;
@@ -260,6 +292,11 @@ export class HomeDashboardComponent implements OnInit, AfterViewInit {
 
   loadOverviewFarmDetails(farmId: string): void {
     if (!farmId) return;
+
+    this.selectedNote = null;
+    // Fetch notes from FarmNotes collection via FarmNoteController
+    this.fetchFarmNotes(farmId);
+
     this.farmService.getFarmById(farmId).subscribe({
       next: (details) => {
         this.overviewFarmDetails = details;
@@ -732,37 +769,340 @@ export class HomeDashboardComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getOverviewNotes(): string[] {
-    const farm = this.selectedOverviewFarm;
-    const notes: string[] = [];
-
-    if (farm) {
-      for (const crop of farm.crops) {
-        for (const obs of crop.observations) {
-          if (obs.message && !notes.includes(obs.message)) {
-            notes.push(obs.message);
-          }
-        }
+  fetchFarmNotes(farmId: string): void {
+    if (!farmId) return;
+    this.farmNoteService.getFarmNotes(farmId).subscribe({
+      next: (notes) => {
+        this.farmNotesMap.set(farmId, notes || []);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.warn('[HomeDashboard] fetchFarmNotes error:', err);
       }
+    });
+  }
+
+  getOverviewNotes(): FarmNote[] {
+    const farmId = this.selectedOverviewFarmId || (this.selectedOverviewFarm?.farmId ?? '');
+    if (farmId && this.farmNotesMap.has(farmId)) {
+      return this.farmNotesMap.get(farmId) || [];
+    }
+    if (farmId) {
+      this.fetchFarmNotes(farmId);
+    }
+    return [];
+  }
+
+  startEditingNotes(): void {
+    const currentNotes = this.getOverviewNotes();
+    if (currentNotes.length === 0) {
+      this.editingNotesList = [{ note: '' }];
+    } else {
+      this.editingNotesList = currentNotes.map(n => ({ noteId: n.noteId, note: n.note }));
+    }
+    this.isEditingNotes = true;
+    this.notesSavedSuccess = false;
+    this.notesSaveError = null;
+    this.cdr.markForCheck();
+  }
+
+  addBulletPoint(): void {
+    this.editingNotesList.push({ note: '' });
+    this.cdr.markForCheck();
+  }
+
+  removeBulletPoint(index: number): void {
+    if (index >= 0 && index < this.editingNotesList.length) {
+      this.editingNotesList.splice(index, 1);
+      if (this.editingNotesList.length === 0) {
+        this.editingNotesList.push({ note: '' });
+      }
+      this.cdr.markForCheck();
+    }
+  }
+
+  cancelEditingNotes(): void {
+    this.isEditingNotes = false;
+    this.editingNotesList = [];
+    this.notesSaveError = null;
+    this.cdr.markForCheck();
+  }
+
+  saveOverviewNotes(): void {
+    const farmId = this.selectedOverviewFarmId || (this.selectedOverviewFarm?.farmId ?? '');
+    if (!farmId) {
+      this.notesSaveError = 'No farm selected.';
+      return;
     }
 
-    const defaultNotes = [
-      'The sowing was done late for this farm',
-      'Agronomist mentioned an insect infestation',
-      'The growth status seems better. Expect higher yield.',
-      'Let the farmer know about new fertilizers'
-    ];
+    const validNotes = this.editingNotesList.filter(item => item.note.trim().length > 0);
+    const originalNotes = this.farmNotesMap.get(farmId) || [];
 
-    if (notes.length === 0) {
-      return defaultNotes;
+    this.isSavingNotes = true;
+    this.notesSaveError = null;
+
+    this.farmNoteService.saveFarmNotesList(farmId, validNotes, originalNotes).subscribe({
+      next: () => {
+        // Re-fetch fresh notes from FarmNotes collection via FarmNoteController
+        this.farmNoteService.getFarmNotes(farmId).subscribe({
+          next: (freshNotes) => {
+            this.farmNotesMap.set(farmId, freshNotes || []);
+            this.isSavingNotes = false;
+            this.isEditingNotes = false;
+            this.notesSavedSuccess = true;
+            this.cdr.markForCheck();
+
+            setTimeout(() => {
+              this.notesSavedSuccess = false;
+              this.cdr.markForCheck();
+            }, 3500);
+          },
+          error: (fetchErr) => {
+            console.warn('[HomeDashboard] Re-fetch notes failed:', fetchErr);
+            this.isSavingNotes = false;
+            this.isEditingNotes = false;
+            this.cdr.markForCheck();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('[HomeDashboard] saveFarmNotesList error:', err);
+        this.isSavingNotes = false;
+        this.notesSaveError = 'Failed to save notes to database. Please try again.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  openAddNoteModal(): void {
+    this.modalNotesList = [{ note: '' }];
+    this.modalNoteError = null;
+    this.isSavingModalNote = false;
+    this.showAddNoteModal = true;
+    this.cdr.markForCheck();
+  }
+
+  closeAddNoteModal(): void {
+    if (this.isSavingModalNote) return;
+    this.showAddNoteModal = false;
+    this.modalNotesList = [{ note: '' }];
+    this.modalNoteError = null;
+    this.cdr.markForCheck();
+  }
+
+  addModalNoteRow(): void {
+    this.modalNotesList.push({ note: '' });
+    this.cdr.markForCheck();
+  }
+
+  removeModalNoteRow(index: number): void {
+    if (index >= 0 && index < this.modalNotesList.length) {
+      this.modalNotesList.splice(index, 1);
+      if (this.modalNotesList.length === 0) {
+        this.modalNotesList.push({ note: '' });
+      }
+      this.cdr.markForCheck();
+    }
+  }
+
+  saveModalNotes(): void {
+    const farmId = this.selectedOverviewFarmId || (this.selectedOverviewFarm?.farmId ?? '');
+    if (!farmId) {
+      this.modalNoteError = 'No farm selected. Please select a farm first.';
+      this.cdr.markForCheck();
+      return;
     }
 
-    const combined = [...notes];
-    for (const dn of defaultNotes) {
-      if (combined.length >= 4) break;
-      if (!combined.includes(dn)) combined.push(dn);
+    const validNotes = this.modalNotesList
+      .map(item => item.note.trim())
+      .filter(text => text.length > 0);
+
+    if (validNotes.length === 0) {
+      this.modalNoteError = 'Please enter at least one note.';
+      this.cdr.markForCheck();
+      return;
     }
-    return combined.slice(0, 4);
+
+    this.isSavingModalNote = true;
+    this.modalNoteError = null;
+
+    const createOps = validNotes.map(text => this.farmNoteService.createFarmNote(farmId, text));
+
+    forkJoin(createOps).subscribe({
+      next: () => {
+        // Re-fetch fresh notes from FarmNotes collection via FarmNoteController
+        this.farmNoteService.getFarmNotes(farmId).subscribe({
+          next: (freshNotes) => {
+            this.farmNotesMap.set(farmId, freshNotes || []);
+            this.isSavingModalNote = false;
+            this.showAddNoteModal = false;
+            this.modalNotesList = [{ note: '' }];
+            this.notesSavedSuccess = true;
+            this.cdr.markForCheck();
+
+            setTimeout(() => {
+              this.notesSavedSuccess = false;
+              this.cdr.markForCheck();
+            }, 3500);
+          },
+          error: (err) => {
+            console.warn('[HomeDashboard] Re-fetch fresh notes error:', err);
+            this.isSavingModalNote = false;
+            this.showAddNoteModal = false;
+            this.modalNotesList = [{ note: '' }];
+            this.cdr.markForCheck();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('[HomeDashboard] createFarmNote error:', err);
+        this.isSavingModalNote = false;
+        this.modalNoteError = 'Failed to save note. Please check backend service and try again.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  toggleSelectNote(note: FarmNote): void {
+    const isSame = this.selectedNote && (
+      (this.selectedNote.noteId && this.selectedNote.noteId === note.noteId) ||
+      (this.selectedNote.id && this.selectedNote.id === note.id)
+    );
+    this.selectedNote = isSame ? null : note;
+    this.cdr.markForCheck();
+  }
+
+  openEditNoteModal(): void {
+    if (!this.selectedNote) return;
+    this.editNoteText = this.selectedNote.note;
+    this.editNoteError = null;
+    this.isSavingEditNote = false;
+    this.showEditNoteModal = true;
+    this.cdr.markForCheck();
+  }
+
+  closeEditNoteModal(): void {
+    if (this.isSavingEditNote) return;
+    this.showEditNoteModal = false;
+    this.editNoteText = '';
+    this.editNoteError = null;
+    this.cdr.markForCheck();
+  }
+
+  saveEditNote(): void {
+    if (!this.selectedNote) return;
+    const farmId = this.selectedOverviewFarmId || (this.selectedOverviewFarm?.farmId ?? '');
+    const noteId = this.selectedNote.noteId || this.selectedNote.id;
+    if (!farmId || !noteId) {
+      this.editNoteError = 'Missing farm or note identifier.';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    const trimmed = this.editNoteText.trim();
+    if (!trimmed) {
+      this.editNoteError = 'Note content cannot be empty.';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.isSavingEditNote = true;
+    this.editNoteError = null;
+
+    this.farmNoteService.updateFarmNote(noteId, farmId, trimmed).subscribe({
+      next: () => {
+        this.farmNoteService.getFarmNotes(farmId).subscribe({
+          next: (freshNotes) => {
+            this.farmNotesMap.set(farmId, freshNotes || []);
+            this.isSavingEditNote = false;
+            this.showEditNoteModal = false;
+            this.selectedNote = null;
+            this.notesSavedSuccess = true;
+            this.cdr.markForCheck();
+
+            setTimeout(() => {
+              this.notesSavedSuccess = false;
+              this.cdr.markForCheck();
+            }, 3500);
+          },
+          error: (err) => {
+            console.warn('[HomeDashboard] Re-fetch fresh notes error:', err);
+            this.isSavingEditNote = false;
+            this.showEditNoteModal = false;
+            this.selectedNote = null;
+            this.cdr.markForCheck();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('[HomeDashboard] updateFarmNote error:', err);
+        this.isSavingEditNote = false;
+        this.editNoteError = 'Failed to update note. Please try again.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  openDeleteNoteModal(): void {
+    if (!this.selectedNote) return;
+    this.deleteNoteError = null;
+    this.isDeletingNote = false;
+    this.showDeleteNoteModal = true;
+    this.cdr.markForCheck();
+  }
+
+  closeDeleteNoteModal(): void {
+    if (this.isDeletingNote) return;
+    this.showDeleteNoteModal = false;
+    this.deleteNoteError = null;
+    this.cdr.markForCheck();
+  }
+
+  confirmDeleteNote(): void {
+    if (!this.selectedNote) return;
+    const farmId = this.selectedOverviewFarmId || (this.selectedOverviewFarm?.farmId ?? '');
+    const noteId = this.selectedNote.noteId || this.selectedNote.id;
+    if (!farmId || !noteId) {
+      this.deleteNoteError = 'Missing farm or note identifier.';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.isDeletingNote = true;
+    this.deleteNoteError = null;
+
+    this.farmNoteService.deleteFarmNote(noteId).subscribe({
+      next: () => {
+        this.farmNoteService.getFarmNotes(farmId).subscribe({
+          next: (freshNotes) => {
+            this.farmNotesMap.set(farmId, freshNotes || []);
+            this.isDeletingNote = false;
+            this.showDeleteNoteModal = false;
+            this.selectedNote = null;
+            this.notesSavedSuccess = true;
+            this.cdr.markForCheck();
+
+            setTimeout(() => {
+              this.notesSavedSuccess = false;
+              this.cdr.markForCheck();
+            }, 3500);
+          },
+          error: (err) => {
+            console.warn('[HomeDashboard] Re-fetch fresh notes error:', err);
+            this.isDeletingNote = false;
+            this.showDeleteNoteModal = false;
+            this.selectedNote = null;
+            this.cdr.markForCheck();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('[HomeDashboard] deleteFarmNote error:', err);
+        this.isDeletingNote = false;
+        this.deleteNoteError = 'Failed to delete note. Please try again.';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   loadDashboardData(): void {
