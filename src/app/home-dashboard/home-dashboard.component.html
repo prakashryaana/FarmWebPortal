@@ -180,12 +180,13 @@
                   <mat-icon class="btn-icon">add</mat-icon>
                   <span>Add Note</span>
                 </button>
-                <button type="button" class="btn-notes-action btn-notes-edit" [disabled]="!selectedNote" (click)="openEditNoteModal()"
-                  [title]="selectedNote ? 'Edit selected note' : 'Select a note to edit'">
+                <button type="button" class="btn-notes-action btn-notes-edit" [disabled]="!selectedNote"
+                  (click)="openEditNoteModal()" [title]="selectedNote ? 'Edit selected note' : 'Select a note to edit'">
                   <mat-icon class="btn-icon">edit</mat-icon>
                   <span>Edit</span>
                 </button>
-                <button type="button" class="btn-notes-action btn-notes-delete" [disabled]="!selectedNote" (click)="openDeleteNoteModal()"
+                <button type="button" class="btn-notes-action btn-notes-delete" [disabled]="!selectedNote"
+                  (click)="openDeleteNoteModal()"
                   [title]="selectedNote ? 'Delete selected note' : 'Select a note to delete'">
                   <mat-icon class="btn-icon">delete_outline</mat-icon>
                   <span>Delete</span>
@@ -204,14 +205,14 @@
             @if (getOverviewNotes().length > 0) {
             <ul class="notes-bullet-list">
               @for (item of getOverviewNotes(); track item.noteId || item.id || $index) {
-              <li
-                class="note-bullet-item"
+              <li class="note-bullet-item"
                 [class.is-selected]="selectedNote && ((selectedNote.noteId && selectedNote.noteId === item.noteId) || (selectedNote.id && selectedNote.id === item.id))"
                 (click)="toggleSelectNote(item)"
-                [title]="(selectedNote && ((selectedNote.noteId && selectedNote.noteId === item.noteId) || (selectedNote.id && selectedNote.id === item.id))) ? 'Selected. Click to deselect' : 'Click to select note'"
-              >
+                [title]="(selectedNote && ((selectedNote.noteId && selectedNote.noteId === item.noteId) || (selectedNote.id && selectedNote.id === item.id))) ? 'Selected. Click to deselect' : 'Click to select note'">
                 <span class="note-select-indicator">
-                  <mat-icon class="indicator-icon">{{ (selectedNote && ((selectedNote.noteId && selectedNote.noteId === item.noteId) || (selectedNote.id && selectedNote.id === item.id))) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                  <mat-icon class="indicator-icon">{{ (selectedNote && ((selectedNote.noteId && selectedNote.noteId ===
+                    item.noteId) || (selectedNote.id && selectedNote.id === item.id))) ? 'check_circle' :
+                    'radio_button_unchecked' }}</mat-icon>
                 </span>
                 <span class="note-text-content">{{ item.note }}</span>
               </li>
@@ -432,368 +433,404 @@
                 </div>
               </div>
 
-              <!-- Segmented Switcher for Activities vs Observations -->
-              <div class="tab-switcher">
-                <button type="button" class="tab-btn" [class.active]="crop.activeTab === 'activities'"
-                  (click)="setCropTab(crop, 'activities')">
-                  <mat-icon class="tab-icon">assignment</mat-icon>
-                  <span>Activities</span>
-                  <span class="tab-badge" [class.badge-active]="crop.activeTab === 'activities'">
-                    {{ crop.activities.length }}
-                  </span>
-                </button>
-
-                <button type="button" class="tab-btn" [class.active]="crop.activeTab === 'observations'"
-                  (click)="setCropTab(crop, 'observations')">
-                  <mat-icon class="tab-icon">visibility</mat-icon>
-                  <span>Observations</span>
-                  <span class="tab-badge" [class.badge-active]="crop.activeTab === 'observations'">
-                    {{ crop.observations.length }}
-                  </span>
-                </button>
-              </div>
+              <!-- Crop Header Stats -->
+              <!-- <div class="crop-header-stats">
+                <span class="crop-stat-pill" title="Activities count">
+                  <mat-icon class="stat-pill-icon">assignment</mat-icon>
+                  <span>{{ crop.activities.length }} Activities</span>
+                </span>
+                <span class="crop-stat-pill" title="Observations count">
+                  <mat-icon class="stat-pill-icon">visibility</mat-icon>
+                  <span>{{ crop.observations.length }} Observations</span>
+                </span>
+              </div> -->
             </div>
 
             <!-- Crop Card Body -->
             <div class="crop-card-body">
-              <!-- ================= ACTIVITIES VIEW (GROUPED BY DATE) ================= -->
-              @if (crop.activeTab === 'activities') {
-              @if (crop.loadingActivities) {
-              <div class="tab-loading">
-                <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
-                <span>Loading activities...</span>
-              </div>
-              } @else if (crop.groupedActivities.length === 0) {
-              <div class="empty-list-box">
-                <mat-icon class="empty-list-icon">pending_actions</mat-icon>
-                <p class="empty-list-title">No Activities Logged</p>
-                <p class="empty-list-sub">No field activities recorded for this crop yet.</p>
-              </div>
-              } @else {
-              <div class="grouped-items-list">
-                @for (group of crop.groupedActivities; track group.date) {
-                <!-- Case 1: Single activity record for this date -->
-                @if (group.originalRecords.length === 1) {
-                <div class="single-item-wrap">
-                  <div class="item-card activity-item">
-                    <div class="item-header">
-                      <div class="item-badge-wrap">
-                        <span class="type-badge"
-                          [ngClass]="getActivityBadgeClass(group.originalRecords[0].activityType)">
-                          <mat-icon class="badge-icon">{{ getActivityIcon(group.originalRecords[0].activityType)
-                            }}</mat-icon>
-                          {{ group.originalRecords[0].activityType }}
-                        </span>
-
-                        @if (group.originalRecords[0].productName) {
-                        <span class="product-badge">
-                          <mat-icon class="badge-icon">inventory_2</mat-icon>
-                          {{ group.originalRecords[0].productName }}
-                          @if (group.originalRecords[0].quantity != null) {
-                          <strong class="qty-highlight">({{ group.originalRecords[0].quantity }})</strong>
-                          }
-                        </span>
-                        }
-                      </div>
-
-                      <time class="item-date">
-                        <mat-icon class="date-icon">schedule</mat-icon>
-                        {{ group.originalRecords[0].createdAt | date: 'dd/MM/yyyy, h:mm a' }}
-                      </time>
+              <div class="crop-horizontal-grids">
+                <!-- ================= ACTIVITIES VIEW (GROUPED BY DATE) ================= -->
+                <div class="crop-grid-column activities-grid-column">
+                  <div class="grid-column-header activities-column-header">
+                    <div class="grid-header-left">
+                      <mat-icon class="grid-header-icon activities-icon">assignment</mat-icon>
+                      <h4 class="grid-header-title">Activities</h4>
                     </div>
-
-                    @if (group.originalRecords[0].message) {
-                    <div class="item-message">
-                      {{ formatActivityMessage(group.originalRecords[0]) }}
-                    </div>
-                    }
-
-                    @if (hasImage(group.originalRecords[0].imageUrl)) {
-                    <div class="item-attachments">
-                      <button type="button" class="img-thumb-btn"
-                        (click)="openImagePopup(group.originalRecords[0].imageUrl)" title="Click to view photo">
-                        <mat-icon class="thumb-icon">image</mat-icon>
-                        <span>View Photo</span>
-                      </button>
-                    </div>
-                    }
+                    <span class="grid-header-badge activities-badge">
+                      {{ crop.activities.length }}
+                    </span>
                   </div>
-                </div>
-                }
 
-                <!-- Case 2: Multiple activity records for this date (Grouped with accordion) -->
-                @if (group.originalRecords.length > 1) {
-                <div class="date-group-card">
-                  <!-- Group Header -->
-                  <div class="date-group-header" (click)="toggleActivityGroup(group)"
-                    [class.expanded]="group.isExpanded">
-                    <div class="date-group-header-left">
-                      <div class="date-badge">
-                        <mat-icon class="cal-icon">calendar_today</mat-icon>
-                        <span class="group-date-text">{{ group.date }}</span>
-                      </div>
-                      <span class="group-count-pill">{{ group.originalRecords.length }} activities</span>
-
-                      <div class="group-types-chips">
-                        @for (type of group.uniqueTypes; track type) {
-                        <span class="type-mini-badge" [ngClass]="getActivityBadgeClass(type)">
-                          {{ type }}
-                        </span>
-                        }
-                      </div>
+                  <div class="grid-column-content">
+                    @if (crop.loadingActivities) {
+                    <div class="tab-loading">
+                      <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+                      <span>Loading activities...</span>
                     </div>
+                    } @else if (crop.groupedActivities.length === 0) {
+                    <div class="empty-list-box">
+                      <mat-icon class="empty-list-icon">pending_actions</mat-icon>
+                      <p class="empty-list-title">No Activities Logged</p>
+                      <p class="empty-list-sub">No field activities recorded for this crop yet.</p>
+                    </div>
+                    } @else {
+                    <div class="grouped-items-list">
+                      @for (group of crop.groupedActivities; track group.date) {
+                      <!-- Case 1: Single activity record for this date -->
+                      @if (group.originalRecords.length === 1) {
+                      <div class="single-item-wrap">
+                        <div class="item-card activity-item">
+                          <div class="item-header">
+                            <div class="item-badge-wrap">
+                              <span class="type-badge"
+                                [ngClass]="getActivityBadgeClass(group.originalRecords[0].activityType)">
+                                <mat-icon class="badge-icon">{{ getActivityIcon(group.originalRecords[0].activityType)
+                                  }}</mat-icon>
+                                {{ group.originalRecords[0].activityType }}
+                              </span>
 
-                    <div class="date-group-header-right">
-                      @if (getActivityGroupImageCount(group) > 0) {
-                      <span class="attachment-pill" title="Photos attached">
-                        <mat-icon class="pill-attach-icon">image</mat-icon>
-                        {{ getActivityGroupImageCount(group) }}
-                      </span>
+                              @if (group.originalRecords[0].productName) {
+                              <span class="product-badge">
+                                <mat-icon class="badge-icon">inventory_2</mat-icon>
+                                {{ group.originalRecords[0].productName }}
+                                @if (group.originalRecords[0].quantity != null) {
+                                <strong class="qty-highlight">({{ group.originalRecords[0].quantity }})</strong>
+                                }
+                              </span>
+                              }
+                            </div>
+
+                            <time class="item-date">
+                              <mat-icon class="date-icon">schedule</mat-icon>
+                              {{ group.originalRecords[0].createdAt | date: 'dd/MM/yyyy, h:mm a' }}
+                            </time>
+                          </div>
+
+                          @if (group.originalRecords[0].message) {
+                          <div class="item-message">
+                            {{ formatActivityMessage(group.originalRecords[0]) }}
+                          </div>
+                          }
+
+                          @if (hasImage(group.originalRecords[0].imageUrl)) {
+                          <div class="item-attachments">
+                            <button type="button" class="img-thumb-btn"
+                              (click)="openImagePopup(group.originalRecords[0].imageUrl)" title="Click to view photo">
+                              <mat-icon class="thumb-icon">image</mat-icon>
+                              <span>View Photo</span>
+                            </button>
+                          </div>
+                          }
+                        </div>
+                      </div>
                       }
 
-                      <button type="button" class="group-chevron-btn"
-                        [attr.aria-label]="group.isExpanded ? 'Collapse date group' : 'Expand date group'"><mat-icon
-                          class="chevron-sm">{{ group.isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'
-                          }}</mat-icon></button>
-                    </div>
-                  </div>
+                      <!-- Case 2: Multiple activity records for this date (Grouped with accordion) -->
+                      @if (group.originalRecords.length > 1) {
+                      <div class="date-group-card">
+                        <!-- Group Header -->
+                        <div class="date-group-header" (click)="toggleActivityGroup(group)"
+                          [class.expanded]="group.isExpanded">
+                          <div class="date-group-header-left">
+                            <div class="date-badge">
+                              <mat-icon class="cal-icon">calendar_today</mat-icon>
+                              <span class="group-date-text">{{ group.date }}</span>
+                            </div>
+                            <span class="group-count-pill">{{ group.originalRecords.length }} activities</span>
 
-                  <!-- Summary preview when collapsed -->
-                  @if (!group.isExpanded && group.messages) {
-                  <div class="group-summary-preview" (click)="toggleActivityGroup(group)">
-                    <span class="summary-text">{{ getDisplayMessage(group.messages, group.originalRecords.length)
-                      }}</span>
-                  </div>
-                  }
+                            <div class="group-types-chips">
+                              @for (type of group.uniqueTypes; track type) {
+                              <span class="type-mini-badge" [ngClass]="getActivityBadgeClass(type)">
+                                {{ type }}
+                              </span>
+                              }
+                            </div>
+                          </div>
 
-                  <!-- Detailed records when expanded -->
-                  @if (group.isExpanded) {
-                  <div class="date-group-details">
-                    @for (act of group.originalRecords; track act.activityId || act.id || $index) {
-                    <div class="detail-record-item activity-detail">
-                      <div class="item-header">
-                        <div class="item-badge-wrap">
-                          <span class="type-badge" [ngClass]="getActivityBadgeClass(act.activityType)">
-                            <mat-icon class="badge-icon">{{ getActivityIcon(act.activityType) }}</mat-icon>
-                            {{ act.activityType }}
-                          </span>
-
-                          @if (act.productName) {
-                          <span class="product-badge">
-                            <mat-icon class="badge-icon">inventory_2</mat-icon>
-                            {{ act.productName }}
-                            @if (act.quantity != null) {
-                            <strong class="qty-highlight">({{ act.quantity }})</strong>
+                          <div class="date-group-header-right">
+                            @if (getActivityGroupImageCount(group) > 0) {
+                            <span class="attachment-pill" title="Photos attached">
+                              <mat-icon class="pill-attach-icon">image</mat-icon>
+                              {{ getActivityGroupImageCount(group) }}
+                            </span>
                             }
-                          </span>
+
+                            <button type="button" class="group-chevron-btn"
+                              [attr.aria-label]="group.isExpanded ? 'Collapse date group' : 'Expand date group'"><mat-icon
+                                class="chevron-sm">{{ group.isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'
+                                }}</mat-icon></button>
+                          </div>
+                        </div>
+
+                        <!-- Summary preview when collapsed -->
+                        @if (!group.isExpanded && group.messages) {
+                        <div class="group-summary-preview" (click)="toggleActivityGroup(group)">
+                          <span class="summary-text">{{ getDisplayMessage(group.messages, group.originalRecords.length)
+                            }}</span>
+                        </div>
+                        }
+
+                        <!-- Detailed records when expanded -->
+                        @if (group.isExpanded) {
+                        <div class="date-group-details">
+                          @for (act of group.originalRecords; track act.activityId || act.id || $index) {
+                          <div class="detail-record-item activity-detail">
+                            <div class="item-header">
+                              <div class="item-badge-wrap">
+                                <span class="type-badge" [ngClass]="getActivityBadgeClass(act.activityType)">
+                                  <mat-icon class="badge-icon">{{ getActivityIcon(act.activityType) }}</mat-icon>
+                                  {{ act.activityType }}
+                                </span>
+
+                                @if (act.productName) {
+                                <span class="product-badge">
+                                  <mat-icon class="badge-icon">inventory_2</mat-icon>
+                                  {{ act.productName }}
+                                  @if (act.quantity != null) {
+                                  <strong class="qty-highlight">({{ act.quantity }})</strong>
+                                  }
+                                </span>
+                                }
+                              </div>
+
+                              <time class="item-date">
+                                <mat-icon class="date-icon">schedule</mat-icon>
+                                {{ act.createdAt | date: 'h:mm a' }}
+                              </time>
+                            </div>
+
+                            @if (act.message) {
+                            <div class="item-message">
+                              {{ formatActivityMessage(act) }}
+                            </div>
+                            }
+
+                            @if (hasImage(act)) {
+                            <div class="item-attachments">
+                              <button type="button" class="img-thumb-btn" (click)="openImagePopup(getImagePath(act))"
+                                title="Click to view photo">
+                                <mat-icon class="thumb-icon">image</mat-icon>
+                                <span>View Photo</span>
+                              </button>
+                            </div>
+                            }
+                          </div>
                           }
                         </div>
-
-                        <time class="item-date">
-                          <mat-icon class="date-icon">schedule</mat-icon>
-                          {{ act.createdAt | date: 'h:mm a' }}
-                        </time>
-                      </div>
-
-                      @if (act.message) {
-                      <div class="item-message">
-                        {{ formatActivityMessage(act) }}
-                      </div>
-                      }
-
-                      @if (hasImage(act)) {
-                      <div class="item-attachments">
-                        <button type="button" class="img-thumb-btn" (click)="openImagePopup(getImagePath(act))"
-                          title="Click to view photo">
-                          <mat-icon class="thumb-icon">image</mat-icon>
-                          <span>View Photo</span>
-                        </button>
-                      </div>
-                      }
-                    </div>
-                    }
-                  </div>
-                  }
-                </div>
-                }
-                }
-              </div>
-              }
-              }
-
-              <!-- ================= OBSERVATIONS VIEW (GROUPED BY DATE) ================= -->
-              @if (crop.activeTab === 'observations') {
-              @if (crop.loadingObservations) {
-              <div class="tab-loading">
-                <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
-                <span>Loading observations...</span>
-              </div>
-              } @else if (crop.groupedObservations.length === 0) {
-              <div class="empty-list-box">
-                <mat-icon class="empty-list-icon">visibility_off</mat-icon>
-                <p class="empty-list-title">No Observations Logged</p>
-                <p class="empty-list-sub">No field observations recorded for this crop yet.</p>
-              </div>
-              } @else {
-              <div class="grouped-items-list">
-                @for (group of crop.groupedObservations; track group.date) {
-                <!-- Case 1: Single observation record for this date -->
-                @if (group.originalRecords.length === 1) {
-                <div class="single-item-wrap">
-                  <div class="item-card observation-item">
-                    <div class="item-header">
-                      <div class="item-badge-wrap">
-                        <span class="type-badge"
-                          [ngClass]="getObservationBadgeClass(group.originalRecords[0].observationType)">
-                          <mat-icon class="badge-icon">{{ getObservationIcon(group.originalRecords[0].observationType)
-                            }}</mat-icon>
-                          {{ group.originalRecords[0].observationType }}
-                        </span>
-                      </div>
-
-                      <time class="item-date">
-                        <mat-icon class="date-icon">schedule</mat-icon>
-                        {{ group.originalRecords[0].createdAt | date: 'dd/MM/yyyy, h:mm a' }}
-                      </time>
-                    </div>
-
-                    @if (group.originalRecords[0].message) {
-                    <div class="item-message">
-                      {{ group.originalRecords[0].message }}
-                    </div>
-                    }
-
-                    <!-- Attachments (Photo & Voice Note) -->
-                    <div class="attachments-row"
-                      *ngIf="hasImage(group.originalRecords[0].imageUrl) || hasAudio(group.originalRecords[0].voiceNoteUrl)">
-                      @if (hasImage(group.originalRecords[0].imageUrl)) {
-                      <button type="button" class="img-thumb-btn"
-                        (click)="openImagePopup(group.originalRecords[0].imageUrl)" title="Click to view photo">
-                        <mat-icon class="thumb-icon">image</mat-icon>
-                        <span>View Photo</span>
-                      </button>
-                      }
-
-                      @if (hasAudio(group.originalRecords[0].voiceNoteUrl)) {
-                      <div class="voice-player-wrap">
-                        <mat-icon class="audio-icon">audiotrack</mat-icon>
-                        <audio controls class="audio-element"
-                          [src]="resolveAudioUrl(group.originalRecords[0].voiceNoteUrl)" preload="none">
-                          Your browser does not support audio element.
-                        </audio>
-                      </div>
-                      }
-                    </div>
-                  </div>
-                </div>
-                }
-
-                <!-- Case 2: Multiple observation records for this date (Grouped with accordion) -->
-                @if (group.originalRecords.length > 1) {
-                <div class="date-group-card">
-                  <!-- Group Header -->
-                  <div class="date-group-header" (click)="toggleObservationGroup(group)"
-                    [class.expanded]="group.isExpanded">
-                    <div class="date-group-header-left">
-                      <div class="date-badge">
-                        <mat-icon class="cal-icon">calendar_today</mat-icon>
-                        <span class="group-date-text">{{ group.date }}</span>
-                      </div>
-                      <span class="group-count-pill">{{ group.originalRecords.length }} observations</span>
-
-                      <div class="group-types-chips">
-                        @for (type of group.uniqueTypes; track type) {
-                        <span class="type-mini-badge" [ngClass]="getObservationBadgeClass(type)">
-                          {{ type }}
-                        </span>
                         }
                       </div>
-                    </div>
-
-                    <div class="date-group-header-right">
-                      @if (getObservationGroupImageCount(group) > 0) {
-                      <span class="attachment-pill" title="Photos attached">
-                        <mat-icon class="pill-attach-icon">image</mat-icon>
-                        {{ getObservationGroupImageCount(group) }}
-                      </span>
                       }
-                      @if (getObservationGroupAudioCount(group) > 0) {
-                      <span class="attachment-pill audio-pill" title="Voice notes attached">
-                        <mat-icon class="pill-attach-icon">audiotrack</mat-icon>
-                        {{ getObservationGroupAudioCount(group) }}
-                      </span>
                       }
-
-                      <button type="button" class="group-chevron-btn"
-                        [attr.aria-label]="group.isExpanded ? 'Collapse date group' : 'Expand date group'"><mat-icon
-                          class="chevron-sm">{{ group.isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'
-                          }}</mat-icon></button>
                     </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- ================= OBSERVATIONS VIEW (GROUPED BY DATE) ================= -->
+                <div class="crop-grid-column observations-grid-column">
+                  <div class="grid-column-header observations-column-header">
+                    <div class="grid-header-left">
+                      <mat-icon class="grid-header-icon observations-icon">visibility</mat-icon>
+                      <h4 class="grid-header-title">Observations</h4>
+                    </div>
+                    <span class="grid-header-badge observations-badge">
+                      {{ crop.observations.length }}
+                    </span>
                   </div>
 
-                  <!-- Summary preview when collapsed -->
-                  @if (!group.isExpanded && group.messages) {
-                  <div class="group-summary-preview" (click)="toggleObservationGroup(group)">
-                    <span class="summary-text">{{ getDisplayMessage(group.messages, group.originalRecords.length)
-                      }}</span>
-                  </div>
-                  }
+                  <div class="grid-column-content">
+                    @if (crop.loadingObservations) {
+                    <div class="tab-loading">
+                      <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+                      <span>Loading observations...</span>
+                    </div>
+                    } @else if (crop.groupedObservations.length === 0) {
+                    <div class="empty-list-box">
+                      <mat-icon class="empty-list-icon">visibility_off</mat-icon>
+                      <p class="empty-list-title">No Observations Logged</p>
+                      <p class="empty-list-sub">No field observations recorded for this crop yet.</p>
+                    </div>
+                    } @else {
+                    <div class="grouped-items-list">
+                      @for (group of crop.groupedObservations; track group.date) {
+                      <!-- Case 1: Single observation record for this date -->
+                      @if (group.originalRecords.length === 1) {
+                      <div class="single-item-wrap">
+                        <div class="item-card observation-item">
+                          <div class="item-header">
+                            <div class="item-badge-wrap">
+                              <span class="type-badge"
+                                [ngClass]="getObservationBadgeClass(group.originalRecords[0].observationType)">
+                                <mat-icon class="badge-icon">{{
+                                  getObservationIcon(group.originalRecords[0].observationType)
+                                  }}</mat-icon>
+                                {{ group.originalRecords[0].observationType }}
+                              </span>
+                            </div>
 
-                  <!-- Detailed records when expanded -->
-                  @if (group.isExpanded) {
-                  <div class="date-group-details">
-                    @for (obs of group.originalRecords; track obs.observationId || obs.id || $index) {
-                    <div class="detail-record-item observation-detail">
-                      <div class="item-header">
-                        <div class="item-badge-wrap">
-                          <span class="type-badge" [ngClass]="getObservationBadgeClass(obs.observationType)">
-                            <mat-icon class="badge-icon">{{ getObservationIcon(obs.observationType) }}</mat-icon>
-                            {{ obs.observationType }}
-                          </span>
+                            <time class="item-date">
+                              <mat-icon class="date-icon">schedule</mat-icon>
+                              {{ group.originalRecords[0].createdAt | date: 'dd/MM/yyyy, h:mm a' }}
+                            </time>
+                          </div>
+
+                          @if (group.originalRecords[0].message) {
+                          <div class="item-message">
+                            {{ group.originalRecords[0].message }}
+                          </div>
+                          }
+
+                          <!-- Attachments (Photo & Voice Note) -->
+                          <div class="attachments-row"
+                            *ngIf="hasImage(group.originalRecords[0]) || hasAudio(group.originalRecords[0])">
+                            @if (hasImage(group.originalRecords[0])) {
+                            <button type="button" class="img-thumb-btn"
+                              (click)="openImagePopup(getImagePath(group.originalRecords[0]))"
+                              title="Click to view photo">
+                              <mat-icon class="thumb-icon">image</mat-icon>
+                              <span>View Photo</span>
+                            </button>
+                            }
+
+                            @if (hasAudio(group.originalRecords[0])) {
+                            <div class="voice-player-wrap">
+                              <div class="voice-player-header">
+                                <div class="voice-header-left">
+                                  <mat-icon class="audio-icon">audiotrack</mat-icon>
+                                  <span class="voice-label">Voice Note</span>
+                                </div>
+                                <button type="button" class="audio-popup-btn"
+                                  (click)="openAudioPopup(group.originalRecords[0])" title="Open in popup player">
+                                  <mat-icon class="popup-btn-icon">open_in_new</mat-icon>
+                                </button>
+                              </div>
+                              <audio controls class="audio-element" [src]="resolveAudioUrl(group.originalRecords[0])"
+                                preload="metadata">
+                                Your browser does not support audio element.
+                              </audio>
+                            </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                      }
+
+                      <!-- Case 2: Multiple observation records for this date (Grouped with accordion) -->
+                      @if (group.originalRecords.length > 1) {
+                      <div class="date-group-card">
+                        <!-- Group Header -->
+                        <div class="date-group-header" (click)="toggleObservationGroup(group)"
+                          [class.expanded]="group.isExpanded">
+                          <div class="date-group-header-left">
+                            <div class="date-badge">
+                              <mat-icon class="cal-icon">calendar_today</mat-icon>
+                              <span class="group-date-text">{{ group.date }}</span>
+                            </div>
+                            <span class="group-count-pill">{{ group.originalRecords.length }} observations</span>
+
+                            <div class="group-types-chips">
+                              @for (type of group.uniqueTypes; track type) {
+                              <span class="type-mini-badge" [ngClass]="getObservationBadgeClass(type)">
+                                {{ type }}
+                              </span>
+                              }
+                            </div>
+                          </div>
+
+                          <div class="date-group-header-right">
+                            @if (getObservationGroupImageCount(group) > 0) {
+                            <span class="attachment-pill" title="Photos attached">
+                              <mat-icon class="pill-attach-icon">image</mat-icon>
+                              {{ getObservationGroupImageCount(group) }}
+                            </span>
+                            }
+                            @if (getObservationGroupAudioCount(group) > 0) {
+                            <span class="attachment-pill audio-pill" title="Voice notes attached">
+                              <mat-icon class="pill-attach-icon">audiotrack</mat-icon>
+                              {{ getObservationGroupAudioCount(group) }}
+                            </span>
+                            }
+
+                            <button type="button" class="group-chevron-btn"
+                              [attr.aria-label]="group.isExpanded ? 'Collapse date group' : 'Expand date group'"><mat-icon
+                                class="chevron-sm">{{ group.isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'
+                                }}</mat-icon></button>
+                          </div>
                         </div>
 
-                        <time class="item-date">
-                          <mat-icon class="date-icon">schedule</mat-icon>
-                          {{ obs.createdAt | date: 'h:mm a' }}
-                        </time>
-                      </div>
-
-                      @if (obs.message) {
-                      <div class="item-message">
-                        {{ obs.message }}
-                      </div>
-                      }
-
-                      <!-- Attachments (Photo & Voice Note) -->
-                      <div class="attachments-row" *ngIf="hasImage(obs) || hasAudio(obs.voiceNoteUrl)">
-                        @if (hasImage(obs)) {
-                        <button type="button" class="img-thumb-btn" (click)="openImagePopup(getImagePath(obs))"
-                          title="Click to view photo">
-                          <mat-icon class="thumb-icon">image</mat-icon>
-                          <span>View Photo</span>
-                        </button>
+                        <!-- Summary preview when collapsed -->
+                        @if (!group.isExpanded && group.messages) {
+                        <div class="group-summary-preview" (click)="toggleObservationGroup(group)">
+                          <span class="summary-text">{{ getDisplayMessage(group.messages, group.originalRecords.length)
+                            }}</span>
+                        </div>
                         }
 
-                        @if (hasAudio(obs.voiceNoteUrl)) {
-                        <div class="voice-player-wrap">
-                          <mat-icon class="audio-icon">audiotrack</mat-icon>
-                          <audio controls class="audio-element" [src]="resolveAudioUrl(obs.voiceNoteUrl)"
-                            preload="none">
-                            Your browser does not support audio element.
-                          </audio>
+                        <!-- Detailed records when expanded -->
+                        @if (group.isExpanded) {
+                        <div class="date-group-details">
+                          @for (obs of group.originalRecords; track obs.observationId || obs.id || $index) {
+                          <div class="detail-record-item observation-detail">
+                            <div class="item-header">
+                              <div class="item-badge-wrap">
+                                <span class="type-badge" [ngClass]="getObservationBadgeClass(obs.observationType)">
+                                  <mat-icon class="badge-icon">{{ getObservationIcon(obs.observationType) }}</mat-icon>
+                                  {{ obs.observationType }}
+                                </span>
+                              </div>
+
+                              <time class="item-date">
+                                <mat-icon class="date-icon">schedule</mat-icon>
+                                {{ obs.createdAt | date: 'h:mm a' }}
+                              </time>
+                            </div>
+
+                            @if (obs.message) {
+                            <div class="item-message">
+                              {{ obs.message }}
+                            </div>
+                            }
+
+                            <!-- Attachments (Photo & Voice Note) -->
+                            <div class="attachments-row" *ngIf="hasImage(obs) || hasAudio(obs)">
+                              @if (hasImage(obs)) {
+                              <button type="button" class="img-thumb-btn" (click)="openImagePopup(getImagePath(obs))"
+                                title="Click to view photo">
+                                <mat-icon class="thumb-icon">image</mat-icon>
+                                <span>View Photo</span>
+                              </button>
+                              }
+
+                              @if (hasAudio(obs)) {
+                              <div class="voice-player-wrap">
+                                <div class="voice-player-header">
+                                  <div class="voice-header-left">
+                                    <mat-icon class="audio-icon">audiotrack</mat-icon>
+                                    <span class="voice-label">Voice Note</span>
+                                  </div>
+                                  <button type="button" class="audio-popup-btn" (click)="openAudioPopup(obs)"
+                                    title="Open in popup player">
+                                    <mat-icon class="popup-btn-icon">open_in_new</mat-icon>
+                                  </button>
+                                </div>
+                                <audio controls class="audio-element" [src]="resolveAudioUrl(obs)" preload="metadata">
+                                  Your browser does not support audio element.
+                                </audio>
+                              </div>
+                              }
+                            </div>
+                          </div>
+                          }
                         </div>
                         }
                       </div>
+                      }
+                      }
                     </div>
                     }
                   </div>
-                  }
                 </div>
-                }
-                }
               </div>
-              }
-              }
             </div>
           </article>
           }
@@ -819,6 +856,28 @@
   </div>
   }
 
+  <!-- Audio Lightbox Modal -->
+  @if (showAudioPopup && selectedAudioUrl) {
+  <div class="lightbox-overlay" (click)="closeAudioPopup()">
+    <div class="lightbox-modal audio-modal" (click)="$event.stopPropagation()">
+      <div class="audio-modal-header">
+        <div class="audio-modal-title">
+          <mat-icon class="audio-modal-icon">audiotrack</mat-icon>
+          <span>Voice Note Recording</span>
+        </div>
+        <button type="button" class="lightbox-close-btn" (click)="closeAudioPopup()" aria-label="Close audio popup">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="audio-modal-body">
+        <audio controls autoplay class="modal-audio-element" [src]="selectedAudioUrl">
+          Your browser does not support audio element.
+        </audio>
+      </div>
+    </div>
+  </div>
+  }
+
   <!-- Add Note Popup Modal -->
   @if (showAddNoteModal) {
   <div class="note-modal-overlay" (click)="closeAddNoteModal()">
@@ -832,11 +891,13 @@
           <div>
             <h3 class="note-modal-title">Add Farm Note</h3>
             <p class="note-modal-subtitle">
-              {{ selectedOverviewFarm?.farmName ? 'Farm: ' + selectedOverviewFarm?.farmName : 'New note for current farm' }}
+              {{ selectedOverviewFarm?.farmName ? 'Farm: ' + selectedOverviewFarm?.farmName : 'New note for current
+              farm' }}
             </p>
           </div>
         </div>
-        <button type="button" class="note-modal-close-btn" (click)="closeAddNoteModal()" [disabled]="isSavingModalNote" aria-label="Close modal">
+        <button type="button" class="note-modal-close-btn" (click)="closeAddNoteModal()" [disabled]="isSavingModalNote"
+          aria-label="Close modal">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -855,20 +916,11 @@
           @for (item of modalNotesList; track $index) {
           <div class="note-modal-input-row">
             <span class="note-modal-bullet">&bull;</span>
-            <input
-              type="text"
-              class="note-modal-input"
-              [(ngModel)]="item.note"
-              placeholder="Enter note details..."
-              (keydown.enter)="addModalNoteRow()"
-            />
+            <input type="text" class="note-modal-input" [(ngModel)]="item.note" placeholder="Enter note details..."
+              (keydown.enter)="addModalNoteRow()" />
             @if (modalNotesList.length > 1) {
-            <button
-              type="button"
-              class="btn-note-modal-remove"
-              (click)="removeModalNoteRow($index)"
-              title="Remove note line"
-            >
+            <button type="button" class="btn-note-modal-remove" (click)="removeModalNoteRow($index)"
+              title="Remove note line">
               <mat-icon>delete_outline</mat-icon>
             </button>
             }
@@ -884,20 +936,11 @@
 
       <!-- Modal Footer -->
       <div class="note-modal-footer">
-        <button
-          type="button"
-          class="btn-note-modal-cancel"
-          (click)="closeAddNoteModal()"
-          [disabled]="isSavingModalNote"
-        >
+        <button type="button" class="btn-note-modal-cancel" (click)="closeAddNoteModal()"
+          [disabled]="isSavingModalNote">
           Cancel
         </button>
-        <button
-          type="button"
-          class="btn-note-modal-save"
-          (click)="saveModalNotes()"
-          [disabled]="isSavingModalNote"
-        >
+        <button type="button" class="btn-note-modal-save" (click)="saveModalNotes()" [disabled]="isSavingModalNote">
           @if (isSavingModalNote) {
           <mat-icon class="btn-icon spin">sync</mat-icon>
           <span>Saving...</span>
@@ -928,7 +971,8 @@
             </p>
           </div>
         </div>
-        <button type="button" class="note-modal-close-btn" (click)="closeEditNoteModal()" [disabled]="isSavingEditNote" aria-label="Close modal">
+        <button type="button" class="note-modal-close-btn" (click)="closeEditNoteModal()" [disabled]="isSavingEditNote"
+          aria-label="Close modal">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -943,30 +987,18 @@
         }
 
         <label class="note-modal-label">Note Content:</label>
-        <textarea
-          class="note-modal-textarea"
-          [(ngModel)]="editNoteText"
-          rows="4"
-          placeholder="Update your note..."
-        ></textarea>
+        <textarea class="note-modal-textarea" [(ngModel)]="editNoteText" rows="4"
+          placeholder="Update your note..."></textarea>
       </div>
 
       <!-- Modal Footer -->
       <div class="note-modal-footer">
-        <button
-          type="button"
-          class="btn-note-modal-cancel"
-          (click)="closeEditNoteModal()"
-          [disabled]="isSavingEditNote"
-        >
+        <button type="button" class="btn-note-modal-cancel" (click)="closeEditNoteModal()"
+          [disabled]="isSavingEditNote">
           Cancel
         </button>
-        <button
-          type="button"
-          class="btn-note-modal-save"
-          (click)="saveEditNote()"
-          [disabled]="isSavingEditNote || !editNoteText.trim()"
-        >
+        <button type="button" class="btn-note-modal-save" (click)="saveEditNote()"
+          [disabled]="isSavingEditNote || !editNoteText.trim()">
           @if (isSavingEditNote) {
           <mat-icon class="btn-icon spin">sync</mat-icon>
           <span>Saving...</span>
@@ -997,7 +1029,8 @@
             </p>
           </div>
         </div>
-        <button type="button" class="note-modal-close-btn" (click)="closeDeleteNoteModal()" [disabled]="isDeletingNote" aria-label="Close modal">
+        <button type="button" class="note-modal-close-btn" (click)="closeDeleteNoteModal()" [disabled]="isDeletingNote"
+          aria-label="Close modal">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -1024,20 +1057,11 @@
 
       <!-- Modal Footer -->
       <div class="note-modal-footer">
-        <button
-          type="button"
-          class="btn-note-modal-cancel"
-          (click)="closeDeleteNoteModal()"
-          [disabled]="isDeletingNote"
-        >
+        <button type="button" class="btn-note-modal-cancel" (click)="closeDeleteNoteModal()"
+          [disabled]="isDeletingNote">
           Cancel
         </button>
-        <button
-          type="button"
-          class="btn-note-modal-delete"
-          (click)="confirmDeleteNote()"
-          [disabled]="isDeletingNote"
-        >
+        <button type="button" class="btn-note-modal-delete" (click)="confirmDeleteNote()" [disabled]="isDeletingNote">
           @if (isDeletingNote) {
           <mat-icon class="btn-icon spin">sync</mat-icon>
           <span>Deleting...</span>

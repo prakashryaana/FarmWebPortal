@@ -624,63 +624,135 @@
   font-family: ui-monospace, SFMono-Regular, monospace;
 }
 
-/* Tab Switcher (Activities vs Observations) */
-.tab-switcher {
+/* Crop Header Stats */
+.crop-header-stats {
   display: flex;
   align-items: center;
-  background: #f1f5f9;
-  padding: 4px;
-  border-radius: 10px;
-  gap: 4px;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
-.tab-btn {
-  display: flex;
+.crop-stat-pill {
+  display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.85rem;
-  border: none;
-  background: transparent;
-  color: #64748b;
-  font-size: 0.85rem;
+  gap: 0.35rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.tab-btn:hover {
-  color: #1e293b;
-}
-
-.tab-btn.active {
-  background: #ffffff;
-  color: #0f172a;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.tab-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-}
-
-.tab-badge {
-  font-size: 0.75rem;
-  padding: 1px 7px;
-  border-radius: 9999px;
-  background: #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #f8fafc;
   color: #475569;
+  border: 1px solid #e2e8f0;
 }
 
-.tab-badge.badge-active {
-  background: #dcfce7;
-  color: #15803d;
+.crop-stat-pill .stat-pill-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #64748b;
 }
 
 /* Crop Card Body */
 .crop-card-body {
   padding: 1.25rem;
+}
+
+/* ================= CROPS DUAL HORIZONTAL GRIDS (ACTIVITIES & OBSERVATIONS) ================= */
+.crop-horizontal-grids {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.crop-grid-column {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.crop-grid-column:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.grid-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.grid-column-header.activities-column-header {
+  border-top: 3px solid #16a34a;
+}
+
+.grid-column-header.observations-column-header {
+  border-top: 3px solid #0284c7;
+}
+
+.grid-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.grid-header-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.grid-header-icon.activities-icon {
+  color: #16a34a;
+}
+
+.grid-header-icon.observations-icon {
+  color: #0284c7;
+}
+
+.grid-header-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.grid-header-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.grid-header-badge.activities-badge {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.grid-header-badge.observations-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.grid-column-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.crop-grid-column .audio-element {
+  max-width: 100%;
+  width: 100%;
+  height: 40px;
 }
 
 .tab-loading {
@@ -1116,25 +1188,95 @@
   height: 16px;
 }
 
+.item-attachments {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-top: 0.25rem;
+}
+
+.attachments-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding-top: 0.35rem;
+  width: 100%;
+}
+
 .voice-player-wrap {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.voice-player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.voice-header-left {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  background: #f1f5f9;
-  padding: 4px 8px;
-  border-radius: 8px;
 }
 
 .audio-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #0284c7;
+}
+
+.voice-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.audio-popup-btn {
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
   color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 5px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.audio-popup-btn:hover {
+  color: #0284c7;
+  background: #e0f2fe;
+  border-color: #bae6fd;
+}
+
+.popup-btn-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
 }
 
 .audio-element {
-  height: 32px;
-  max-width: 240px;
+  height: 40px;
+  width: 100%;
+  border-radius: 8px;
+  outline: none;
+  display: block;
 }
 
 /* ================= LIGHTBOX POPUP ================= */
@@ -1196,6 +1338,56 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Audio Modal */
+.audio-modal {
+  width: 90vw;
+  max-width: 480px;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.audio-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+
+.audio-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.audio-modal-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  color: #0284c7;
+}
+
+.audio-modal-body {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.modal-audio-element {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  outline: none;
 }
 
 /* ================= RESPONSIVENESS ================= */
@@ -1283,14 +1475,13 @@
     gap: 0.75rem;
   }
 
-  .tab-switcher {
-    width: 100%;
-    justify-content: space-between;
+  .crop-horizontal-grids {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
-  .tab-btn {
-    flex: 1;
-    justify-content: center;
+  .grid-column-content {
+    padding: 0.75rem;
   }
 
   .crop-card-body {
@@ -1313,7 +1504,7 @@
   .audio-element {
     width: 100%;
     max-width: 100%;
-    height: 32px;
+    height: 40px;
   }
 }
 
@@ -1484,26 +1675,28 @@
     height: 18px;
   }
 
-  .tab-switcher {
-    padding: 2px;
-    border-radius: 8px;
+  .crop-header-stats {
+    width: 100%;
+    justify-content: space-between;
   }
 
-  .tab-btn {
-    padding: 0.35rem 0.4rem;
-    font-size: 0.78rem;
-    gap: 0.25rem;
+  .crop-stat-pill {
+    flex: 1;
+    justify-content: center;
+    font-size: 0.74rem;
+    padding: 3px 6px;
   }
 
-  .tab-icon {
-    font-size: 15px;
-    width: 15px;
-    height: 15px;
+  .grid-column-header {
+    padding: 0.6rem 0.75rem;
   }
 
-  .tab-badge {
-    font-size: 0.68rem;
-    padding: 1px 4px;
+  .grid-header-title {
+    font-size: 0.88rem;
+  }
+
+  .grid-column-content {
+    padding: 0.5rem;
   }
 
   .crop-card-body {
@@ -1634,13 +1827,13 @@
   .voice-player-wrap {
     width: 100%;
     box-sizing: border-box;
-    padding: 3px 6px;
+    padding: 0.4rem 0.5rem;
   }
 
   .audio-element {
     width: 100%;
     max-width: 100%;
-    height: 30px;
+    height: 38px;
   }
 
   .img-thumb-btn {

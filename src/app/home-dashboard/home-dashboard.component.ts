@@ -162,6 +162,10 @@ export class HomeDashboardComponent implements OnInit, AfterViewInit {
   selectedImage: SafeUrl | string | null = null;
   showImagePopup = false;
 
+  // Audio popup state
+  selectedAudioUrl: string | null = null;
+  showAudioPopup = false;
+
   // Gallery slider state & controls
   @ViewChild('galleryScrollContainer') galleryScrollContainer?: ElementRef<HTMLDivElement>;
   isGalleryAtStart = true;
@@ -1398,11 +1402,11 @@ export class HomeDashboardComponent implements OnInit, AfterViewInit {
   }
 
   getObservationGroupImageCount(group: GroupedObservation): number {
-    return group.originalRecords.filter(r => this.hasImage(r.imageUrl)).length;
+    return group.originalRecords.filter(r => this.hasImage(r)).length;
   }
 
   getObservationGroupAudioCount(group: GroupedObservation): number {
-    return group.originalRecords.filter(r => this.hasAudio(r.voiceNoteUrl)).length;
+    return group.originalRecords.filter(r => this.hasAudio(r)).length;
   }
 
   getDisplayMessage(messages: string, count: number): string {
@@ -1470,13 +1474,59 @@ export class HomeDashboardComponent implements OnInit, AfterViewInit {
     return this.fileServerService.getImageUrl(trimmed);
   }
 
-  resolveAudioUrl(path: string | null | undefined): SafeUrl | null {
+  extractAudioFromRecord(record: any): string | null {
+    if (!record) return null;
+    if (typeof record === 'string') {
+      const trimmed = record.trim();
+      return trimmed.length > 0 ? trimmed : null;
+    }
+
+    const possibleProps = [
+      'voiceNoteUrl', 'VoiceNoteUrl',
+      'voiceNote', 'VoiceNote',
+      'voiceNotePath', 'VoiceNotePath',
+      'audioUrl', 'AudioUrl',
+      'audio', 'Audio',
+      'audioPath', 'AudioPath',
+      'voiceUrl', 'VoiceUrl',
+      'voice', 'Voice',
+      'filePath', 'FilePath',
+      'fileName', 'FileName',
+      'attachment', 'Attachment',
+      'fileUrl', 'FileUrl',
+      'url', 'Url'
+    ];
+
+    for (const prop of possibleProps) {
+      const val = record[prop];
+      if (val && typeof val === 'string' && val.trim().length > 0) {
+        const trimmed = val.trim();
+        const lower = trimmed.toLowerCase();
+        if (['filePath', 'FilePath', 'fileName', 'FileName', 'attachment', 'Attachment', 'fileUrl', 'FileUrl', 'url', 'Url'].includes(prop)) {
+          if (lower.endsWith('.webm') || lower.endsWith('.mp3') || lower.endsWith('.wav') || lower.endsWith('.ogg') || lower.endsWith('.m4a') || lower.endsWith('.aac') || lower.includes('audio')) {
+            return trimmed;
+          }
+        } else {
+          return trimmed;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  resolveAudioUrl(pathOrItem: any): string | null {
+    if (!pathOrItem) return null;
+    const path = typeof pathOrItem === 'string' ? pathOrItem : this.extractAudioFromRecord(pathOrItem);
     if (!path || !path.trim()) return null;
     const trimmed = path.trim();
-    const url = (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:') || trimmed.startsWith('blob:'))
-      ? trimmed
-      : this.fileServerService.getImageUrl(trimmed);
-    return url ? this.sanitizer.bypassSecurityTrustUrl(url) : null;
+    if (trimmed.startsWith('data:') || trimmed.startsWith('blob:') || trimmed.startsWith('assets/')) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    return this.fileServerService.getImageUrl(trimmed);
   }
 
   hasImage(item: any): boolean {
@@ -1487,8 +1537,12 @@ export class HomeDashboardComponent implements OnInit, AfterViewInit {
     return this.extractImageFromRecord(item);
   }
 
-  hasAudio(url: string | null | undefined): boolean {
-    return !!(url && url.trim().length > 0);
+  hasAudio(item: any): boolean {
+    return !!this.extractAudioFromRecord(item);
+  }
+
+  getAudioPath(item: any): string | null {
+    return this.extractAudioFromRecord(item);
   }
 
   openImagePopup(imageUrl: string | null | undefined): void {
@@ -1509,6 +1563,19 @@ export class HomeDashboardComponent implements OnInit, AfterViewInit {
       this.selectedImage = this.sanitizer.bypassSecurityTrustUrl(resolved);
       this.showImagePopup = true;
     }
+  }
+
+  openAudioPopup(recordOrUrl: any): void {
+    const resolved = this.resolveAudioUrl(recordOrUrl);
+    if (resolved) {
+      this.selectedAudioUrl = resolved;
+      this.showAudioPopup = true;
+    }
+  }
+
+  closeAudioPopup(): void {
+    this.showAudioPopup = false;
+    this.selectedAudioUrl = null;
   }
 
   onGalleryImageError(event: Event, index: number): void {
