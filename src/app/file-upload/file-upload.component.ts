@@ -1,31 +1,35 @@
-    import { Component, Output, EventEmitter } from '@angular/core';
-    import { HttpClient } from '@angular/common/http';
-    import { CommonModule } from '@angular/common';
-    import { environment } from '../../environments/environment';
-    import { HttpEvent, HttpEventType } from '@angular/common/http';
-    import { UploadService } from '../file-upload/upload.service';
-    import { MatProgressBar } from '@angular/material/progress-bar';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { environment } from '../../environments/environment';
+import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { UploadService } from '../file-upload/upload.service';
+import { MatProgressBar } from '@angular/material/progress-bar';
 
-    @Component({
-      selector: 'app-file-upload',
-      imports: [CommonModule, MatProgressBar],
-      templateUrl: './file-upload.component.html',
-      styleUrls: ['./file-upload.component.css']
-    })
-    export class FileUploadComponent {
-      @Output() fileUploaded = new EventEmitter<any>(); // Emit upload success or data
-      private apiUrl = `${environment.baseApiUrl}api`; // Update with your actual API endpoint
-      selectedFile: File | null = null;
-      progress = 0;
-      message = 'Please select a file to upload';
+@Component({
+  selector: 'app-file-upload',
+  imports: [CommonModule, MatProgressBar],
+  templateUrl: './file-upload.component.html',
+  styleUrls: ['./file-upload.component.css']
+})
+export class FileUploadComponent {
+  @Input() autoUpload: boolean = false;
+  @Output() fileUploaded = new EventEmitter<any>(); // Emit upload success or data
+  private apiUrl = `${environment.baseApiUrl}api`; // Update with your actual API endpoint
+  selectedFile: File | null = null;
+  progress = 0;
+  message = 'Please select a file to upload';
 
-      constructor(private http: HttpClient, private uploadService: UploadService) {}
+  constructor(private http: HttpClient, private uploadService: UploadService) {}
 
-      onFileSelected(event: any): void {
-        this.selectedFile = event.target.files[0];
-        this.progress = 0;
-        this.message = '';
-      }
+  onFileSelected(event: any): void {
+    this.selectedFile = event.target.files[0];
+    this.progress = 0;
+    this.message = '';
+    if (this.autoUpload && this.selectedFile) {
+      this.uploadFile();
+    }
+  }
 
       uploadFile(): void {
         if (!this.selectedFile) {

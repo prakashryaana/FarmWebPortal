@@ -23,6 +23,7 @@ export interface FarmDto {
     motorCapacity: string | null | undefined;
     additionalWaterSource: string | null | undefined;
     waterTestCertificateUrl: string | null | undefined;
+    waterTestCertificate?: string | null | undefined;
     isSinglePhasePower: boolean | null | undefined;
     isThreePhasePower: boolean | null | undefined;
     //gridPowerUnAvailability?: GridPowerUnavailability[];

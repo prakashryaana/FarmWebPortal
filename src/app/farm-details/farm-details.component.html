@@ -1,0 +1,527 @@
+<div class="farm-details-container">
+  <!-- Page Header -->
+  <div class="header-banner">
+    <div class="header-left">
+      <div class="title-row">
+        <mat-icon class="title-icon">analytics</mat-icon>
+        <div>
+          <h1 class="page-title">Farm Details & Configuration</h1>
+          <p class="page-subtitle">Inspect and update all registration data, certificates, and infrastructure settings
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Farm Selector in Header -->
+    <div class="header-farm-selector">
+      <mat-form-field appearance="outline" class="farm-select-field">
+        <mat-label>Select Farm to Edit</mat-label>
+        <mat-select [value]="selectedFarmId()" (selectionChange)="onSelectFarm($event.value)"
+          [disabled]="isLoading() || isSaving()">
+          <mat-option *ngFor="let farm of farmsList()" [value]="farm.farmId">
+            {{ farm.farmName }} ({{ farm.farmId }})
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix class="selector-prefix-icon">agriculture</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-state">
+    <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    <p>Loading farm details...</p>
+  </div>
+
+  <!-- Empty State when no farms exist -->
+  <div *ngIf="!isLoading() && farmsList().length === 0" class="empty-state-card">
+    <mat-icon class="empty-icon">search_off</mat-icon>
+    <h3>No Farms Found</h3>
+    <p>There are currently no registered farms available to display.</p>
+  </div>
+
+  <!-- Main Content Form -->
+  <form *ngIf="!isLoading() && selectedFarmId()" [formGroup]="farmForm" (ngSubmit)="saveFarmDetails()"
+    class="farm-details-content">
+
+    <!-- Quick Overview Strip -->
+    <div class="overview-strip">
+      <div class="strip-item">
+        <mat-icon class="strip-icon">business</mat-icon>
+        <div class="strip-text">
+          <span class="strip-label">Farm Name</span>
+          <span class="strip-value">{{ farmForm.get('farmName')?.value || 'Not Set' }}</span>
+        </div>
+      </div>
+
+      <div class="strip-item">
+        <mat-icon class="strip-icon">tag</mat-icon>
+        <div class="strip-text">
+          <span class="strip-label">Farm ID</span>
+          <span class="strip-value">{{ selectedFarmId() }}</span>
+        </div>
+      </div>
+
+      <!-- <div class="strip-item">
+        <mat-icon class="strip-icon person-strip-icon">person</mat-icon>
+        <div class="strip-text">
+          <span class="strip-label">Farm Owner</span>
+          <span class="strip-value text-truncate" [matTooltip]="selectedOwner()?.name || farmForm.get('farmOwnerId')?.value || 'Not Assigned'">
+            {{ selectedOwner()?.name || farmForm.get('farmOwnerId')?.value || 'Not Assigned' }}
+          </span>
+        </div>
+      </div> -->
+
+      <!-- <div class="strip-item">
+        <mat-icon class="strip-icon help-strip-icon">support_agent</mat-icon>
+        <div class="strip-text">
+          <span class="strip-label">Farm Help</span>
+          <span class="strip-value text-truncate" [matTooltip]="selectedMaintainer()?.name || farmForm.get('farmMaintainerId')?.value || 'None Assigned'">
+            {{ selectedMaintainer()?.name || farmForm.get('farmMaintainerId')?.value || 'None' }}
+          </span>
+        </div>
+      </div> -->
+
+      <div class="strip-item">
+        <mat-icon class="strip-icon">landscape</mat-icon>
+        <div class="strip-text">
+          <span class="strip-label">Shade-Net Area</span>
+          <span class="strip-value">{{ farmForm.get('shadeNetArea')?.value || 0 }} sq.mt</span>
+        </div>
+      </div>
+
+      <div class="strip-item">
+        <mat-icon class="strip-icon">solar_power</mat-icon>
+        <div class="strip-text">
+          <span class="strip-label">Solar Power</span>
+          <span class="strip-badge" [class.badge-active]="farmForm.get('isSolarPowerAvailable')?.value">
+            {{ farmForm.get('isSolarPowerAvailable')?.value ? 'Available' : 'Unavailable' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="details-grid">
+      <!-- Section 1: Basic Information -->
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-title">
+            <mat-icon class="section-icon">info</mat-icon>
+            <h2>Basic Information</h2>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="card-body form-row-2">
+          <mat-form-field appearance="outline" class="form-field full-span">
+            <mat-label>Farm Name</mat-label>
+            <input matInput formControlName="farmName" placeholder="Enter farm name" required />
+            <mat-icon matSuffix>edit</mat-icon>
+            <mat-error *ngIf="farmForm.get('farmName')?.hasError('required')">Farm Name is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field" [class.full-span]="!isKarnataka()">
+            <mat-label>Survey Number</mat-label>
+            <input matInput formControlName="surveyNumber" placeholder="Survey Number" />
+            <mat-icon matSuffix>pin</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field" *ngIf="isKarnataka()">
+            <mat-label>Hissa Number</mat-label>
+            <input matInput formControlName="hissa" placeholder="Hissa" />
+            <mat-icon matSuffix>bookmark_border</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Section 2: Farm Ownership & Assigned Personnel -->
+      <div class="details-card personnel-card">
+        <div class="card-header">
+          <div class="card-title">
+            <mat-icon class="section-icon personnel-icon">badge</mat-icon>
+            <h2>Farm Ownership & Personnel</h2>
+          </div>
+          <span class="badge-role">Owner & Help</span>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="card-body personnel-body">
+          <!-- Farm Owner Slot -->
+          <div class="personnel-slot owner-slot">
+            <div class="slot-header">
+              <div class="slot-title">
+                <mat-icon class="slot-icon owner-accent">account_circle</mat-icon>
+                <div>
+                  <span class="slot-name">Farm Owner</span>
+                  <span class="slot-required">* Required</span>
+                </div>
+              </div>
+              <button type="button" mat-stroked-button color="primary" class="btn-change-personnel"
+                (click)="openOwnerSearchDialog()">
+                <mat-icon>search</mat-icon>
+                Change Owner
+              </button>
+            </div>
+
+            <!-- Owner details display -->
+            <div class="entity-display-card" [class.has-entity]="selectedOwner() || farmForm.get('farmOwnerId')?.value">
+              <div class="entity-avatar owner-avatar">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="entity-meta">
+                <div class="entity-name-row">
+                  <span class="entity-full-name">
+                    {{ selectedOwner()?.name || (farmForm.get('farmOwnerId')?.value ? 'Owner (' +
+                    farmForm.get('farmOwnerId')?.value + ')' : 'No Owner Selected') }}
+                  </span>
+                  <span *ngIf="isLoadingOwner()" class="resolving-pill">
+                    <mat-progress-spinner diameter="12" mode="indeterminate"></mat-progress-spinner>
+                    Looking up...
+                  </span>
+                </div>
+                <div class="entity-sub-details">
+                  <span class="entity-badge">
+                    <mat-icon class="badge-icon">fingerprint</mat-icon>
+                    ID: {{ farmForm.get('farmOwnerId')?.value || 'Not Set' }}
+                  </span>
+                  <span *ngIf="selectedOwner()?.contactNumber" class="entity-badge contact-badge">
+                    <mat-icon class="badge-icon">phone</mat-icon>
+                    {{ selectedOwner()?.contactNumber }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Owner ID Input with Search Trigger -->
+            <mat-form-field appearance="outline" class="form-field full-span personnel-input">
+              <mat-label>Owner ID</mat-label>
+              <input matInput formControlName="farmOwnerId" placeholder="Enter Owner ID or search"
+                (blur)="onOwnerIdInputBlur()" required />
+              <button mat-icon-button matSuffix type="button" (click)="openOwnerSearchDialog()"
+                matTooltip="Search Farm Owners">
+                <mat-icon color="primary">search</mat-icon>
+              </button>
+              <mat-error *ngIf="farmForm.get('farmOwnerId')?.hasError('required')">Farm Owner is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <mat-divider class="slot-divider"></mat-divider>
+
+          <!-- Farm Help / Maintainer Slot -->
+          <div class="personnel-slot maintainer-slot">
+            <div class="slot-header">
+              <div class="slot-title">
+                <mat-icon class="slot-icon maintainer-accent">support_agent</mat-icon>
+                <div>
+                  <span class="slot-name">Farm Help / Maintainer</span>
+                  <span class="slot-optional">Optional</span>
+                </div>
+              </div>
+              <div class="slot-actions">
+                <button type="button" mat-stroked-button color="primary" class="btn-change-personnel"
+                  (click)="openMaintainerSearchDialog()">
+                  <mat-icon>{{ farmForm.get('farmMaintainerId')?.value ? 'swap_horiz' : 'person_add' }}</mat-icon>
+                  {{ farmForm.get('farmMaintainerId')?.value ? 'Change Help' : 'Assign Help' }}
+                </button>
+                <button *ngIf="farmForm.get('farmMaintainerId')?.value" type="button" mat-icon-button color="warn"
+                  (click)="clearMaintainer()" matTooltip="Remove Farm Help">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Maintainer details display -->
+            <div class="entity-display-card"
+              [class.has-entity]="selectedMaintainer() || farmForm.get('farmMaintainerId')?.value"
+              [class.empty-entity]="!farmForm.get('farmMaintainerId')?.value">
+              <div class="entity-avatar maintainer-avatar">
+                <mat-icon>{{ farmForm.get('farmMaintainerId')?.value ? 'engineering' : 'person_off' }}</mat-icon>
+              </div>
+              <div class="entity-meta">
+                <div class="entity-name-row">
+                  <span class="entity-full-name">
+                    {{ selectedMaintainer()?.name || (farmForm.get('farmMaintainerId')?.value ? 'Farm Help (' +
+                    farmForm.get('farmMaintainerId')?.value + ')' : 'No Farm Help Assigned') }}
+                  </span>
+                  <span *ngIf="isLoadingMaintainer()" class="resolving-pill">
+                    <mat-progress-spinner diameter="12" mode="indeterminate"></mat-progress-spinner>
+                    Looking up...
+                  </span>
+                </div>
+                <div class="entity-sub-details" *ngIf="farmForm.get('farmMaintainerId')?.value">
+                  <span class="entity-badge">
+                    <mat-icon class="badge-icon">fingerprint</mat-icon>
+                    ID: {{ farmForm.get('farmMaintainerId')?.value }}
+                  </span>
+                  <span *ngIf="selectedMaintainer()?.contactNumber" class="entity-badge contact-badge">
+                    <mat-icon class="badge-icon">phone</mat-icon>
+                    {{ selectedMaintainer()?.contactNumber }}
+                  </span>
+                </div>
+                <div class="entity-hint" *ngIf="!farmForm.get('farmMaintainerId')?.value">
+                  Assign a farm help to manage crop activities and alerts.
+                </div>
+              </div>
+            </div>
+
+            <!-- Maintainer ID Input with Search & Clear Trigger -->
+            <mat-form-field appearance="outline" class="form-field full-span personnel-input">
+              <mat-label>Farm Help / Maintainer ID (Optional)</mat-label>
+              <input matInput formControlName="farmMaintainerId" placeholder="Enter Maintainer ID or search"
+                (blur)="onMaintainerIdInputBlur()" />
+              <button mat-icon-button matSuffix type="button" (click)="openMaintainerSearchDialog()"
+                matTooltip="Search Farm Help">
+                <mat-icon color="primary">search</mat-icon>
+              </button>
+              <button *ngIf="farmForm.get('farmMaintainerId')?.value" mat-icon-button matSuffix type="button"
+                (click)="clearMaintainer()" matTooltip="Clear Maintainer">
+                <mat-icon color="warn">close</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Address & Location Details -->
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-title">
+            <mat-icon class="section-icon">place</mat-icon>
+            <h2>Address & Geographical Details</h2>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="card-body form-row-2">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Pincode</mat-label>
+            <input matInput formControlName="pincode" placeholder="6-digit pincode" maxlength="6" />
+            <mat-icon matSuffix>local_post_office</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>State</mat-label>
+            <mat-select formControlName="state">
+              <mat-option value="">Select State</mat-option>
+              <mat-option *ngFor="let s of states()" [value]="s.stateName">{{ s.stateName }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>District</mat-label>
+            <input matInput formControlName="district" placeholder="District name" />
+          </mat-form-field>
+
+          <!-- Karnataka Specific Fields -->
+          <ng-container *ngIf="isKarnataka()">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Taluka</mat-label>
+              <input matInput formControlName="taluka" placeholder="Taluka" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Hobli</mat-label>
+              <input matInput formControlName="hobli" placeholder="Hobli" />
+            </mat-form-field>
+          </ng-container>
+
+          <!-- Other States Specific Fields -->
+          <ng-container *ngIf="!isKarnataka()">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Sub-District</mat-label>
+              <input matInput formControlName="subDistrict" placeholder="Sub-district" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field full-span">
+              <mat-label>Address Line</mat-label>
+              <input matInput formControlName="addressLine" placeholder="Street / Door / Area details" />
+            </mat-form-field>
+          </ng-container>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Village</mat-label>
+            <input matInput formControlName="village" placeholder="Village" />
+          </mat-form-field>
+
+          <!-- Coordinates -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Latitude</mat-label>
+            <input matInput type="number" formControlName="latitude" placeholder="e.g. 17.3297" step="any" />
+            <mat-icon matSuffix>explore</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Longitude</mat-label>
+            <input matInput type="number" formControlName="longitude" placeholder="e.g. 76.8343" step="any" />
+            <mat-icon matSuffix>explore</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Section 3: Infrastructure & Facilities -->
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-title">
+            <mat-icon class="section-icon">domain</mat-icon>
+            <h2>Infrastructure & Facilities</h2>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="card-body form-row-2">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Shade-Net Area (sq. mt)</mat-label>
+            <input matInput type="number" formControlName="shadeNetArea" required min="0" />
+            <mat-icon matSuffix>grid_view</mat-icon>
+            <mat-error *ngIf="farmForm.get('shadeNetArea')?.hasError('required')">Shade-net area is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Farm Pond Volume (cu. mt)</mat-label>
+            <input matInput type="number" formControlName="farmPondVolume" required min="0" />
+            <mat-icon matSuffix>water_drop</mat-icon>
+            <mat-error *ngIf="farmForm.get('farmPondVolume')?.hasError('required')">Pond volume is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Automation Room Size (sq. ft)</mat-label>
+            <input matInput type="number" formControlName="automationRoomSize" required min="0" />
+            <mat-icon matSuffix>meeting_room</mat-icon>
+            <mat-error *ngIf="farmForm.get('automationRoomSize')?.hasError('required')">Room size is
+              required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Storage Area Note</mat-label>
+            <input matInput formControlName="storageAreaNote" placeholder="Storage area specifications / notes" />
+            <mat-icon matSuffix>notes</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Section 4: Power & Water Management -->
+      <div class="details-card">
+        <div class="card-header">
+          <div class="card-title">
+            <mat-icon class="section-icon">bolt</mat-icon>
+            <h2>Power & Water Management</h2>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="card-body form-row-2">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Motor Capacity</mat-label>
+            <mat-select formControlName="motorCapacity">
+              <mat-option value="5.5 HP">5.5 HP</mat-option>
+              <mat-option value="7.5 HP">7.5 HP</mat-option>
+              <mat-option value="10 HP">10 HP</mat-option>
+              <mat-option value="12.5 HP">12.5 HP</mat-option>
+              <mat-option value="15 HP">15 HP</mat-option>
+            </mat-select>
+            <mat-icon matSuffix>speed</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Additional Water Source</mat-label>
+            <input matInput formControlName="additionalWaterSource" placeholder="e.g. Borewell, Canal, River" />
+            <mat-icon matSuffix>waves</mat-icon>
+          </mat-form-field>
+
+          <div class="toggle-option-card">
+            <span class="toggle-label">Solar Power Availability</span>
+            <mat-radio-group formControlName="isSolarPowerAvailable" class="radio-inline">
+              <mat-radio-button [value]="true" color="primary">Available (Yes)</mat-radio-button>
+              <mat-radio-button [value]="false" color="primary">No Solar</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <div class="toggle-option-card">
+            <span class="toggle-label">Grid Power Phase Types</span>
+            <div class="phase-toggles">
+              <mat-slide-toggle formControlName="isSinglePhasePower" color="primary">Single Phase</mat-slide-toggle>
+              <mat-slide-toggle formControlName="isThreePhasePower" color="primary">Three Phase</mat-slide-toggle>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Certificates & Documents -->
+      <div class="details-card certificate-card full-span">
+        <div class="card-header">
+          <div class="card-title">
+            <mat-icon class="section-icon">verified_user</mat-icon>
+            <h2>Water Test Certificate & Documents</h2>
+          </div>
+          <button type="button" mat-stroked-button color="primary"
+            (click)="showUploadSection.set(!showUploadSection())">
+            <mat-icon>{{ showUploadSection() ? 'close' : 'cloud_upload' }}</mat-icon>
+            {{ showUploadSection() ? 'Cancel Upload' : 'Upload Certificate' }}
+          </button>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="card-body">
+          <!-- Existing Certificate Display -->
+          <div *ngIf="farmForm.get('waterTestCertificateUrl')?.value" class="existing-certificate-box">
+            <div class="cert-info">
+              <mat-icon class="cert-file-icon">description</mat-icon>
+              <div class="cert-meta">
+                <span class="cert-title">Attached Water Test Certificate</span>
+                <span class="cert-filename">{{ getCertificateFileName(farmForm.get('waterTestCertificateUrl')?.value)
+                  }}</span>
+              </div>
+            </div>
+
+            <div class="cert-actions">
+              <button type="button" mat-raised-button color="accent" (click)="viewCertificate()">
+                <mat-icon>visibility</mat-icon>
+                Download
+              </button>
+              <button type="button" mat-stroked-button color="warn" (click)="removeCertificate()">
+                <mat-icon>delete_outline</mat-icon>
+                Remove
+              </button>
+            </div>
+          </div>
+
+          <!-- Empty Certificate Notice -->
+          <div *ngIf="!farmForm.get('waterTestCertificateUrl')?.value" class="no-certificate-box">
+            <mat-icon class="no-cert-icon">info_outline</mat-icon>
+            <p>No water test certificate attached to this farm registration.</p>
+          </div>
+
+          <!-- Upload Dropzone (when toggled) -->
+          <div *ngIf="showUploadSection()" class="certificate-upload-section">
+            <div class="upload-heading">
+              <h4>Upload New or Replacement Water Test Certificate</h4>
+              <p>Supported file formats: PDF, PNG, JPG, JPEG, WEBM. The certificate will be linked once saved.</p>
+            </div>
+            <app-file-upload (fileUploaded)="handleCertificateUploaded($event)"></app-file-upload>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky / Bottom Action Bar -->
+    <div class="actions-bar">
+      <div class="actions-info">
+        <mat-icon class="save-status-icon">check_circle_outline</mat-icon>
+        <span>Changes made here will be applied directly to the farm registration record.</span>
+      </div>
+      <div class="actions-buttons">
+        <button type="button" mat-stroked-button (click)="resetForm()" [disabled]="isSaving()">
+          <mat-icon>undo</mat-icon>
+          Discard Changes
+        </button>
+        <button type="submit" mat-raised-button color="primary" [disabled]="farmForm.invalid || isSaving()"
+          class="btn-save">
+          <mat-icon *ngIf="!isSaving()">save</mat-icon>
+          <mat-progress-spinner *ngIf="isSaving()" diameter="18" mode="indeterminate"
+            class="save-spinner"></mat-progress-spinner>
+          {{ isSaving() ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

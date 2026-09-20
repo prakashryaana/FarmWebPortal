@@ -228,7 +228,27 @@
           <h3 class="section-title">Document Upload</h3>
           <div class="upload-container">
             <label for="Water-test-certificate" class="upload-label">Water Test Certificate (Optional)</label>
-            <app-file-upload id="Water-test-certificate" (fileUploaded)="handleFileUploaded($event)"></app-file-upload>
+
+            <!-- Attached Certificate State -->
+            <div *ngIf="farmRegistrationForm.get('waterTestCertificateUrl')?.value" class="cert-attached-box">
+              <div class="cert-attached-info">
+                <mat-icon class="cert-success-icon">task_alt</mat-icon>
+                <div class="cert-meta">
+                  <span class="cert-title">Certificate Uploaded & Attached</span>
+                  <span class="cert-filename">{{ getCertificateFileName(farmRegistrationForm.get('waterTestCertificateUrl')?.value) }}</span>
+                </div>
+              </div>
+              <button mat-stroked-button color="warn" type="button" (click)="removeCertificate()" class="btn-remove-cert">
+                <mat-icon>delete_outline</mat-icon>
+                Remove
+              </button>
+            </div>
+
+            <!-- Upload Component State -->
+            <div *ngIf="!farmRegistrationForm.get('waterTestCertificateUrl')?.value">
+              <app-file-upload id="Water-test-certificate" [autoUpload]="true" (fileUploaded)="handleFileUploaded($event)"></app-file-upload>
+              <p class="upload-hint">Supported formats: PDF, PNG, JPG, JPEG. Select a file to upload automatically.</p>
+            </div>
           </div>
         </div>
 

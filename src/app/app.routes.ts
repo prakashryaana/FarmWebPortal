@@ -26,10 +26,13 @@ import { FertilizerMasterComponent } from './master/fertilizer-master/fertilizer
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { roleGuard } from './role-guard';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
+import { FarmDetailsComponent } from './farm-details/farm-details.component';
 
 
 export const routes: Routes = [
     { path: 'farm-registration', component: FarmRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], hideCropFarmSelector: true } }
+    , { path: 'farm-details', component: FarmDetailsComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], hideCropFarmSelector: true } }
+    , { path: 'farm-details/:farmId', component: FarmDetailsComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], hideCropFarmSelector: true } }
     , { path: 'farm-owner-registration', component: FarmOwnerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], hideCropFarmSelector: true } }
     //,{ path: 'maintainer-registration/:farmId', component: MaintainerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'] } }
     , { path: 'maintainer-registration', component: MaintainerRegistrationComponent, canActivate: [authGuard, roleGuard], data: { roles: ['EASYGROWADMIN'], hideCropFarmSelector: true } }

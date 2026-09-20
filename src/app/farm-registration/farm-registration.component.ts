@@ -376,6 +376,7 @@ export class FarmRegistrationComponent {
         motorCapacity: this.farmRegistrationForm.get('motorCapacity')?.value,
         additionalWaterSource: this.farmRegistrationForm.get('additionalWaterSource')?.value,
         waterTestCertificateUrl: this.farmRegistrationForm.get('waterTestCertificateUrl')?.value,
+        waterTestCertificate: this.farmRegistrationForm.get('waterTestCertificateUrl')?.value,
         isSinglePhasePower: Boolean(this.farmRegistrationForm.get('isSinglePhasePower')?.value ?? undefined),
         isThreePhasePower: Boolean(this.farmRegistrationForm.get('isThreePhasePower')?.value ?? undefined),
         //gridPowerUnAvailability: this.gridPowerSchedule,
@@ -464,16 +465,74 @@ export class FarmRegistrationComponent {
     this.gridPowerForm.reset({ applyAllDays: false, selectedDay: '', timeRanges: [{ fromTime: '', toTime: '' }] });
   }
 
-  onFileChange(event: any) {
-    const file = event.target.files[0];
-    console.log('Selected file:', file);
-    // You can implement file upload logic here
+  extractCertificateUrl(data: any): string {
+    if (!data) return '';
+    if (typeof data === 'string') return data.trim();
+
+    const keysToCheck = [
+      'waterTestCertificateUrl',
+      'WaterTestCertificateUrl',
+      'waterTestCertificate',
+      'WaterTestCertificate',
+      'fullPath',
+      'FullPath',
+      'filePath',
+      'FilePath',
+      'fileName',
+      'FileName',
+      'path',
+      'Path',
+      'url',
+      'Url'
+    ];
+
+    for (const key of keysToCheck) {
+      if (data[key] && typeof data[key] === 'string' && data[key].trim() !== '') {
+        return data[key].trim();
+      }
+    }
+
+    if (data.data && typeof data.data === 'object') {
+      const nested = this.extractCertificateUrl(data.data);
+      if (nested) return nested;
+    }
+
+    for (const key of Object.keys(data)) {
+      const lowerKey = key.toLowerCase();
+      if (
+        (lowerKey.includes('certificate') || lowerKey.includes('watertest') || lowerKey.includes('path') || lowerKey.includes('file')) &&
+        typeof data[key] === 'string' &&
+        data[key].trim() !== ''
+      ) {
+        return data[key].trim();
+      }
+    }
+
+    return '';
+  }
+
+  getCertificateFileName(url: string | null | undefined): string {
+    if (!url) return '';
+    const parts = url.split(/[\\\/]/);
+    return parts[parts.length - 1] || url;
   }
 
   handleFileUploaded(data: any): void {
     console.log('File uploaded successfully in farm component!', data);
-    this.isFileUploaded = true;
-    this.farmRegistrationForm.get('waterTestCertificateUrl')?.setValue(data.fullPath);
-    // Process the uploaded file data received from the file-upload component
+    const uploadedPath = this.extractCertificateUrl(data);
+    if (uploadedPath) {
+      this.isFileUploaded = true;
+      this.farmRegistrationForm.get('waterTestCertificateUrl')?.setValue(uploadedPath);
+      this.snackBar.open('Water test certificate uploaded successfully!', 'Close', { duration: 3000 });
+    } else {
+      console.warn('Could not extract file path from upload response:', data);
+      this.snackBar.open('Uploaded, but could not determine file path', 'Close', { duration: 4000 });
+    }
+  }
+
+  removeCertificate(): void {
+    this.farmRegistrationForm.get('waterTestCertificateUrl')?.setValue('');
+    this.isFileUploaded = false;
+    this.snackBar.open('Certificate removed from registration form', 'Close', { duration: 2500 });
   }
 }

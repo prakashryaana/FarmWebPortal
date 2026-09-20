@@ -87,6 +87,7 @@ export class SidebarComponent {
         { label: 'navigation.farmOwnerRegistration', route: '/farm-owner-registration', icon: 'person_add' },
         { label: 'navigation.farmHelpRegistration', route: '/maintainer-registration', icon: 'person_add' },
         { label: 'navigation.farmRegistration', route: '/farm-registration', icon: 'agriculture' },
+        { label: 'navigation.farmDetails', route: '/farm-details', icon: 'info' },
         { label: 'navigation.setupCrop', route: '/crop-registration', icon: 'grass' },
         { label: 'actions.addAction', route: '/add-actions', icon: 'add_circle' },
         { label: 'actions.viewActions', route: '/view-actions', icon: 'list' },
